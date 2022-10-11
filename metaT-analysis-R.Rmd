@@ -1,0 +1,96 @@
+---
+title: "Metatranscriptome data analysis"
+author: "Sarah Hu"
+date: "9/1/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Import metatranscriptome R data objects
+
+Should have normalized to whole community and then normalized to key taxonomic groups. 
+Import a taxa ID and functional ID for each unique contig ID
+
+# Taxonomic composition & distribution
+
+Evaluate taxonomic diversity and composition across all sites.
+
+## Taxonomic level curation and estimate relative abundance
+1) Use normalized TPM (?) to whole community data.
+2) taxa curation
+3) Average across replicates (or how should replicates be considered)
+4) Sum to each sample
+
+## Taxonomy bar plot
+5) bar plot of relative TPM? CPM? for major taxnomic groups
+Keep ALOHA July and April separate, ALOHA on the left side and on the right side, all CA sites.
+Also place "sun" emoji for samples that are within the euphotic zone
+
+
+
+# Whole community functional profile
+
+Prepare data ahead of time. Use normalization to the whole community.
+Include functional modules that were curated for this work.
+
+> What percentage of the data are represented when we only look at the curated data?
+
+Change input data to all numeric for downstream transformations, etc.
+
+1) all data, change zeros to 1 (or to below the lowest value)
+
+2) all data, remove NAs and zeros. Only represent proteins that appear in all samples
+
+3) Subset to only those protein IDs of interest (get stats on what this is)
+Make sure to retain module information in definiation. 
+3.1) change zeroes to 1 (or lowest)
+3.2) remove NAs
+
+## PCoA with whole community functional profile
+
+### Does PCoA change when only taxonomic information is input?
+(supplementary)
+
+## Define each site by module
+(k-means?)
+
+# Transcriptional profiles for taxonomic groups
+(supplementary?)
+Normalized by individual taxonomic groups.
+
+## PCoA with curated functional profiles and known taxonomic IDs.
+(subset this way to increase confidence?)
+
+### Heterotrophy
+
+Isolate and sum to pathways associated with heterotrophy. Gene level is likely too much. Determine for each 
+
+> How varied are the transcriptional signatures related to heterotrophy among protists?
+
+Use flag/half square heatmap, where top half shows the percent number of genes and bottom half shows the TPM summary. 
+
+### N & P metabolism
+
+Isolate at individual gene level for N & P pathways. Show TPM across sites and core taxa
+
+> For ecologically-important phytoplankton at ALOHA and coastal CA, what is the relative importance of nutrient profiles? nutrient utilization?
+
+Plot heat map for each taxa. Show all N and P relevant genes on the x axis and y axis should have all samples. 
+
+### Determine statistical significance
+Estimate statistical significance for N&P genes, pairwise comparisons. Then add a column for each gene ID that lists the number of samples that are statistically different. 
+
+
+
+# Functional redundancy
+
+Input data is all normalized. Then perform pairwise Jaccard dissimilarity with taxa and then with KEGG/pfam IDs - plot as x/y
+
+# Session info
+```{r}
+sessionInfo()
+```
+
