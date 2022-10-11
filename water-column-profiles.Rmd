@@ -1,0 +1,54 @@
+---
+title: "Water column profiles"
+author: "Sarah Hu"
+date: "2022-10-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Import metadata & combine
+
+```{r, message=FALSE}
+library(tidyverse)
+```
+
+```{r}
+tmp_all_metadata <- read.csv("input-data/All_metadata.csv")
+# colnames(tmp_all_metadata)
+july <- read.delim("input-data/flor_env_ALOHAJuly_SPOT.txt")
+march <- read.delim("input-data/flour_ALOHAMarch.txt")
+```
+
+```{r}
+# head(july)
+# head(march)
+fluor <- july %>% 
+  left_join(march) %>% 
+  pivot_longer(cols = SPOT:ALOHAMarch, names_to = "Site", values_to = "Fluor")
+
+metadata_all <- tmp_all_metadata %>% 
+  select(-X) %>% 
+  left_join(fluor)
+
+```
+Isolate specific depths
+```{r}
+spot<-c(1,150,885)
+spotsite<-c("SPOT", "Catalina", "PortofLA")
+aloha<-c(1,120,150,1000)
+
+pt_depth <- metadata_all %>% 
+  filter(Site %in% spotsite & Depth %in% spot | Site == "ALOHA" & Depth %in% aloha) %>% 
+  add_column(Label = "discrete")
+pt_depth
+```
+
+```{r}
+metadata_all %>% 
+  ggplot()
+```
+
