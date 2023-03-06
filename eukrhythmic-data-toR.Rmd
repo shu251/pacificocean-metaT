@@ -11,5 +11,21 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Import data from eukrhythmic
 
-Output file list:
-1. 
+Explanation of output data from eukrhythmic
+
+-   00-nucleotide_assembly:
+    -   MAD.filtered.nospace.fasta: Full length sequences of merged assembly groups (MAD) that have been de-duplicated
+    
+-   01-predicted_proteins:
+    -   MAD.fasta.transdecoder.cds: Identified coding regions of transcripts from the Merged assembly groups (MAD)
+    -   MAD.fasta.transdecoder.pep: Translated peptide sequences from the Merged assembly groups (MAD)
+    
+-   02-annotation_table:
+    -   SeqID_Dict.csv: Original sequence names (MAD-based) that originate from rnaspades, megahit merged/deduplicates and the associated **ShortSeqID** that is found in the other annotation outputs.
+    -   TaxonomicAndFunctionalAnnotations.csv: Taxonomic levels, GOs, PFAMs, and KEGG KOs - assigned by short seq ID and the full sequence ID.
+    
+-   03-abundance_tables:
+    -   ReadTable_ByContig.csv: Matrix where row names indicate the ShortSeqID, and column headers are the sample IDs. Counts equal raw counts.
+    -   SeqID_Dict.csv: same as above.
+    -   TPMTable_ByContig.csv: Matrix where row names indicate ShortSeqID and column headers are sample IDs. Counts equate to TPM.
+
