@@ -14,13 +14,15 @@ knitr::opts_chunk$set(echo = TRUE)
 Should have normalized to whole community and then normalized to key taxonomic groups. 
 Import a taxa ID and functional ID for each unique contig ID
 
+From eukrhythmic, worked to compile all data via SQL database.
+
 # Taxonomic composition & distribution
 
 Evaluate taxonomic diversity and composition across all sites.
 
 ## Taxonomic level curation and estimate relative abundance
-1) Use normalized TPM (?) to whole community data.
-2) taxa curation
+
+Raxa curation
 3) Average across replicates (or how should replicates be considered)
 4) Sum to each sample
 

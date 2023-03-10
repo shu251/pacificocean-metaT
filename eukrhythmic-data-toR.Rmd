@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 ```
 
 # Import data from eukrhythmic
@@ -28,4 +28,284 @@ Explanation of output data from eukrhythmic
     -   ReadTable_ByContig.csv: Matrix where row names indicate the ShortSeqID, and column headers are the sample IDs. Counts equal raw counts.
     -   SeqID_Dict.csv: same as above.
     -   TPMTable_ByContig.csv: Matrix where row names indicate ShortSeqID and column headers are sample IDs. Counts equate to TPM.
+
+# Create SQL database with metatranscriptome data
+
+```
+module load GCCcore/12.2.0 
+module load SQLite/3.39.4 
+module load Python/3.10.8
+
+module load GCC/11.2.0
+module load OpenMPI/4.1.1
+module load pandas/1.4.0-Python-3.9.6
+```
+
+In python (`python`):
+```
+# Import required libraries
+import sqlite3
+import pandas as pd
+
+conn = sqlite3.connect('/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db')
+
+tpm_data = pd.read_csv('/scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig.csv')
+
+
+## Set tpm_data object to SQL:
+# tpm_data.to_sql, table name = "TPM", conn = sqlite db, if exists replace and do not index
+
+tpm_data.to_sql('TPM',conn, if_exists='replace',index=False)
+
+
+# Add metadata
+
+metadata = pd.read_csv('/home/skhu/pacificocean-metaT/input-data/complete-sample-list.txt')
+metadata.to_sql('metadata', conn, if_exists='replace', index=False)
+
+
+# Add annotation data
+taxfxn = pd.read_csv('/scratch/user/skhu/SPOT-ALOHA/02-annotation_table/TaxonomicAndFunctionalAnnotations.csv')
+taxfxn.to_sql('annot', conn, if_exists='replace', index=False)
+
+conn.close()
+
+```
+Resources:
+* https://datacarpentry.org/R-ecology-lesson/05-r-and-databases.html
+* https://www.geeksforgeeks.org/creating-a-sqlite-database-from-csv-with-python/
+* https://mungingdata.com/sqlite/create-database-load-csv-python/
+
+
+# Work with SQL database via tidyverse
+
+```{r}
+# install.packages("RSQLite")
+library(tidyverse);library(dbplyr);library(RSQLite)  
+```
+
+Import and query databases.
+```{r}
+metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
+
+# tbls listed.
+src_dbi(metat)
+
+## Example output:
+### tbls: TPM, metadata, annot
+```
+
+Interpret as R objects.
+```{r}
+metadata <- tbl(metat, "metadata")
+tpm <- tbl(metat, "TPM")
+annot <- tbl(metat, "annot")
+
+names(metadata)
+```
+
+Column "RUN" in metadata is associated with the column headers in TPM.
+
+
+# Isolate taxonomy and functional keys
+
+See Rscript `summary-sql.r`
+```{r}
+# Create unique taxa key, for downstream taxonomic plots
+tax_key <- annot %>% 
+  # select(Domain:Species) %>% 
+  select(Domain:Supergroup) %>% 
+  distinct()
+
+class(tax_key)
+
+tax_df <- tax_key %>% collect() #Use collect to actually SAVE sql db steps as a dataframe.
+class(tax_df)
+### Then I can take this in R locally and work on the taxa naming and cleaning up the taxonomic names     
+
+fxn_key <- annot %>%
+  select(PFAMs, KEGG_ko, GOs) %>% 
+  distinct()
+
+fxn_df <- fxn_key %>% collect()
+
+cat("taxonomy key consists of:\n")
+dim(tax_key)
+dim(tax_df)
+
+cat("annotation key consists of:\n")
+dim(fxn_key)
+dim(fxn_df)
+
+save(fxn_df, tax_df, file = "/scratch/user/skhu/SPOT-ALOHA/tax_annot_key_DFs.RData")
+```
+
+
+# Create matrix for estimating across replicates.
+
+Connect and define SQL database
+```{r}
+library(tidyverse);library(dbplyr);library(RSQLite) 
+metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
+metadata <- tbl(metat, "metadata")
+tpm <- tbl(metat, "TPM")
+annot <- tbl(metat, "annot")
+```
+
+Start with all TPMs, pivot longer. `tpm-avg-sql.r`
+```{r}
+library(tidyverse);library(dbplyr);library(RSQLite)  
+
+metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
+metadata <- tbl(metat, "metadata")
+tpm <- tbl(metat, "TPM")
+annot <- tbl(metat, "annot")
+
+
+tpm_sumreps <- tpm %>% 
+  select(ShortSeqID, starts_with("SRR")) %>%
+  pivot_longer(cols = starts_with("SRR"), names_to = "SRR_SAMPLEID", values_to = "TPM") %>% 
+  filter(TPM > 0) %>% 
+  left_join(metadata %>% select(SRR_SAMPLEID = RUN, DATE,SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH)) %>% 
+  group_by(ShortSeqID, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY, REGION,PACIFIC_REGION,MONTH) %>% 
+    summarise(MEAN_TPM = mean(TPM))
+
+class(tpm_sumreps)
+dim(tpm_sumreps)
+
+cat("start collect\n")
+#tpm_df <- tpm_sumreps %>% collect()
+
+tpm_annot <- tpm_sumreps %>% 
+  left_join(annot)
+
+tpm_annot_df <- tpm_annot %>% collect()
+
+cat("collect complete\n\n")
+
+dim(tpm_annot_df)
+
+save(tpm_annot_df, file = "/scratch/user/skhu/SPOT-ALOHA/Avg_tpm_acrossreps_annot.RData")
+```
+
+# Stats on metatranscriptome run
+
+## Annotated vs. unannotated
+
+Average TPM, include annotations, and then subset to look at a high level.
+```{r}
+library(tidyverse);library(dbplyr);library(RSQLite)  
+metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
+metadata <- tbl(metat, "metadata")
+tpm <- tbl(metat, "TPM")
+annot <- tbl(metat, "annot")
+
+tpm_wfxnwtax <- tpm %>% 
+  select(ShortSeqID, starts_with("SRR")) %>%
+  pivot_longer(cols = starts_with("SRR"), names_to = "SRR_SAMPLEID", values_to = "TPM") %>% 
+  filter(TPM > 0) %>% 
+  left_join(metadata %>% select(SRR_SAMPLEID = RUN, DATE,SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH)) %>% 
+  group_by(ShortSeqID, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY, REGION,PACIFIC_REGION,MONTH) %>% 
+    summarise(MEAN_TPM = mean(TPM)) %>% 
+  left_join(annot)
+
+tpm_annot_stats <- tpm_annot %>% 
+  group_by(SAMPLENAME, Domain, PFAMs, KEGG_ko) %>% 
+    summarize(SUM_STATS = sum(MEAN_TPM),
+              COUNT_STATS = n())
+
+cat("start collect\n")
+tpm_annot_stats_df <- tpm_annot_stats %>% collect()
+cat("collect complete\n\n")
+
+save(tpm_annot_stats_df, file = "/scratch/user/skhu/SPOT-ALOHA/AnnotationStats.RData")
+```
+
+Bring locally
+```{r}
+load("input-data/AnnotationStats.RData")
+```
+
+```{r}
+# Get totals for annotated vs unannotated
+data.frame(tpm_annot_stats_df) %>% 
+  
+# What is TPM total for Domain level? what is total number of annotated transcripts?
+# What is TPM total for some kind of fxn annotation? How about only KEGGs?
+# What is TPM total and counts for transcripts with both TAX and FXN annotation?
+```
+
+## Curate taxonomic information
+
+```{r}
+load("input-data/tax_annot_key_DFs.RData", verbose = TRUE)
+```
+
+In order to curate taxonomic output, use this approach:
+```{r}
+unique(tax_df$Domain)
+
+# Keep only Eukaryota
+t <- data.frame(tax_df) %>% 
+  mutate(COUNT = 1) %>% 
+  filter(Domain == "Eukaryota") %>% 
+  group_by( Supergroup,  Phylum) %>% 
+    summarise(SUM = sum(COUNT))
+# View(t)
+```
+
+
+From SQL TPM matrix with annotations. Create several outputs for Supergroup, Phylum, and Class levels
+```{r}
+library(tidyverse);library(dbplyr);library(RSQLite)  
+metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
+metadata <- tbl(metat, "metadata")
+tpm <- tbl(metat, "TPM")
+annot <- tbl(metat, "annot")
+
+tpm_wfxnwtax <- tpm %>% 
+  select(ShortSeqID, starts_with("SRR")) %>%
+  pivot_longer(cols = starts_with("SRR"), names_to = "SRR_SAMPLEID", values_to = "TPM") %>% 
+  filter(TPM > 0) %>% 
+  left_join(metadata %>% select(SRR_SAMPLEID = RUN, DATE,SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH)) %>% 
+  group_by(ShortSeqID, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY, REGION,PACIFIC_REGION,MONTH) %>% 
+    summarise(MEAN_TPM = mean(TPM)) %>% 
+  left_join(annot)
+
+# Supergroup
+tax_sql_super <- data.frame(tpm_wfxnwtax) %>% 
+filter(Domain == "Eukaryota") %>% 
+  group_by( Supergroup,  SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH) %>% 
+    summarise(SUM_TPM = sum(MEAN_TPM))
+cat("start collecting\n")
+tax_super_df <- tax_sql_super %>% collect()
+cat("finished\n\n")
+
+# Phylum
+tax_sql_phy <- data.frame(tpm_wfxnwtax) %>% 
+filter(Domain == "Eukaryota") %>% 
+  group_by( Supergroup,  Phylum, SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH) %>% 
+    summarise(SUM_TPM = sum(MEAN_TPM))
+cat("start collecting\n")
+tax_phy_df <- tax_sql_phy %>% collect()
+cat("finished\n\n")
+
+# Class
+tax_sql_class <- data.frame(tpm_annot_df) %>% 
+filter(Domain == "Eukaryota") %>% 
+  group_by( Supergroup,  Phylum,  Class, SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH) %>% 
+    summarise(SUM_TPM = sum(MEAN_TPM))
+cat("start collecting\n")
+tax_class_df <- tax_sql_class %>% collect()
+cat("finished\n\n")
+
+save(tax_super_df, tax_phy_df, tax_class_df, file = "/scratch/user/skhu/SPOT-ALOHA/taxonomic-summaries.RData")
+```
+
+
+
+
+```{r}
+
+```
 
