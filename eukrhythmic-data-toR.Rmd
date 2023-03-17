@@ -12,7 +12,6 @@ knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 # Import data from eukrhythmic
 
 Explanation of output data from eukrhythmic
-
 -   00-nucleotide_assembly:
     -   MAD.filtered.nospace.fasta: Full length sequences of merged assembly groups (MAD) that have been de-duplicated
     
@@ -96,8 +95,8 @@ library(tidyverse);library(dbplyr);library(RSQLite);library(multidplyr)
 Import and query databases.
 ```{r}
 # metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
-
-metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/toy-metat.db")
+metat <- DBI::dbConnect(RSQLite::SQLite(), "input-data//toy-metat.db")
+# metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/toy-metat.db")
 ```
 
 ```{r}
@@ -128,7 +127,7 @@ tmp_csv <- read.csv("input-data/All_metadata.csv")
 
 parallel::detectCores() 
 
-cluster <- new_cluster(2)
+cluster <- new_cluster(4)
 cluster
 
 # Examples of how long it takes without running in parallel vs. running in parallel
@@ -148,16 +147,24 @@ There are two ways to get data to the workers in cluster:
 
 See Rscript `summary-sql.r`
 ```{r}
+# head(annot)
 # Create unique taxa key, for downstream taxonomic plots
 tax_key <- annot %>% 
   # select(Domain:Species) %>% 
-  select(Domain:Supergroup) %>% 
+  select(Domain:Supergroup) %>%
+  filter(Domain != "Eukaryota") %>% 
   distinct()
 
 class(tax_key)
 
-tax_df <- tax_key %>% collect() #Use collect to actually SAVE sql db steps as a dataframe.
-class(tax_df)
+tax_df <- tax_key %>% 
+  collect() %>% 
+  partition(cluster) #Use collect to actually SAVE sql db steps as a dataframe.
+
+# class(tax_df)
+# head(tax_df)
+# out <- (data.frame(tax_df))
+# out
 ### Then I can take this in R locally and work on the taxa naming and cleaning up the taxonomic names     
 
 fxn_key <- annot %>%
