@@ -89,37 +89,34 @@ Resources:
 # install.packages("tidyverse")
 
 ## Issue with this install:
-install.packages("multidplyr", dependencies = TRUE)
+# install.packages("multidplyr", dependencies = TRUE)
 
 # Tried individual
-install.packages("Rcpp")
-install.packages("RcppParallel", dependencies = TRUE)
-install.packages("qs")
+# install.packages("Rcpp")
+# install.packages("RcppParallel", dependencies = TRUE)
+# install.packages("qs")
 
 # Tried from source
-install.packages("/scratch/user/skhu/R/library-4.0.3/RcppParallel_5.1.7.tar.gz", repos = NULL, type = "source")
-install.packages("/scratch/user/skhu/R/library-4.0.3/stringfish_0.15.7.tar.gz", repos = NULL, type = "source")
-install.packages("/scratch/user/skhu/R/library-4.0.3/qs_0.25.5.tar.gz", repos = NULL, type = "source")
-install.packages("/scratch/user/skhu/R/library-4.0.3/multidplyr_0.1.2.tar.gz", repos = NULL, type = "source")
+# install.packages("/scratch/user/skhu/R/library-4.0.3/RcppParallel_5.1.7.tar.gz", repos = NULL, type = "source")
+# install.packages("/scratch/user/skhu/R/library-4.0.3/stringfish_0.15.7.tar.gz", repos = NULL, type = "source")
+# install.packages("/scratch/user/skhu/R/library-4.0.3/qs_0.25.5.tar.gz", repos = NULL, type = "source")
+# install.packages("/scratch/user/skhu/R/library-4.0.3/multidplyr_0.1.2.tar.gz", repos = NULL, type = "source")
 
 # Tried from github
-devtools::install_github("tidyverse/multidplyr")
+# devtools::install_github("tidyverse/multidplyr")
 
+# Must install in this order
+library(multidplyr)
 library(tidyverse)
 library(dbplyr)
 library(RSQLite)
-library(multidplyr)
-```
-
-```{r}
-sessionInfo()
 ```
 
 Import and query databases.
 ```{r}
-# metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
+metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
 # metat <- DBI::dbConnect(RSQLite::SQLite(), "input-data//toy-metat.db")
-metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/")
+# metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/toy-metat.db")
 ```
 
 ```{r}
@@ -137,26 +134,38 @@ metadata <- tbl(metat, "metadata")
 tpm <- tbl(metat, "TPM")
 annot <- tbl(metat, "annot")
 
-names(metadata)
+# annot_df <- as.data.frame(annot) %>% partition(cluster = cluster)
+# annot_df <- as.data.frame(annot)
+# tmp_df <- as.data.frame(tpm)
+# metadata_df <- as.data.frame(metadata)
+# class(tpm_df)
 ```
 
 Column "RUN" in metadata is associated with the column headers in TPM.
 
 Set up run in parallel
 ```{r}
+# install.packages("nycflights13")
 library(nycflights13)
-tmp_csv <- read.csv("input-data/All_metadata.csv")
+# tmp_csv <- read.csv("input-data/All_metadata.csv")
 # head(tmp_csv)
 
 parallel::detectCores() 
 
-cluster <- new_cluster(4)
+cluster <- new_cluster(16)
 cluster
 
 # Examples of how long it takes without running in parallel vs. running in parallel
 system.time(flights %>% group_by(dest))
+
+flights_party <- flights %>% group_by(dest) %>% partition(cluster)
+
+system.time(re_group <- flights_party %>% collect())
+
 system.time(flights %>% group_by(dest) %>% partition(cluster))
 
+# tmp <- flights %>% partition(cluster)
+# tmp
 ```
 
 There are two ways to get data to the workers in cluster:
@@ -170,88 +179,43 @@ There are two ways to get data to the workers in cluster:
 
 See Rscript `summary-sql.r`
 ```{r}
-# head(annot)
+# tpm_party <- data.frame(tpm) %>% partition(cluster)
+# annot_party <- data.frame(annot) %>% partition(cluster)
+# class(annot_party)
+# df <- party_df(cluster, "annot")
+
 # Create unique taxa key, for downstream taxonomic plots
-tax_key <- annot %>% 
-  # select(Domain:Species) %>% 
-  select(Domain:Supergroup) %>%
-  filter(Domain != "Eukaryota") %>% 
-  distinct()
+system.time(tax_key <- annot %>% 
+  select(Domain:Species) %>%
+    distinct() %>% collect())
 
-class(tax_key)
-
-tax_df <- tax_key %>% 
-  collect() %>% 
-  partition(cluster) #Use collect to actually SAVE sql db steps as a dataframe.
-
-# class(tax_df)
-# head(tax_df)
-# out <- (data.frame(tax_df))
-# out
-### Then I can take this in R locally and work on the taxa naming and cleaning up the taxonomic names     
+# system.time(tax_key <- annot_df %>% 
+#   select(Domain:Species) %>%
+#   distinct() %>% partition(cluster))
 
 fxn_key <- annot %>%
   select(PFAMs, KEGG_ko, GOs) %>% 
-  distinct()
-
-fxn_df <- fxn_key %>% collect()
-
-cat("taxonomy key consists of:\n")
-dim(tax_key)
-dim(tax_df)
-
-cat("annotation key consists of:\n")
-dim(fxn_key)
-dim(fxn_df)
-
-save(fxn_df, tax_df, file = "/scratch/user/skhu/SPOT-ALOHA/tax_annot_key_DFs.RData")
+  distinct() %>% collect()
+# class(fxn_key)
+save(fxn_key, tax_key, file = "/scratch/user/skhu/SPOT-ALOHA/tax_annot_key_DFs.RData")
 ```
 
 
 # Create matrix for estimating across replicates.
 
-Connect and define SQL database
+Start with all TPMs, pivot longer. Join with metadata, get mean TPM across replicates.
 ```{r}
-library(tidyverse);library(dbplyr);library(RSQLite) 
-metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
-metadata <- tbl(metat, "metadata")
-tpm <- tbl(metat, "TPM")
-annot <- tbl(metat, "annot")
-```
-
-Start with all TPMs, pivot longer. `tpm-avg-sql.r`
-```{r}
-library(tidyverse);library(dbplyr);library(RSQLite)  
-
-metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
-metadata <- tbl(metat, "metadata")
-tpm <- tbl(metat, "TPM")
-annot <- tbl(metat, "annot")
-
-
-tpm_sumreps <- tpm %>% 
+tpm_annot <- tpm %>% 
   select(ShortSeqID, starts_with("SRR")) %>%
   pivot_longer(cols = starts_with("SRR"), names_to = "SRR_SAMPLEID", values_to = "TPM") %>% 
   filter(TPM > 0) %>% 
   left_join(metadata %>% select(SRR_SAMPLEID = RUN, DATE,SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH)) %>% 
   group_by(ShortSeqID, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY, REGION,PACIFIC_REGION,MONTH) %>% 
-    summarise(MEAN_TPM = mean(TPM))
-
-class(tpm_sumreps)
-dim(tpm_sumreps)
-
-cat("start collect\n")
-#tpm_df <- tpm_sumreps %>% collect()
-
-tpm_annot <- tpm_sumreps %>% 
+    summarise(MEAN_TPM = mean(TPM)) %>% 
   left_join(annot)
-
+# head(annot_df)
 tpm_annot_df <- tpm_annot %>% collect()
-
-cat("collect complete\n\n")
-
-dim(tpm_annot_df)
-
+# head(tpm_annot_df)
 save(tpm_annot_df, file = "/scratch/user/skhu/SPOT-ALOHA/Avg_tpm_acrossreps_annot.RData")
 ```
 
@@ -261,37 +225,28 @@ save(tpm_annot_df, file = "/scratch/user/skhu/SPOT-ALOHA/Avg_tpm_acrossreps_anno
 
 Average TPM, include annotations, and then subset to look at a high level.
 ```{r}
-library(tidyverse);library(dbplyr);library(RSQLite)  
-metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
-metadata <- tbl(metat, "metadata")
-tpm <- tbl(metat, "TPM")
-annot <- tbl(metat, "annot")
-
-tpm_wfxnwtax <- tpm %>% 
+tpm_wfxnwtax <- tpm_df %>% 
   select(ShortSeqID, starts_with("SRR")) %>%
   pivot_longer(cols = starts_with("SRR"), names_to = "SRR_SAMPLEID", values_to = "TPM") %>% 
   filter(TPM > 0) %>% 
-  left_join(metadata %>% select(SRR_SAMPLEID = RUN, DATE,SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH)) %>% 
+  left_join(metadata_df %>% select(SRR_SAMPLEID = RUN, DATE,SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH)) %>% 
   group_by(ShortSeqID, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY, REGION,PACIFIC_REGION,MONTH) %>% 
     summarise(MEAN_TPM = mean(TPM)) %>% 
-  left_join(annot)
+  left_join(annot_df)
 
-tpm_annot_stats <- tpm_annot %>% 
+tpm_annot_stats <- tpm_wfxnwtax %>% 
   group_by(SAMPLENAME, Domain, PFAMs, KEGG_ko) %>% 
     summarize(SUM_STATS = sum(MEAN_TPM),
               COUNT_STATS = n())
 
-cat("start collect\n")
-tpm_annot_stats_df <- tpm_annot_stats %>% collect()
-cat("collect complete\n\n")
+View(tpm_annot_stats)
+# View(tpm_wfxnwtax)
+# system.time(tpm_annot_stats_df <- tpm_annot_stats %>% collect())
+
 
 save(tpm_annot_stats_df, file = "/scratch/user/skhu/SPOT-ALOHA/AnnotationStats.RData")
 ```
 
-Bring locally
-```{r}
-load("input-data/AnnotationStats.RData")
-```
 
 ```{r}
 # Get totals for annotated vs unannotated
