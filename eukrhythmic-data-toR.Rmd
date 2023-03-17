@@ -87,16 +87,39 @@ Resources:
 # install.packages("RSQLite")
 # install.packages("dbplyr")
 # install.packages("tidyverse")
-# install.packages("multidplyr")
-library(tidyverse);library(dbplyr);library(RSQLite);library(multidplyr)
+
+## Issue with this install:
+install.packages("multidplyr", dependencies = TRUE)
+
+# Tried individual
+install.packages("Rcpp")
+install.packages("RcppParallel", dependencies = TRUE)
+install.packages("qs")
+
+# Tried from source
+install.packages("/scratch/user/skhu/R/library-4.0.3/RcppParallel_5.1.7.tar.gz", repos = NULL, type = "source")
+install.packages("/scratch/user/skhu/R/library-4.0.3/stringfish_0.15.7.tar.gz", repos = NULL, type = "source")
+install.packages("/scratch/user/skhu/R/library-4.0.3/qs_0.25.5.tar.gz", repos = NULL, type = "source")
+install.packages("/scratch/user/skhu/R/library-4.0.3/multidplyr_0.1.2.tar.gz", repos = NULL, type = "source")
+
+# Tried from github
+devtools::install_github("tidyverse/multidplyr")
+
+library(tidyverse)
+library(dbplyr)
+library(RSQLite)
+library(multidplyr)
 ```
 
+```{r}
+sessionInfo()
+```
 
 Import and query databases.
 ```{r}
 # metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
-metat <- DBI::dbConnect(RSQLite::SQLite(), "input-data//toy-metat.db")
-# metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/toy-metat.db")
+# metat <- DBI::dbConnect(RSQLite::SQLite(), "input-data//toy-metat.db")
+metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/")
 ```
 
 ```{r}
