@@ -81,13 +81,17 @@ Resources:
 
 ```{r}
 # install.packages("RSQLite")
+# install.packages("dbplyr")
+# install.packages("tidyverse")
 library(tidyverse);library(dbplyr);library(RSQLite)  
 ```
 
 Import and query databases.
 ```{r}
 metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
-
+ 
+library(tidyverse);library(dbplyr);library(RSQLite)  
+metat <- DBI::dbConnect(RSQLite::SQLite(), "spot-aloha-metat.db")
 # tbls listed.
 src_dbi(metat)
 
