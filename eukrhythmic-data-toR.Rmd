@@ -104,18 +104,22 @@ Resources:
 
 # Tried from github
 # devtools::install_github("tidyverse/multidplyr")
-
+```
+```{r}
 # Must install in this order
 library(multidplyr)
 library(tidyverse)
 library(dbplyr)
 library(RSQLite)
+library(tictoc)
+library(vroom)
 ```
+
 
 Import and query databases.
 ```{r}
 metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
-# metat <- DBI::dbConnect(RSQLite::SQLite(), "input-data//toy-metat.db")
+# metat <- DBI::dbConnect(RSQLite::SQLite(), "input-data/toy-metat.db")
 # metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/toy-metat.db")
 ```
 
@@ -134,11 +138,88 @@ metadata <- tbl(metat, "metadata")
 tpm <- tbl(metat, "TPM")
 annot <- tbl(metat, "annot")
 
-# annot_df <- as.data.frame(annot) %>% partition(cluster = cluster)
-# annot_df <- as.data.frame(annot)
-# tmp_df <- as.data.frame(tpm)
-# metadata_df <- as.data.frame(metadata)
-# class(tpm_df)
+# Interpret as dataframes
+metadata_df <- data.frame(metadata)
+tic()
+annot_df <- data.frame(annot) # large - 251.601 sec elapsed
+toc()
+# head(annot)
+# ?group_walk()
+```
+
+Try VROOM
+
+```{r}
+# Regular
+# tic();tpm <- vroom("../../../scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig_15k.csv");toc()
+
+# tic();tpm <- vroom("../../../scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig.csv");toc()
+
+# # Parallel?
+# parallel::detectCores() 
+# 
+# cluster <- new_cluster(4)
+# # cluster
+# cluster_library(cluster, "dplyr")
+# 
+# # Use vroom to load
+# cluster_send(cluster, tpm_para <- vroom::vroom("../../../scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig_15k.csv"))
+# 
+# # Party df, across workers
+# tpm_para <- party_df(cluster, "tpm_para")
+```
+
+Generate a sampled 
+```{r}
+# tic()
+# tpm_nonpara <- tpm %>% 
+#   select(ShortSeqID, starts_with("SRR")) %>%
+#   sample_frac(0.01) %>% 
+#   pivot_longer(cols = starts_with("SRR"), names_to = "SRR_SAMPLEID", values_to = "TPM") %>% 
+#   filter(TPM > 0)
+# toc()
+# dim(tpm_nonpara)
+```
+
+
+## Data table & reshape
+
+```{r}
+# install.packages("data.table")
+# install.packages("reshape2")
+
+library(data.table)
+library(reshape2)
+```
+Got a separate table that is filtered and already in long format.
+Import with data.table
+```{r}
+## Use this for all contigs
+# tpm <- fread("../../../scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig.csv")
+# str(tpm)
+# colnames(tpm)
+# srrs <- as.character(colnames(tpm)[-1:-2])
+# class(srrs)
+
+## User this for smaller dataset
+tpm_melt <- fread("../../../scratch/user/skhu/SPOT-ALOHA/filt_low_tpm_melt.csv")
+colnames(tpm_melt)
+tpm_melt$V1 <- NULL # remove excess column
+tpm_melt <- select(tpm_melt, ShortSeqID, RUN = Sample, TPM)
+```
+
+```{r}
+# tpm_melt <- melt(tpm, id.vars = "ShortSeqID")
+# melt(setDT(m, keep.rownames = "Tickets"), id.vars = "Tickets")[, variable := NULL][value != "0"]
+```
+
+```{r}
+# tic()
+# tpm_wpara <- tpm %>% 
+#   select(ShortSeqID, starts_with("SRR")) %>%
+#   pivot_longer(cols = starts_with("SRR"), names_to = "SRR_SAMPLEID", values_to = "TPM") %>% 
+#   filter(TPM > 0)
+# toc()
 ```
 
 Column "RUN" in metadata is associated with the column headers in TPM.
@@ -146,23 +227,28 @@ Column "RUN" in metadata is associated with the column headers in TPM.
 Set up run in parallel
 ```{r}
 # install.packages("nycflights13")
-library(nycflights13)
+# library(nycflights13)
 # tmp_csv <- read.csv("input-data/All_metadata.csv")
 # head(tmp_csv)
 
-parallel::detectCores() 
+# parallel::detectCores() 
 
-cluster <- new_cluster(16)
-cluster
-
-# Examples of how long it takes without running in parallel vs. running in parallel
-system.time(flights %>% group_by(dest))
-
-flights_party <- flights %>% group_by(dest) %>% partition(cluster)
-
-system.time(re_group <- flights_party %>% collect())
-
-system.time(flights %>% group_by(dest) %>% partition(cluster))
+# cluster <- new_cluster(24)
+# cluster
+# cluster_library(cluster, "dplyr")
+# 
+# # Examples of how long it takes without running in parallel vs. running in parallel
+# tic()
+# flights %>% group_by(dest)
+# toc()
+# 
+# tic()
+# flights_party <- flights %>% group_by(dest) %>% partition(cluster)
+# toc()
+# 
+# system.time(re_group <- flights_party %>% collect())
+# 
+# system.time(flights %>% group_by(dest) %>% partition(cluster))
 
 # tmp <- flights %>% partition(cluster)
 # tmp
@@ -216,155 +302,273 @@ tpm_annot <- tpm %>%
 # head(annot_df)
 tpm_annot_df <- tpm_annot %>% collect()
 # head(tpm_annot_df)
-save(tpm_annot_df, file = "/scratch/user/skhu/SPOT-ALOHA/Avg_tpm_acrossreps_annot.RData")
+# save(tpm_annot_df, file = "/scratch/user/skhu/SPOT-ALOHA/Avg_tpm_acrossreps_annot.RData")
 ```
 
+
+
+Repeat with filtered dataset.
+
+```{r}
+head(tpm_melt)
+```
+
+```{r}
+# class(metadata)
+# metadata_df <- data.frame(metadata) %>% 
+#   select(Sample = RUN, DATE,SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH)
+class(metadata_df)
+
+tpm_mean_reps <- tpm_melt %>% 
+  left_join(metadata_df) %>% 
+  group_by(ShortSeqID, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY, REGION,PACIFIC_REGION,MONTH) %>% 
+    summarise(MEAN_TPM = mean(TPM))
+
+```
+
+```{r}
+tpm_mean_reps_annot <- tpm_mean_reps %>% 
+  left_join(data.frame(annot))
+# head(tpm_annot_df)
+
+save(tpm_mean_reps, tpm_mean_reps_annot, file = "/scratch/user/skhu/SPOT-ALOHA/Avg_tpm_acrossreps_annot.RData")
+```
+
+
+### Repeat above, but in parallel
+```{r}
+# head(tpm_melt)
+# head(metadata_df)
+# head(annot_df)
+```
+Try group by and partition - via multidplyr
+```{r}
+cluster <- new_cluster(8)
+```
+
+```{r}
+# Separate samples by partition
+meta_cluster <- metadata_df %>% 
+  group_by(SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY, REGION, PACIFIC_REGION, MONTH) %>% 
+  partition(cluster)
+
+# Metatranscriptome samples have been partitioned to separate clusters == shards
+# meta_cluster
+```
+Use the above so that meta_cluster == the metadata_df and groupby functions.
+
+Add TPM with left_join, and average across replicates.
+```{r}
+# colnames(meta_cluster)
+# tpm_mean_reps <- meta_cluster %>% 
+  # left_join(data.frame(tpm_melt)) %>% # can't figure out how to use 'left_join' with data in shards?
+  # summarise(MEAN_TPM = mean(TPM))
+```
+
+
 # Stats on metatranscriptome run
+
+Import from Rdata saved file
+```{r}
+tic()
+load("/scratch/user/skhu/SPOT-ALOHA/Avg_tpm_acrossreps_annot.RData", verbose = TRUE)
+toc() #244.6 sec elapsed
+# note: at this point, 12.75 GB is memory usage in R.
+```
+Try group by and partition to create shards - via multidplyr
+```{r}
+parallel::detectCores()
+
+cluster <- new_cluster(12)
+cluster
+cluster_library(cluster, "dplyr")
+# cluster <- new_cluster(8)
+
+# Create a shard by sample
+tic()
+shard_sample <- tpm_mean_reps_annot %>%
+  group_by(SAMPLENAME) %>%
+  partition(cluster)
+toc() #120.708 sec elapsed
+```
+
+```{r}
+head(shard_sample)
+class(shard_sample)
+```
+
 
 ## Annotated vs. unannotated
 
 Average TPM, include annotations, and then subset to look at a high level.
-```{r}
-tpm_wfxnwtax <- tpm_df %>% 
-  select(ShortSeqID, starts_with("SRR")) %>%
-  pivot_longer(cols = starts_with("SRR"), names_to = "SRR_SAMPLEID", values_to = "TPM") %>% 
-  filter(TPM > 0) %>% 
-  left_join(metadata_df %>% select(SRR_SAMPLEID = RUN, DATE,SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH)) %>% 
-  group_by(ShortSeqID, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY, REGION,PACIFIC_REGION,MONTH) %>% 
-    summarise(MEAN_TPM = mean(TPM)) %>% 
-  left_join(annot_df)
-
-tpm_annot_stats <- tpm_wfxnwtax %>% 
-  group_by(SAMPLENAME, Domain, PFAMs, KEGG_ko) %>% 
-    summarize(SUM_STATS = sum(MEAN_TPM),
-              COUNT_STATS = n())
-
-View(tpm_annot_stats)
-# View(tpm_wfxnwtax)
-# system.time(tpm_annot_stats_df <- tpm_annot_stats %>% collect())
-
-
-save(tpm_annot_stats_df, file = "/scratch/user/skhu/SPOT-ALOHA/AnnotationStats.RData")
-```
-
 
 ```{r}
-# Get totals for annotated vs unannotated
-data.frame(tpm_annot_stats_df) %>% 
+tic()
+tpm_sum_domain <- shard_sample %>% 
+  group_by(SAMPLE_ID_PARSED, DEPTH_CATEGORY, REGION, PACIFIC_REGION, MONTH, Domain) %>% 
+  summarise(SUM_TPM = sum(MEAN_TPM),
+            COUNT_TRANSCRIPT = n()) %>% 
+  collect()
+toc() #6.697 sec elapsed
+
+# head(tpm_sum_domain)
+domain_stats <- tpm_sum_domain %>% 
+  mutate(DOMAIN = str_squish(Domain)) %>%
+  group_by(SAMPLE_ID_PARSED, DEPTH_CATEGORY, REGION, PACIFIC_REGION, MONTH, DOMAIN) %>% 
+  summarise(SUM_TPM = sum(SUM_TPM),
+            COUNT_TRANSCRIPT = sum(COUNT_TRANSCRIPT))
   
-# What is TPM total for Domain level? what is total number of annotated transcripts?
-# What is TPM total for some kind of fxn annotation? How about only KEGGs?
-# What is TPM total and counts for transcripts with both TAX and FXN annotation?
+# unique(domain_stats$DOMAIN)
 ```
 
-## Curate taxonomic information
-
+### by domain
 ```{r}
-load("input-data/tax_annot_key_DFs.RData", verbose = TRUE)
+# head(domain_stats)
+domain_stats %>%
+  # group_by(SAMPLE_ID_PARSED, DOMAIN) %>% 
+  # summarise(SUM_TPM_Domain = sum(SUM_TPM)) %>% 
+  ggplot(aes(x = SAMPLE_ID_PARSED, y = SUM_TPM, fill = DOMAIN)) +
+  geom_bar(stat = "identity", color = "black", position = "fill") +
+  theme_linedraw() + theme(
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
+  )
+
+# COUNT_TRANSCRIPT
+domain_stats %>%
+  # group_by(SAMPLE_ID_PARSED, DOMAIN) %>% 
+  # summarise(SUM_TPM_Domain = sum(SUM_TPM)) %>% 
+  ggplot(aes(x = SAMPLE_ID_PARSED, y = COUNT_TRANSCRIPT, fill = DOMAIN)) +
+  geom_bar(stat = "identity", color = "black", position = "stack") +
+  theme_linedraw() + theme(
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
+  )
 ```
 
-In order to curate taxonomic output, use this approach:
+Table reporting % of transcripts that were assigned various taxonomic levels. 
 ```{r}
-unique(tax_df$Domain)
+# Total transcripts
+total <- sum(domain_stats$COUNT_TRANSCRIPT)
+# total
+# Percent annotated domain and protein
+domain_stats %>% 
+  group_by(DOMAIN) %>% 
+    summarise(TRANSCRIPT = sum(COUNT_TRANSCRIPT)) %>% 
+  mutate(PERC = 100*(TRANSCRIPT/total))
+```
+> What is the difference between Unclassified and "NA"?
 
-# Keep only Eukaryota
-t <- data.frame(tax_df) %>% 
-  mutate(COUNT = 1) %>% 
+```{r}
+head(shard_sample)
+```
+
+
+## by annotation
+```{r}
+tic()
+tpm_sum_kegg <- shard_sample %>% 
+  mutate(KEGG_pa = case_when(
+    KEGG_ko == "-" ~ "Not annotated",
+    TRUE ~ "Annotated"
+  )) %>%
+  group_by(SAMPLE_ID_PARSED, KEGG_pa) %>% 
+  summarise(SUM_TPM = sum(MEAN_TPM),
+            COUNT_TRANSCRIPT = n()) %>% 
+  collect()
+toc() # 7.065 sec elapsed
+
+total <- sum(tpm_sum_kegg$COUNT_TRANSCRIPT)
+total
+
+# Percent annotated domain and protein
+tpm_sum_kegg %>% 
+  group_by(KEGG_pa) %>% 
+    summarise(TRANSCRIPT = sum(COUNT_TRANSCRIPT)) %>% 
+  mutate(PERC = 100*(TRANSCRIPT/total))
+```
+
+What percentage of the data am I using, when I isolate eukaryotic transcripts that also have an annotation?
+```{r}
+tic()
+stats_all <- shard_sample %>% 
+  mutate(KEGG_pa = case_when(
+    KEGG_ko == "-" ~ "Not annotated",
+    TRUE ~ "Annotated"
+  )) %>%
+  group_by(KEGG_pa, Domain, Supergroup) %>% 
+  summarise(SUM_TPM = sum(MEAN_TPM),
+            COUNT_TRANSCRIPT = n()) %>% 
+  collect()
+toc() # 3.692 sec elapsed
+
+total_all <- sum(stats_all$COUNT_TRANSCRIPT)
+
+# Report percentage domain and kegg annotated.
+stats_all %>% 
+  mutate(DOMAIN = str_squish(Domain)) %>% 
+  group_by(KEGG_pa, DOMAIN) %>% 
+  summarise(SUM_TPM = sum(SUM_TPM),
+            COUNT_TRANSCRIPT = sum(COUNT_TRANSCRIPT),
+            PERCENT = (100*(COUNT_TRANSCRIPT/total_all)))
+```
+
+> 18.1% of all transcripts were assigned eukaryote and had a kegg annotation.
+
+Issue is with the NA Domain assignments, where 72% of the transcripts were assigned NA at the domain level and were annotated. What does this mean?
+
+Save work here.
+```{r}
+save(shard_sample, file = "/scratch/user/skhu/SPOT-ALOHA/party_df_all.RData")
+```
+
+
+# Curate taxonomic information
+
+```{r}
+load("/scratch/user/skhu/SPOT-ALOHA/party_df_all.RData", verbose = TRUE)
+```
+
+```{r}
+head(shard_sample)
+```
+
+```{r}
+# Supergroup and phylum
+tic()
+euks_only_df <- shard_sample %>% 
   filter(Domain == "Eukaryota") %>% 
-  group_by( Supergroup,  Phylum) %>% 
-    summarise(SUM = sum(COUNT))
-# View(t)
+  group_by( Supergroup,  Phylum, SAMPLENAME, SAMPLE_ID_PARSED, 
+            DEPTH_CATEGORY, REGION, PACIFIC_REGION, MONTH) %>% 
+    summarise(SUM_TPM = sum(MEAN_TPM)) %>% 
+  collect()
+toc() #1.87 sec elapsed
+# mutate(across(Domain:Species, str_squish(.))) %>% 
 ```
 
+## Plot taxa at supergroup level
 
-From SQL TPM matrix with annotations. Create several outputs for Supergroup, Phylum, and Class levels
 ```{r}
-library(tidyverse);library(dbplyr);library(RSQLite)  
-metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
-metadata <- tbl(metat, "metadata")
-tpm <- tbl(metat, "TPM")
-annot <- tbl(metat, "annot")
+unique(euks_only_df$Supergroup)
+head(euks_only_df)
+```
 
-tpm_wfxnwtax <- tpm %>% 
-  select(ShortSeqID, starts_with("SRR")) %>%
-  pivot_longer(cols = starts_with("SRR"), names_to = "SRR_SAMPLEID", values_to = "TPM") %>% 
-  filter(TPM > 0) %>% 
-  left_join(metadata %>% select(SRR_SAMPLEID = RUN, DATE,SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH)) %>% 
-  group_by(ShortSeqID, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY, REGION,PACIFIC_REGION,MONTH) %>% 
-    summarise(MEAN_TPM = mean(TPM)) %>% 
-  left_join(annot)
-
-# Supergroup
-tax_sql_super <- data.frame(tpm_wfxnwtax) %>% 
-filter(Domain == "Eukaryota") %>% 
-  group_by( Supergroup,  SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH) %>% 
-    summarise(SUM_TPM = sum(MEAN_TPM))
-cat("start collecting\n")
-tax_super_df <- tax_sql_super %>% collect()
-cat("finished\n\n")
-
-# Phylum
-tax_sql_phy <- data.frame(tpm_wfxnwtax) %>% 
-filter(Domain == "Eukaryota") %>% 
-  group_by( Supergroup,  Phylum, SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH) %>% 
-    summarise(SUM_TPM = sum(MEAN_TPM))
-cat("start collecting\n")
-tax_phy_df <- tax_sql_phy %>% collect()
-cat("finished\n\n")
-
-# Class
-tax_sql_class <- data.frame(tpm_annot_df) %>% 
-filter(Domain == "Eukaryota") %>% 
-  group_by( Supergroup,  Phylum,  Class, SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH) %>% 
-    summarise(SUM_TPM = sum(MEAN_TPM))
-cat("start collecting\n")
-tax_class_df <- tax_sql_class %>% collect()
-cat("finished\n\n")
-
-save(tax_super_df, tax_phy_df, tax_class_df, file = "/scratch/user/skhu/SPOT-ALOHA/taxonomic-summaries.RData")
+### by supergroup
+```{r}
+euks_only_df %>% 
+  group_by(Supergroup, SAMPLE_ID_PARSED, PACIFIC_REGION, DEPTH_CATEGORY) %>% 
+  summarise(SUM = sum(SUM_TPM)) %>% 
+  ggplot(aes(x = SAMPLE_ID_PARSED, y = SUM, fill = Supergroup)) +
+    geom_bar(stat = "identity", color = "black", position = "fill") +
+    theme_linedraw() + theme(
+      axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
+    )
 ```
 
 
 
-# Create toy dataset (of TPM) to ensure all code works
 
-```
-module load GCCcore/12.2.0 
-module load SQLite/3.39.4 
-module load Python/3.10.8
-
-module load GCC/11.2.0
-module load OpenMPI/4.1.1
-module load pandas/1.4.0-Python-3.9.6
+# Session
+```{r}
+sessionInfo()
 ```
 
-In python (`python`):
-```
-# Import required libraries
-import sqlite3
-import pandas as pd
-
-conn = sqlite3.connect('/scratch/user/skhu/SPOT-ALOHA/toy-metat.db')
-
-tpm_data = pd.read_csv('/scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig_150k.csv')
-
-## Set tpm_data object to SQL:
-# tpm_data.to_sql, table name = "TPM", conn = sqlite db, if exists replace and do not index
-
-tpm_data.to_sql('TPM',conn, if_exists='replace',index=False)
-
-
-# Add metadata
-
-metadata = pd.read_csv('/home/skhu/pacificocean-metaT/input-data/complete-sample-list.txt')
-metadata.to_sql('metadata', conn, if_exists='replace', index=False)
-
-
-# Add annotation data
-taxfxn = pd.read_csv('/scratch/user/skhu/SPOT-ALOHA/02-annotation_table/TaxonomicAndFunctionalAnnotations.csv')
-taxfxn.to_sql('annot', conn, if_exists='replace', index=False)
-
-conn.close()
-
-```
 
