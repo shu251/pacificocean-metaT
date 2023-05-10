@@ -105,6 +105,7 @@ Resources:
 # Tried from github
 # devtools::install_github("tidyverse/multidplyr")
 ```
+
 ```{r}
 # Must install in this order
 library(multidplyr)
@@ -137,57 +138,16 @@ Interpret as R objects.
 metadata <- tbl(metat, "metadata")
 tpm <- tbl(metat, "TPM")
 annot <- tbl(metat, "annot")
-
 # Interpret as dataframes
 metadata_df <- data.frame(metadata)
-tic()
-annot_df <- data.frame(annot) # large - 251.601 sec elapsed
-toc()
-# head(annot)
-# ?group_walk()
-```
-
-Try VROOM
-
-```{r}
-# Regular
-# tic();tpm <- vroom("../../../scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig_15k.csv");toc()
-
-# tic();tpm <- vroom("../../../scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig.csv");toc()
-
-# # Parallel?
-# parallel::detectCores() 
-# 
-# cluster <- new_cluster(4)
-# # cluster
-# cluster_library(cluster, "dplyr")
-# 
-# # Use vroom to load
-# cluster_send(cluster, tpm_para <- vroom::vroom("../../../scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig_15k.csv"))
-# 
-# # Party df, across workers
-# tpm_para <- party_df(cluster, "tpm_para")
-```
-
-Generate a sampled 
-```{r}
 # tic()
-# tpm_nonpara <- tpm %>% 
-#   select(ShortSeqID, starts_with("SRR")) %>%
-#   sample_frac(0.01) %>% 
-#   pivot_longer(cols = starts_with("SRR"), names_to = "SRR_SAMPLEID", values_to = "TPM") %>% 
-#   filter(TPM > 0)
+annot_df <- data.frame(annot) # large - 251.601 sec elapsed
 # toc()
-# dim(tpm_nonpara)
 ```
-
 
 ## Data table & reshape
 
 ```{r}
-# install.packages("data.table")
-# install.packages("reshape2")
-
 library(data.table)
 library(reshape2)
 ```
@@ -195,12 +155,79 @@ Got a separate table that is filtered and already in long format.
 Import with data.table
 ```{r}
 ## Use this for all contigs
-# tpm <- fread("../../../scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig.csv")
-# str(tpm)
+tic()
+tpm_all <- fread("../../../scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig.csv", 
+                 verbose = TRUE,
+                 drop = 1,
+                 showProgress = TRUE,
+                 nThread = 32)
+toc() # 1664.89 sec elapsed and at 22.39 GB in RStudio
+str(tpm_all)
 # colnames(tpm)
 # srrs <- as.character(colnames(tpm)[-1:-2])
 # class(srrs)
+```
 
+```{r}
+# Should all equal 1E6
+sum(tpm_all$SRR11178168)
+sum(tpm_all$SRR6048898)
+```
+
+
+## Totals, stats, annotations
+
+```{r}
+head(annot_df)
+length(unique(annot_df$ShortSeqID))
+length(unique(tpm_all$ShortSeqID))
+```
+
+
+Isolate eukaryote only Seq IDs
+```{r}
+# load("/scratch/user/skhu/SPOT-ALOHA/party_df_all.RData", verbose = TRUE)
+# parallel::detectCores()
+# cluster <- new_cluster(24)
+# cluster
+# cluster_library(cluster, "dplyr")
+# class(shard_sample)
+euk_only <- shard_sample %>% 
+  filter(Domain == "Eukaryota") %>% 
+  collect()
+
+colnames(euk_only)
+euk_seqid <- as.character(unique(euk_only$ShortSeqID))
+```
+
+
+```{r}
+tic()
+tpm_all_euk <- tpm_all %>% 
+  filter(ShortSeqID %in% euk_seqid) 
+toc()
+
+library(compositions)
+
+head((tpm_all_euk))
+
+tic()
+tpm_all_euk_clr <- compositions::clr((t(tpm_all_euk) %>% 
+  column_to_rownames(var = "")))
+toc()
+# head(tpm_all_euk_clr)
+
+tic()
+tpm_all_euk_long <- tpm_all_euk %>% 
+  pivot_longer(cols = starts_with("SRR"))
+toc()
+
+# Save data table outputs
+save(tpm_all_euk, tpm_all_euk_clr, tpm_all_euk_long, file = "../../../scratch/user/skhu/SPOT-ALOHA/tpm_all_datafiles.RData")
+```
+
+Import filtered dataset
+```{r}
 ## User this for smaller dataset
 tpm_melt <- fread("../../../scratch/user/skhu/SPOT-ALOHA/filt_low_tpm_melt.csv")
 colnames(tpm_melt)
@@ -208,10 +235,6 @@ tpm_melt$V1 <- NULL # remove excess column
 tpm_melt <- select(tpm_melt, ShortSeqID, RUN = Sample, TPM)
 ```
 
-```{r}
-# tpm_melt <- melt(tpm, id.vars = "ShortSeqID")
-# melt(setDT(m, keep.rownames = "Tickets"), id.vars = "Tickets")[, variable := NULL][value != "0"]
-```
 
 ```{r}
 # tic()
@@ -271,43 +294,53 @@ See Rscript `summary-sql.r`
 # df <- party_df(cluster, "annot")
 
 # Create unique taxa key, for downstream taxonomic plots
-system.time(tax_key <- annot %>% 
-  select(Domain:Species) %>%
-    distinct() %>% collect())
+# system.time(tax_key <- annot %>% 
+#   select(Domain:Species) %>%
+#     distinct() %>% collect())
 
 # system.time(tax_key <- annot_df %>% 
 #   select(Domain:Species) %>%
 #   distinct() %>% partition(cluster))
 
-fxn_key <- annot %>%
-  select(PFAMs, KEGG_ko, GOs) %>% 
-  distinct() %>% collect()
-# class(fxn_key)
-save(fxn_key, tax_key, file = "/scratch/user/skhu/SPOT-ALOHA/tax_annot_key_DFs.RData")
+# fxn_key <- annot %>%
+#   select(PFAMs, KEGG_ko, GOs) %>% 
+#   distinct() %>% collect()
+# # class(fxn_key)
+# save(fxn_key, tax_key, file = "/scratch/user/skhu/SPOT-ALOHA/tax_annot_key_DFs.RData")
 ```
 
 
 # Create matrix for estimating across replicates.
 
-Start with all TPMs, pivot longer. Join with metadata, get mean TPM across replicates.
+First use all TPM information
 ```{r}
-tpm_annot <- tpm %>% 
-  select(ShortSeqID, starts_with("SRR")) %>%
-  pivot_longer(cols = starts_with("SRR"), names_to = "SRR_SAMPLEID", values_to = "TPM") %>% 
-  filter(TPM > 0) %>% 
-  left_join(metadata %>% select(SRR_SAMPLEID = RUN, DATE,SAMPLENAME, SAMPLE_ID_PARSED,DEPTH_CATEGORY,REGION,PACIFIC_REGION,MONTH)) %>% 
-  group_by(ShortSeqID, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY, REGION,PACIFIC_REGION,MONTH) %>% 
-    summarise(MEAN_TPM = mean(TPM)) %>% 
-  left_join(annot)
-# head(annot_df)
-tpm_annot_df <- tpm_annot %>% collect()
-# head(tpm_annot_df)
-# save(tpm_annot_df, file = "/scratch/user/skhu/SPOT-ALOHA/Avg_tpm_acrossreps_annot.RData")
+# Save data table outputs
+# save(tpm_all_euk, tpm_all_euk_clr, tpm_all_euk_long, file = "../../../scratch/user/skhu/SPOT-ALOHA/tpm_all_datafiles.RData")
+```
+
+```{r}
+head(metadata_df)
+head(tpm_all_euk_long)
 ```
 
 
+```{r}
+# class(metadata_df)
+tic()
+tpm_ALL_mean_reps_annot <- tpm_all_euk_long %>% 
+  filter(value > 0) %>% 
+  left_join(metadata_df, by = c("name" = "RUN")) %>% 
+  group_by(ShortSeqID, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY, REGION,PACIFIC_REGION,MONTH) %>% 
+    summarise(MEAN_TPM = mean(value)) %>% 
+  left_join(data.frame(annot))
+toc() #570 sec elapsed
+```
 
-Repeat with filtered dataset.
+```{r}
+save(tpm_ALL_mean_reps_annot, file = "/scratch/user/skhu/SPOT-ALOHA/Avg_tpm_ALL_acrossreps_annot.RData")
+```
+
+## Repeat with filtered dataset.
 
 ```{r}
 head(tpm_melt)
@@ -379,7 +412,7 @@ Try group by and partition to create shards - via multidplyr
 ```{r}
 parallel::detectCores()
 
-cluster <- new_cluster(12)
+cluster <- new_cluster(32)
 cluster
 cluster_library(cluster, "dplyr")
 # cluster <- new_cluster(8)
@@ -519,6 +552,16 @@ Save work here.
 ```{r}
 save(shard_sample, file = "/scratch/user/skhu/SPOT-ALOHA/party_df_all.RData")
 ```
+
+```{r}
+# head(shard_sample)
+# 
+# unclass <- shard_sample %>% 
+#   filter(Domain == "Unclassified") %>% 
+#   collect()
+# View(unclass)
+```
+
 
 
 # Curate taxonomic information

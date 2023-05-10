@@ -9,12 +9,72 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Set up working R environment
+```{r}
+library(multidplyr)
+library(tidyverse)
+library(dbplyr)
+library(RSQLite)
+library(tictoc)
+library(data.table)
+library(compositions)
+```
+
 # Import metatranscriptome R data objects
 
-Should have normalized to whole community and then normalized to key taxonomic groups. 
-Import a taxa ID and functional ID for each unique contig ID
+## Input all TPM results
 
-From eukrhythmic, worked to compile all data via SQL database.
+Below R objects sourced by first isolating only the eukaryotic transcripts, averaging across replicates, and placing into long format.
+
+```{r}
+load(file = "/scratch/user/skhu/SPOT-ALOHA/Avg_tpm_ALL_acrossreps_annot.RData", verbose = T)
+head(tpm_ALL_mean_reps_annot)
+dim(tpm_ALL_mean_reps_annot)
+```
+
+Use ```multidplyr``` to perform tidyverse functions in parallel.
+```{r}
+# cluster
+tic()
+all_shard <- tpm_ALL_mean_reps_annot %>% 
+  group_by(SAMPLENAME) %>% 
+  partition(cluster)
+toc() #95.245 sec elapsed
+```
+
+```{r}
+# Supergroup
+supergroup_all <- all_shard %>%
+  group_by(Domain, Supergroup, PACIFIC_REGION, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY) %>% 
+  summarize(SUM_TPM_supergroup = sum(MEAN_TPM)) %>% 
+  collect()
+
+supergroup_all %>% 
+  filter(Domain == "Eukaryota") %>% 
+  ggplot(aes(x = SAMPLE_ID_PARSED, y = SUM_TPM_supergroup, fill = Supergroup)) +
+  geom_bar(stat = "identity", position = "fill", color = "black")+
+  theme_linedraw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+```
+
+
+```{r}
+# Phylum
+phylum_all <- all_shard %>%
+  group_by(Domain, Supergroup, Phylum, PACIFIC_REGION, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY) %>% 
+  summarize(SUM_TPM_supergroup = sum(MEAN_TPM)) %>% 
+  collect() %>% 
+  unite(Supergroup_phylum, Supergroup, Phylum, sep = " ")
+
+phylum_all %>% 
+  filter(Domain == "Eukaryota") %>% 
+  ggplot(aes(x = SAMPLE_ID_PARSED, y = SUM_TPM_supergroup, fill = Supergroup_phylum)) +
+  geom_bar(stat = "identity", position = "fill", color = "black")+
+  theme_linedraw() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+```
+
+
 
 # Taxonomic composition & distribution
 
@@ -22,7 +82,7 @@ Evaluate taxonomic diversity and composition across all sites.
 
 ## Taxonomic level curation and estimate relative abundance
 
-Raxa curation
+Taxa curation
 3) Average across replicates (or how should replicates be considered)
 4) Sum to each sample
 
@@ -52,6 +112,19 @@ Make sure to retain module information in definiation.
 3.2) remove NAs
 
 ## PCoA with whole community functional profile
+
+```{r}
+head(tpm_all_euk_clr)
+```
+```{r}
+pca_lr <- prcomp(as.data.frame(tpm_all_euk_clr))
+
+variance_lr <- (pca_lr$sdev^2)/sum(pca_lr$sdev^2)
+## View bar plot
+barplot(variance_lr, main = "Log-Ratio PCA Screeplot", xlab = "PC Axis", ylab = "% Variance", 
+    cex.names = 1.5, cex.axis = 1.5, cex.lab = 1.5, cex.main = 1.5)
+```
+
 
 ### Does PCoA change when only taxonomic information is input?
 (supplementary)
