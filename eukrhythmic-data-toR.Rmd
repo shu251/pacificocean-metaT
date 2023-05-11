@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 # Import data from eukrhythmic
 
 Explanation of output data from eukrhythmic
+
 -   00-nucleotide_assembly:
     -   MAD.filtered.nospace.fasta: Full length sequences of merged assembly groups (MAD) that have been de-duplicated
     
@@ -50,11 +51,6 @@ conn = sqlite3.connect('/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db')
 
 tpm_data = pd.read_csv('/scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig.csv')
 
-### Toy dataset
-# conn = sqlite3.connect('/scratch/user/skhu/SPOT-ALOHA/toy-metat.db')
-
-# tpm_data = pd.read_csv('/scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig_150k.csv')
-####
 
 ## Set tpm_data object to SQL:
 # tpm_data.to_sql, table name = "TPM", conn = sqlite db, if exists replace and do not index
@@ -85,28 +81,19 @@ Resources:
 
 ```{r}
 # install.packages("RSQLite")
-# install.packages("dbplyr")
-# install.packages("tidyverse")
-# install.packages("multidplyr")
-library(tidyverse);library(dbplyr);library(RSQLite);library(multidplyr)
+library(tidyverse);library(dbplyr);library(RSQLite)  
 ```
-
 
 Import and query databases.
 ```{r}
-# metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
-metat <- DBI::dbConnect(RSQLite::SQLite(), "input-data//toy-metat.db")
-# metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/toy-metat.db")
-```
+metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
 
-```{r}
 # tbls listed.
 src_dbi(metat)
 
 ## Example output:
 ### tbls: TPM, metadata, annot
 ```
-
 
 Interpret as R objects.
 ```{r}
@@ -119,52 +106,21 @@ names(metadata)
 
 Column "RUN" in metadata is associated with the column headers in TPM.
 
-Set up run in parallel
-```{r}
-library(nycflights13)
-tmp_csv <- read.csv("input-data/All_metadata.csv")
-# head(tmp_csv)
-
-parallel::detectCores() 
-
-cluster <- new_cluster(4)
-cluster
-
-# Examples of how long it takes without running in parallel vs. running in parallel
-system.time(flights %>% group_by(dest))
-system.time(flights %>% group_by(dest) %>% partition(cluster))
-
-```
-
-There are two ways to get data to the workers in cluster:
-* partition() a data frame that already loaded in the interactive process.
-* Load a different subset of the data in each worker.
-
-
-> Does this partition(cluster) approach work with SQL collect step?
 
 # Isolate taxonomy and functional keys
 
 See Rscript `summary-sql.r`
 ```{r}
-# head(annot)
 # Create unique taxa key, for downstream taxonomic plots
 tax_key <- annot %>% 
   # select(Domain:Species) %>% 
-  select(Domain:Supergroup) %>%
-  filter(Domain != "Eukaryota") %>% 
+  select(Domain:Supergroup) %>% 
   distinct()
 
 class(tax_key)
 
-tax_df <- tax_key %>% 
-  collect() %>% 
-  partition(cluster) #Use collect to actually SAVE sql db steps as a dataframe.
-
-# class(tax_df)
-# head(tax_df)
-# out <- (data.frame(tax_df))
-# out
+tax_df <- tax_key %>% collect() #Use collect to actually SAVE sql db steps as a dataframe.
+class(tax_df)
 ### Then I can take this in R locally and work on the taxa naming and cleaning up the taxonomic names     
 
 fxn_key <- annot %>%
@@ -348,45 +304,8 @@ save(tax_super_df, tax_phy_df, tax_class_df, file = "/scratch/user/skhu/SPOT-ALO
 
 
 
-# Create toy dataset (of TPM) to ensure all code works
 
-```
-module load GCCcore/12.2.0 
-module load SQLite/3.39.4 
-module load Python/3.10.8
-
-module load GCC/11.2.0
-module load OpenMPI/4.1.1
-module load pandas/1.4.0-Python-3.9.6
-```
-
-In python (`python`):
-```
-# Import required libraries
-import sqlite3
-import pandas as pd
-
-conn = sqlite3.connect('/scratch/user/skhu/SPOT-ALOHA/toy-metat.db')
-
-tpm_data = pd.read_csv('/scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig_150k.csv')
-
-## Set tpm_data object to SQL:
-# tpm_data.to_sql, table name = "TPM", conn = sqlite db, if exists replace and do not index
-
-tpm_data.to_sql('TPM',conn, if_exists='replace',index=False)
-
-
-# Add metadata
-
-metadata = pd.read_csv('/home/skhu/pacificocean-metaT/input-data/complete-sample-list.txt')
-metadata.to_sql('metadata', conn, if_exists='replace', index=False)
-
-
-# Add annotation data
-taxfxn = pd.read_csv('/scratch/user/skhu/SPOT-ALOHA/02-annotation_table/TaxonomicAndFunctionalAnnotations.csv')
-taxfxn.to_sql('annot', conn, if_exists='replace', index=False)
-
-conn.close()
+```{r}
 
 ```
 

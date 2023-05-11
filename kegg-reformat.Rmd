@@ -1,0 +1,55 @@
+---
+title: "kegg-pfam-db"
+author: "Sarah Hu"
+date: "2022-10-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+combined kegg DB compelte
+```{r}
+kegg <- read.csv("../KEGG_DB/combined_kegg.csv")
+# head(kegg$KO_number)
+curated_kegg <- read.csv("../KEGG_DB/reformat-kegg-pfam-skh.csv")
+# head(curated_kegg)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+key_geneid <- curated_kegg %>% 
+  select(-X) %>% 
+  right_join(kegg %>% select(KEGG = KO_number, everything(), -X)) %>% 
+  distinct() %>% 
+  select(starts_with("KeggOrthology_"), Category01, Category02, FullName, GeneID, Gene_identification, KEGG, PFAM, Descriptions, REF = REFs)
+
+```
+
+```{r}
+unique(key_geneid$KeggOrthology_A)
+unique(key_geneid$KeggOrthology_B)
+table(key_geneid$KeggOrthology_C)
+unique(key_geneid$Category01)
+```
+# Combine with annotation information by KEGG ID and PFAM ID
+
+## Relative TPM abundance of traditional KEGG categories by site
+```{r}
+
+```
+
+## Pare down to curated list 
+```{r}
+# what is total annotated
+
+# what percent is included in the Category01
+## Remove "" and NA?
+
+```
+
+## What is the relative abundance
