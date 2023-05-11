@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 # Import data from eukrhythmic
 
 Explanation of output data from eukrhythmic
+
 -   00-nucleotide_assembly:
     -   MAD.filtered.nospace.fasta: Full length sequences of merged assembly groups (MAD) that have been de-duplicated
     
@@ -50,11 +51,6 @@ conn = sqlite3.connect('/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db')
 
 tpm_data = pd.read_csv('/scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig.csv')
 
-### Toy dataset
-# conn = sqlite3.connect('/scratch/user/skhu/SPOT-ALOHA/toy-metat.db')
-
-# tpm_data = pd.read_csv('/scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/TPMTable_ByContig_150k.csv')
-####
 
 ## Set tpm_data object to SQL:
 # tpm_data.to_sql, table name = "TPM", conn = sqlite db, if exists replace and do not index
@@ -85,6 +81,9 @@ Resources:
 
 ```{r}
 # install.packages("RSQLite")
+<<<<<<< HEAD
+library(tidyverse);library(dbplyr);library(RSQLite)  
+=======
 # install.packages("dbplyr")
 # install.packages("tidyverse")
 
@@ -114,24 +113,25 @@ library(dbplyr)
 library(RSQLite)
 library(tictoc)
 library(vroom)
+>>>>>>> refs/remotes/origin/main
 ```
-
 
 Import and query databases.
 ```{r}
 metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/spot-aloha-metat.db")
+<<<<<<< HEAD
+=======
 # metat <- DBI::dbConnect(RSQLite::SQLite(), "input-data/toy-metat.db")
 # metat <- DBI::dbConnect(RSQLite::SQLite(), "/scratch/user/skhu/SPOT-ALOHA/toy-metat.db")
 ```
+>>>>>>> refs/remotes/origin/main
 
-```{r}
 # tbls listed.
 src_dbi(metat)
 
 ## Example output:
 ### tbls: TPM, metadata, annot
 ```
-
 
 Interpret as R objects.
 ```{r}
@@ -247,6 +247,8 @@ tpm_melt <- select(tpm_melt, ShortSeqID, RUN = Sample, TPM)
 
 Column "RUN" in metadata is associated with the column headers in TPM.
 
+<<<<<<< HEAD
+=======
 Set up run in parallel
 ```{r}
 # install.packages("nycflights13")
@@ -283,11 +285,19 @@ There are two ways to get data to the workers in cluster:
 
 
 > Does this partition(cluster) approach work with SQL collect step?
+>>>>>>> refs/remotes/origin/main
 
 # Isolate taxonomy and functional keys
 
 See Rscript `summary-sql.r`
 ```{r}
+<<<<<<< HEAD
+# Create unique taxa key, for downstream taxonomic plots
+tax_key <- annot %>% 
+  # select(Domain:Species) %>% 
+  select(Domain:Supergroup) %>% 
+  distinct()
+=======
 # tpm_party <- data.frame(tpm) %>% partition(cluster)
 # annot_party <- data.frame(annot) %>% partition(cluster)
 # class(annot_party)
@@ -297,16 +307,39 @@ See Rscript `summary-sql.r`
 # system.time(tax_key <- annot %>% 
 #   select(Domain:Species) %>%
 #     distinct() %>% collect())
+>>>>>>> refs/remotes/origin/main
 
 # system.time(tax_key <- annot_df %>% 
 #   select(Domain:Species) %>%
 #   distinct() %>% partition(cluster))
 
+<<<<<<< HEAD
+tax_df <- tax_key %>% collect() #Use collect to actually SAVE sql db steps as a dataframe.
+class(tax_df)
+### Then I can take this in R locally and work on the taxa naming and cleaning up the taxonomic names     
+
+fxn_key <- annot %>%
+  select(PFAMs, KEGG_ko, GOs) %>% 
+  distinct()
+
+fxn_df <- fxn_key %>% collect()
+
+cat("taxonomy key consists of:\n")
+dim(tax_key)
+dim(tax_df)
+
+cat("annotation key consists of:\n")
+dim(fxn_key)
+dim(fxn_df)
+
+save(fxn_df, tax_df, file = "/scratch/user/skhu/SPOT-ALOHA/tax_annot_key_DFs.RData")
+=======
 # fxn_key <- annot %>%
 #   select(PFAMs, KEGG_ko, GOs) %>% 
 #   distinct() %>% collect()
 # # class(fxn_key)
 # save(fxn_key, tax_key, file = "/scratch/user/skhu/SPOT-ALOHA/tax_annot_key_DFs.RData")
+>>>>>>> refs/remotes/origin/main
 ```
 
 
@@ -609,9 +642,15 @@ euks_only_df %>%
 
 
 
+<<<<<<< HEAD
+```{r}
+
+```
+=======
 # Session
 ```{r}
 sessionInfo()
 ```
 
+>>>>>>> refs/remotes/origin/main
 
