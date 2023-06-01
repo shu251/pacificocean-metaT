@@ -1,0 +1,33 @@
+---
+title: "Metatranscriptome survey of Pacific Ocean"
+---
+
+Home for code and analysis for microeukaryotic metatranscriptome survey.
+
+_in prep_
+
+**TO DO**:
+
+  * Add links for where to find raw data
+
+  * Add badge for bcodmo, ncbi, and zenodo
+
+  * Add description for each tab above for data analysis
+
+# Study background
+_Premise_:  Unicellular microbial eukaryotes (primarily protists) underpin functional processes integral to oceanic ecosystems and form the critical linkages between marine food webs and biogeochemical cycles. Shifts in the relative abundances of protists exhibiting specific nutritional strategies signify responses to environmental cues, yet, the extent to which trophic capabilities are maintained or vary within diverse protistan assemblages remains a difficult task to assess. In this study, a metatranscriptomic survey of protistan assemblages spanning broad horizontal (oligotrophic North Pacific Subtropical Gyre and coastal Southern California) and vertical (surface to 1,000 m depth) ranges was used to characterize the taxonomic and functional community profiles (functional structure). Results revealed how oligotrophic vs. coastal environments may select for specific protistan groups and how globally-distributed species may adapt to regions of low nutrients or low oxygen. We also demonstrate the application of a Jaccard dissimilarity approach to evaluate functional redundancy among protistan communities. Our findings highlight the contribution of microbial biodiversity to sustaining biogeochemical processes in the ocean, where protistan community composition is shaped by local environmental forcing factors, often resulting in the conservation of ecosystem function across distinct oceanic regions.
+
+## Study sites
+
+* SPOT, POLA, Catalina
+* ALOHA
+
+# Metatranscriptome analysis information
+
+mRNA isolation and sequencing
+
+## Sequencing information
+
+## eukrhythmic
+
+## Summary of analysis

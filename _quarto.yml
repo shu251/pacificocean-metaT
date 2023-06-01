@@ -1,0 +1,32 @@
+project:
+  type: website
+  output-dir: docs
+  # add .qmd files you actually want to the website. Otherwise, will not render
+  render:
+    - index.qmd # home page
+    - env-metadata.qmd
+    - metat-analysis.qmd
+    - process-eukrhythmic-output.qmd
+
+website:
+  sidebar:
+    style: "docked"
+    search: true
+    contents:
+      - href: index.qmd
+        text: Home
+      - href: env-metadata.qmd
+        text: Water column profiles
+      - href: process-eukrhythmic-output.qmd
+        text: eukrhythmic output
+      - href: metat-analysis.qmd
+        text: Data analysis
+
+format:
+  html:
+    theme: superhero
+    css: styles.css
+    toc: true
+
+
+

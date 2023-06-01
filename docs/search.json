@@ -1,0 +1,128 @@
+[
+  {
+    "objectID": "env-metadata.html",
+    "href": "env-metadata.html",
+    "title": "Environmental metadata",
+    "section": "",
+    "text": "library(tidyverse); library(patchwork)\n\n\ntmp_all_metadata <- read.csv(\"input-data/All_metadata.csv\")\n# colnames(tmp_all_metadata)\n# unique(tmp_all_metadata$Site)\n# View(tmp_all_metadata)\njuly <- read.delim(\"input-data/flor_env_ALOHAJuly_SPOT.txt\")\nmarch <- read.delim(\"input-data/flour_ALOHAMarch.txt\")\n\n\n# head(july)\n# head(march)\nfluor <- july %>% \n  left_join(march) %>% \n  pivot_longer(cols = SPOT:ALOHAMarch, names_to = \"Site\", values_to = \"Fluor\")\n\nJoining with `by = join_by(Depth)`\n\n# unique(fluor$Site)\nmetadata_all <- tmp_all_metadata %>% \n  filter((!Site == \"ALOHA\")) %>% \n  select(-X) %>% \n  left_join(fluor) %>% \n  pivot_longer(cols = Temp:Fluor, names_to = \"VARIABLE\", values_to = \"VALUE\")\n\nJoining with `by = join_by(Site, Depth, Fluor)`\n\n# head(metadata_all)\n# unique(metadata_all$Site)\n\nFigure aesthetics\n\nsite_order <- c(\"SPOT\", \"PortofLA\", \"Catalina\", \"ALOHAJuly\", \"ALOHAMarch\")\nsite_label <- c(\"SPOT\", \"Port of LA\", \"Catalina\", \"ALOHA July\", \"ALOHA March\")\nsite_color_fill <- c(\"#3288bd\", \"#8073ac\", \"#66bd63\", \"#e6f598\", \"#d53e4f\")\nsite_color_fill_nopola <- c(\"#3288bd\", \"#66bd63\", \"#e6f598\", \"#d53e4f\")\n\nIsolate specific depths, add a label\n\nspot<-c(1,150,885)\nspotsite<-c(\"SPOT\", \"Catalina\", \"PortofLA\")\naloha<-c(1,120,150,1000)\n\nmetadata_pt_depth <- metadata_all %>% \n  filter(Site %in% spotsite & Depth %in% spot | grepl(\"ALOHA\", Site) & Depth %in% aloha) %>% \n  add_column(Label = \"discrete\") %>% \n  mutate(VAR_ORDER = factor(VARIABLE, levels = c(\"Temp\", \"Fluor\", \"Sal\", \"Oxy\"), labels = c(\"Temperature\", \"Chlorophyll\", \"Salinity\", \"Oxygen\"))) %>% \n  mutate(SITE_ORDER = factor(Site, levels = site_order, labels = site_label))\n# unique(metadata_all$Site)\n\n\nallenv <- metadata_all %>% \n  mutate(VAR_ORDER = factor(VARIABLE, levels = c(\"Temp\", \"Fluor\", \"Sal\", \"Oxy\"), labels = c(\"Temperature\", \"Chlorophyll\", \"Salinity\", \"Oxygen\"))) %>% \n  mutate(SITE_ORDER = factor(Site, levels = site_order, labels = site_label)) %>% \n  arrange(Depth) %>% \n  ggplot(aes(y = Depth, x = VALUE)) +\n  geom_hline(yintercept = 0, alpha = 0.3) +\n  geom_path(size = 1, aes(color = SITE_ORDER)) +\n  geom_point(data = metadata_pt_depth, size = 2, aes(y = Depth, x = VALUE, fill = SITE_ORDER, shape = SITE_ORDER)) +\n    scale_shape_manual(values = c(21, 22, 23, 24, 25)) +\n    scale_fill_manual(values = site_color_fill) +\n    scale_color_manual(values = site_color_fill) +\n  scale_y_reverse() +\n  facet_grid(. ~ VAR_ORDER, scales = \"free\", switch = \"both\") +\n  theme_linedraw() +\n  labs(x = \"\", y = \"Depth (m)\") +\n  theme(strip.background = element_blank(),\n        strip.placement = \"outside\",\n        strip.text = element_text(color = \"black\"),\n        legend.title = element_blank())\n\nWarning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.\nℹ Please use `linewidth` instead.\n\nallenv\n\nWarning: Removed 2 rows containing missing values (`geom_path()`).\n\n\n\n\n\n\nno_pola <- metadata_all %>% \n  mutate(VAR_ORDER = factor(VARIABLE, levels = c(\"Temp\", \"Fluor\", \"Sal\", \"Oxy\"), labels = c(\"Temperature\", \"Chlorophyll\", \"Salinity\", \"Oxygen\"))) %>% \n  mutate(SITE_ORDER = factor(Site, levels = site_order, labels = site_label)) %>% \n  arrange(Depth) %>% \n  filter(Site != \"PortofLA\") %>% \n  ggplot(aes(y = Depth, x = VALUE)) +\n  geom_hline(yintercept = 0, alpha = 0.3) +\n  geom_path(size = 1, aes(color = SITE_ORDER)) +\n  geom_point(data = (metadata_pt_depth %>% filter(Site != \"PortofLA\")), size = 2, aes(y = Depth, x = VALUE, fill = SITE_ORDER, shape = SITE_ORDER)) +\n    scale_shape_manual(values = c(21, 22, 23, 24, 25)) +\n    scale_fill_manual(values = site_color_fill_nopola) +\n    scale_color_manual(values = site_color_fill_nopola) +\n  scale_y_reverse() +\n  facet_grid(. ~ VAR_ORDER, scales = \"free\", switch = \"both\") +\n  theme_linedraw() +\n  labs(x = \"\", y = \"Depth (m)\") +\n  theme(strip.background = element_blank(),\n        strip.placement = \"outside\",\n        strip.text = element_text(color = \"black\"),\n        legend.title = element_blank())\n\nno_pola\n\nWarning: Removed 2 rows containing missing values (`geom_path()`).\n\n\n\n\n\n\n# svg(\"figs/water-col.svg\", w = 8, h = 7)\nallenv + no_pola + patchwork::plot_layout(ncol = 1)\n\nWarning: Removed 2 rows containing missing values (`geom_path()`).\nRemoved 2 rows containing missing values (`geom_path()`).\n\n\n\n\n# dev.off()\n\n# Requires manual modification of chlorophyll with Port of LA sample"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Metatranscriptome survey of Pacific Ocean",
+    "section": "",
+    "text": "Home for code and analysis for microeukaryotic metatranscriptome survey.\nin prep\nTO DO:"
+  },
+  {
+    "objectID": "metat-analysis.html",
+    "href": "metat-analysis.html",
+    "title": "Analysis of metatranscriptome data",
+    "section": "",
+    "text": "library(multidplyr)\nlibrary(tidyverse)\nlibrary(dbplyr)\nlibrary(RSQLite)\nlibrary(tictoc)\nlibrary(data.table)\nlibrary(compositions)"
+  },
+  {
+    "objectID": "metat-analysis.html#input-all-tpm-results",
+    "href": "metat-analysis.html#input-all-tpm-results",
+    "title": "Analysis of metatranscriptome data",
+    "section": "Input all TPM results",
+    "text": "Input all TPM results\nBelow R objects sourced by first isolating only the eukaryotic transcripts, averaging across replicates, and placing into long format.\n\nload(file = \"/scratch/user/skhu/SPOT-ALOHA/Avg_tpm_ALL_acrossreps_annot.RData\", verbose = T)\nhead(tpm_ALL_mean_reps_annot)\ndim(tpm_ALL_mean_reps_annot)\n\nUse multidplyr to perform tidyverse functions in parallel.\n\n# cluster\ntic()\nall_shard <- tpm_ALL_mean_reps_annot %>% \n  group_by(SAMPLENAME) %>% \n  partition(cluster)\ntoc() #95.245 sec elapsed\n\n\n# Supergroup\nsupergroup_all <- all_shard %>%\n  group_by(Domain, Supergroup, PACIFIC_REGION, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY) %>% \n  summarize(SUM_TPM_supergroup = sum(MEAN_TPM)) %>% \n  collect()\n\nsupergroup_all %>% \n  filter(Domain == \"Eukaryota\") %>% \n  ggplot(aes(x = SAMPLE_ID_PARSED, y = SUM_TPM_supergroup, fill = Supergroup)) +\n  geom_bar(stat = \"identity\", position = \"fill\", color = \"black\")+\n  theme_linedraw() +\n  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))\n\n\n# Phylum\nphylum_all <- all_shard %>%\n  group_by(Domain, Supergroup, Phylum, PACIFIC_REGION, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY) %>% \n  summarize(SUM_TPM_supergroup = sum(MEAN_TPM)) %>% \n  collect() %>% \n  unite(Supergroup_phylum, Supergroup, Phylum, sep = \" \")\n\nphylum_all %>% \n  filter(Domain == \"Eukaryota\") %>% \n  ggplot(aes(x = SAMPLE_ID_PARSED, y = SUM_TPM_supergroup, fill = Supergroup_phylum)) +\n  geom_bar(stat = \"identity\", position = \"fill\", color = \"black\")+\n  theme_linedraw() +\n  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))"
+  },
+  {
+    "objectID": "metat-analysis.html#taxonomic-level-curation-and-estimate-relative-abundance",
+    "href": "metat-analysis.html#taxonomic-level-curation-and-estimate-relative-abundance",
+    "title": "Analysis of metatranscriptome data",
+    "section": "Taxonomic level curation and estimate relative abundance",
+    "text": "Taxonomic level curation and estimate relative abundance\nTaxa curation 3) Average across replicates (or how should replicates be considered) 4) Sum to each sample"
+  },
+  {
+    "objectID": "metat-analysis.html#taxonomy-bar-plot",
+    "href": "metat-analysis.html#taxonomy-bar-plot",
+    "title": "Analysis of metatranscriptome data",
+    "section": "Taxonomy bar plot",
+    "text": "Taxonomy bar plot\n\nbar plot of relative TPM? CPM? for major taxnomic groups Keep ALOHA July and April separate, ALOHA on the left side and on the right side, all CA sites. Also place “sun” emoji for samples that are within the euphotic zone"
+  },
+  {
+    "objectID": "metat-analysis.html#pcoa-with-whole-community-functional-profile",
+    "href": "metat-analysis.html#pcoa-with-whole-community-functional-profile",
+    "title": "Analysis of metatranscriptome data",
+    "section": "PCoA with whole community functional profile",
+    "text": "PCoA with whole community functional profile\n\nhead(tpm_all_euk_clr)\n\n\npca_lr <- prcomp(as.data.frame(tpm_all_euk_clr))\n\nvariance_lr <- (pca_lr$sdev^2)/sum(pca_lr$sdev^2)\n## View bar plot\nbarplot(variance_lr, main = \"Log-Ratio PCA Screeplot\", xlab = \"PC Axis\", ylab = \"% Variance\", \n    cex.names = 1.5, cex.axis = 1.5, cex.lab = 1.5, cex.main = 1.5)\n\n\nDoes PCoA change when only taxonomic information is input?\n(supplementary)"
+  },
+  {
+    "objectID": "metat-analysis.html#define-each-site-by-module",
+    "href": "metat-analysis.html#define-each-site-by-module",
+    "title": "Analysis of metatranscriptome data",
+    "section": "Define each site by module",
+    "text": "Define each site by module\n(k-means?)"
+  },
+  {
+    "objectID": "metat-analysis.html#pcoa-with-curated-functional-profiles-and-known-taxonomic-ids.",
+    "href": "metat-analysis.html#pcoa-with-curated-functional-profiles-and-known-taxonomic-ids.",
+    "title": "Analysis of metatranscriptome data",
+    "section": "PCoA with curated functional profiles and known taxonomic IDs.",
+    "text": "PCoA with curated functional profiles and known taxonomic IDs.\n(subset this way to increase confidence?)\n\nHeterotrophy\nIsolate and sum to pathways associated with heterotrophy. Gene level is likely too much. Determine for each\n\nHow varied are the transcriptional signatures related to heterotrophy among protists?\n\nUse flag/half square heatmap, where top half shows the percent number of genes and bottom half shows the TPM summary.\n\n\nN & P metabolism\nIsolate at individual gene level for N & P pathways. Show TPM across sites and core taxa\n\nFor ecologically-important phytoplankton at ALOHA and coastal CA, what is the relative importance of nutrient profiles? nutrient utilization?\n\nPlot heat map for each taxa. Show all N and P relevant genes on the x axis and y axis should have all samples.\n\n\nDetermine statistical significance\nEstimate statistical significance for N&P genes, pairwise comparisons. Then add a column for each gene ID that lists the number of samples that are statistically different."
+  },
+  {
+    "objectID": "index.html#study-sites",
+    "href": "index.html#study-sites",
+    "title": "Metatranscriptome survey of Pacific Ocean",
+    "section": "Study sites",
+    "text": "Study sites\n\nSPOT, POLA, Catalina\nALOHA"
+  },
+  {
+    "objectID": "index.html#sequencing-information",
+    "href": "index.html#sequencing-information",
+    "title": "Metatranscriptome survey of Pacific Ocean",
+    "section": "Sequencing information",
+    "text": "Sequencing information"
+  },
+  {
+    "objectID": "index.html#eukrhythmic",
+    "href": "index.html#eukrhythmic",
+    "title": "Metatranscriptome survey of Pacific Ocean",
+    "section": "eukrhythmic",
+    "text": "eukrhythmic"
+  },
+  {
+    "objectID": "index.html#summary-of-analysis",
+    "href": "index.html#summary-of-analysis",
+    "title": "Metatranscriptome survey of Pacific Ocean",
+    "section": "Summary of analysis",
+    "text": "Summary of analysis"
+  },
+  {
+    "objectID": "process-eukrhythmic-output.html",
+    "href": "process-eukrhythmic-output.html",
+    "title": "eukrhythmic compilation",
+    "section": "",
+    "text": "Explanation of output data from eukrhythmic\n\n00-nucleotide_assembly:\n\nMAD.filtered.nospace.fasta: Full length sequences of merged assembly groups (MAD) that have been de-duplicated\n\n01-predicted_proteins:\n\nMAD.fasta.transdecoder.cds: Identified coding regions of transcripts from the Merged assembly groups (MAD)\nMAD.fasta.transdecoder.pep: Translated peptide sequences from the Merged assembly groups (MAD)\n\n02-annotation_table:\n\nSeqID_Dict.csv: Original sequence names (MAD-based) that originate from rnaspades, megahit merged/deduplicates and the associated ShortSeqID that is found in the other annotation outputs.\nTaxonomicAndFunctionalAnnotations.csv: Taxonomic levels, GOs, PFAMs, and KEGG KOs - assigned by short seq ID and the full sequence ID.\n\n03-abundance_tables:\n\nReadTable_ByContig.csv: Matrix where row names indicate the ShortSeqID, and column headers are the sample IDs. Counts equal raw counts.\nSeqID_Dict.csv: same as above.\nTPMTable_ByContig.csv: Matrix where row names indicate ShortSeqID and column headers are sample IDs. Counts equate to TPM."
+  },
+  {
+    "objectID": "process-eukrhythmic-output.html#import-metadata",
+    "href": "process-eukrhythmic-output.html#import-metadata",
+    "title": "eukrhythmic compilation",
+    "section": "Import metadata",
+    "text": "Import metadata\n\ntic()\nmetadata <- fread(\"input-data/complete-sample-list.txt\", \n                 # verbose = TRUE,\n                 showProgress = TRUE,\n                 nThread = num_threads,\n                 header = TRUE)\ntoc() # 0.042 sec elapsed\n\n\nhead(metadata)\n\n# Order of current names of table\nsrr_order <- data.frame(RUN = (names(counts_all)[2:44]))\n\n# set re-name from metadata, include RUN srr IDs\nsrr_list_rename <- select(metadata, SAMPLENAME, RUN) %>% \n  distinct() %>% \n  unite(SRR_EDGER, SAMPLENAME, RUN, sep = \"-\", remove = FALSE)\n\n# Re-order these based on table\njoined_reorder <- srr_order %>% \n  left_join(srr_list_rename)\n\n# All should be equal to TRUE\nsrr_order == as.character(joined_reorder$RUN)\n\n# Set new names\nsrr_rename <- as.character(joined_reorder$SRR_EDGER)\n\nRename counts table\n\n# srr_rename\nnames(counts_all)\ncolnames(counts_all)[2:44] <- srr_rename\nnames(counts_all)\n\n\nQC read counts with what is annotated\nWhat sequences were not annotated? Remove them from the data.\n\n# ID seqID associated \nhead(counts_all$ShortSeqID) # There are more of these here, than was annotated\n\n# What is total number of ShortSeqIDs?\ntic()\nlength(unique(counts_all$ShortSeqID)); toc()\n# 54,080,665\n\nThere are over 54 million hits of read on contigs.\n\n# head(annot_all)\ntic()\nlength(unique(annot_all$ShortSeqID)); toc() #14,737,135 # 14 million with annotations\n\ntic()\nlength(unique(annot_all$SequenceID)); toc()\n# 14840771 - 14737135\n# 103,636 equate to duplicated ORFs\n\nOf these reads, only 14 million had an annotation. This is 27% of the reads that will be used in downstream analysis.\n\n100*(14840771/54080665)\n\n\n\nRemove unannotated.\n\nseqIDs_wannot <- as.character(unique(annot_all$ShortSeqID))\n\n# Save unannotated\nunannot_counts <- counts_all %>% \n  filter(!(ShortSeqID %in% seqIDs_wannot))\n\ncounts_annot <- counts_all %>% \n  filter(ShortSeqID %in% seqIDs_wannot)\n\nNew counts table.\n\ndim(counts_annot)"
+  },
+  {
+    "objectID": "process-eukrhythmic-output.html#edger",
+    "href": "process-eukrhythmic-output.html#edger",
+    "title": "eukrhythmic compilation",
+    "section": "EdgeR",
+    "text": "EdgeR\nPrep matrix of counts\n\nhead(all_counts_matrix)\ny <- dim(all_counts_matrix)[2]\ny # should be 43\n# ?DGEList()\n\n# annot_genes <- annot_all %>% \n  # distinct()\n  # column_to_rownames(var = \"ShortSeqID\")\n# dim(annot_all)\n# dim(annot_genes)\n\n\ntic()\ndge_obj_spot_aloha <- DGEList(counts = all_counts_df,\n                              group = c(rep(\"CA_Catalina_5_May\",6),\n          rep(\"CA_PortofLA_5_May\",6),\n          rep(\"CA_SPOT_150_May\",3),\n          rep(\"CA_SPOT_5_May\",12),\n          rep(\"CA_SPOT_890_May\",4),\n          rep(\"NPSG_ALOHA_1000_July\",1),\n          rep(\"NPSG_ALOHA_1000_March\",1),\n          rep(\"NPSG_ALOHA_119_July\",2),\n          rep(\"NPSG_ALOHA_120_March\",2),\n          rep(\"NPSG_ALOHA_150_July\",1),\n          rep(\"NPSG_ALOHA_150_March\",1),\n          rep(\"NPSG_ALOHA_5_July\",2),\n          rep(\"NPSG_ALOHA_5_March\",2)))\ntoc()\n\n\ndge_obj_spot_aloha$samples\n\ntic()\ndata_tmm <- calcNormFactors(dge_obj_spot_aloha, method=\"TMM\") # TMM normalization\ntoc() # 1290.48 sec elapsed\n\nclass(data_tmm)\n# save(data_tmm, file = \"../../../scratch/user/skhu/SPOT-ALOHA/tmm.RData\")\n\n\nCheckpoint to load TMM data\n\nload(file = \"../../../scratch/user/skhu/SPOT-ALOHA/tmm.RData\", verbose = TRUE)\n\ndata_tmm$samples\n\nGet CPM using normalized library size.\n\ndata_tpm_cpm <- cpm(data_tmm, normalized.lib.sizes = TRUE, log = FALSE)\nclass(data_tpm_cpm) ## outputs a matrix array\n\nhead(data_tpm_cpm)[1:4]\n# Transpose\ntmp <- t(data_tpm_cpm)\nhead(tmp)[,1:2]"
+  },
+  {
+    "objectID": "process-eukrhythmic-output.html#subset-for-test-data",
+    "href": "process-eukrhythmic-output.html#subset-for-test-data",
+    "title": "eukrhythmic compilation",
+    "section": "SUBSET for test data",
+    "text": "SUBSET for test data\n\n# dim(tmp)\n# # 14,841,331 # 14 million\n# \nsubset_tmp <- tmp[,1:1000000]\n# class(subset_tmp)\n# head(subset_tmp)[,1:5]\n# \n# # Create a mini one too.\n# mini_subset_tmp <- tmp[,1:10]"
+  },
+  {
+    "objectID": "process-eukrhythmic-output.html#add-metadata",
+    "href": "process-eukrhythmic-output.html#add-metadata",
+    "title": "eukrhythmic compilation",
+    "section": "Add metadata",
+    "text": "Add metadata\n\n# ?left_join()\n# metat_cpm_wannot <- metat_cpm %>% \n#   left_join(annot_all, )"
+  }
+]
