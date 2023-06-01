@@ -13,8 +13,6 @@ editor: visual
 
 **List of output directories**: 
 
-```intermediate-files```
-
 -   00-nucleotide_assembly:
     -   MAD.filtered.nospace.fasta: Full length sequences of merged assembly groups (MAD) that have been de-duplicated
     
@@ -79,6 +77,7 @@ library(tidyverse)
 # Import data
 
 Outputs from eukrhythmic that are collated.
+
 ```{r}
 # Count data, compiled from salmon output
 count_metat <- read.csv('..', header = TRUE, sep = ",")
@@ -90,7 +89,8 @@ tpm_metat <- read.csv('..', header = TRUE, sep = ",")
 length_metat <- read.csv('..', header = TRUE, sep = ",")
 ```
 
-Import metadata
+Import metadata.
+
 ```{r}
 metadata <- fread("input-data/complete-sample-list.txt", 
                  header = TRUE)
@@ -100,7 +100,8 @@ metadata <- fread("input-data/complete-sample-list.txt",
 ```
 
 
-Make sure metadata lines up with input files
+Make sure metadata lines up with input files.
+
 ```{r}
 # colData : Rows of colData correspond to columns of countData
 
@@ -116,9 +117,8 @@ Make sure metadata lines up with input files
 
 https://bioconductor.org/packages/devel/bioc/manuals/tximport/man/tximport.pdf
 
-Description
+Description: tximport imports transcript-level estimates from Salmon and summarizes abundances, counts, and transcript lengths to output transcript-level matrices (see txOut argument).
 
-tximport imports transcript-level estimates from Salmon and summarizes abundances, counts, and transcript lengths to output transcript-level matrices (see txOut argument).
 txi to DESeqDataSetFromTximport as outlined below is correct: the function creates the appropriate offset for you to perform gene-level differential expression
 
 ```{r}
@@ -142,6 +142,7 @@ txi_makecounts <- makeCountsFromAbundance(count_metat,
 ```
 
 ## Make tx2gene
+
 ```{r}
 # tic()
 # annot_all <- fread("../../../scratch/user/skhu/SPOT-ALOHA/02-annotation_table/TaxonomicAndFunctionalAnnotations.csv", 
@@ -153,13 +154,15 @@ txi_makecounts <- makeCountsFromAbundance(count_metat,
 # ?fread()
 ```
 
-Don't need this:
+Don't need this
+
 ```{r}
 # tx2gene_ko <- annot_all %>% 
   # select(TXNAME = ShortSeqID, GENEID = KEGG_ko)
 ```
 
 Don't need this
+
 ```{r}
 # txi_gene <- summarizeToGene(txi_makecounts,
 #                 tx2gene = tx2gene_ko,
@@ -171,6 +174,7 @@ Don't need this
 ```
 
 Don't need this
+
 ```{r}
 # tximport(
 #   files = txifiles,
@@ -186,13 +190,11 @@ Don't need this
 
 # DESeq normalization
 
-First need to create DESeq object to work with
-```{r}
-# dds <- DESeqDataSetFromTximport(txi, sampleTable, ~condition)
-# dds is now ready for DESeq() see DESeq2 vignette
-# DESeqDataSetFromTximport(txi, colData, design, ...)
+First need to create DESeq object to work with:
 
-?DESeqDataSetFromMatrix()
+```{r}
+# DESeqDataSetFromTximport(txi, colData, design, ...)
+# ?DESeqDataSetFromMatrix()
 
 dds_tpm_sample <- DESeqDataSetFromTximport(txi_makecounts,
                                     colData = metadata,
@@ -202,17 +204,21 @@ dds_tpm_sample <- DESeqDataSetFromTximport(txi_makecounts,
 # design ~ x == serves the purpose of considering biological replicates
 ```
 
+Ways to query DESeq object:
 
-
-Dealing with replicates
 ```{r}
-# collapseReplicates(object, groupby, run, renameCols = TRUE)
+
 ```
+
+
+# STOP HERE
+----
 
 
 # Import count table by contigs
 
 Uncomment and only run on HPC.
+
 ```{r}
 # tic()
 # counts_all <- fread("../../../scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/ReadTable_ByContig.csv", 
