@@ -11,12 +11,13 @@ knitr::opts_chunk$set(echo = TRUE)
 # Set up environment
 ```{r}
 # Must install in this order
-library(multidplyr)
+# library(multidplyr)
 library(tidyverse)
-library(dbplyr)
-library(RSQLite)
-library(tictoc) #use for timing
-library(vroom)
+# WHOI: installing ggplot2, dplyr, tidyr? r version 4.2.2
+# library(dbplyr)
+# library(RSQLite)
+# library(tictoc) #use for timing
+# library(vroom)
 library(data.table)
 library(edgeR)
 #
