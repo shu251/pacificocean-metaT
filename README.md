@@ -1,5 +1,14 @@
 # pacificocean-metaT
 
+
+## Update
+June 1, 2023
+
+* Converting to quarto document. Previously Rmd files will remain or be placed in ARCHIVE. Any exisiting code on HPC will be removed and replaced with individual .R scripts from here. Quarto document will show entire code as blocks and explanation
+
+
+
+
 ## Sequences
 
 Sequence read table, ```03-abundance_tables/ReadTable_ByContig.csv```, has raw counts for all sequences that hit contigs (via Salmon).
