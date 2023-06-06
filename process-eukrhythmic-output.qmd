@@ -11,19 +11,16 @@ editor: visual
 
 # Description of eukrhythmic output files:
 
-**List of output directories**: 
+**List of output directories**:
 
 -   00-nucleotide_assembly:
     -   MAD.filtered.nospace.fasta: Full length sequences of merged assembly groups (MAD) that have been de-duplicated
-    
 -   01-predicted_proteins:
     -   MAD.fasta.transdecoder.cds: Identified coding regions of transcripts from the Merged assembly groups (MAD)
     -   MAD.fasta.transdecoder.pep: Translated peptide sequences from the Merged assembly groups (MAD)
-    
 -   02-annotation_table:
     -   SeqID_Dict.csv: Original sequence names (MAD-based) that originate from rnaspades, megahit merged/deduplicates and the associated **ShortSeqID** that is found in the other annotation outputs.
     -   TaxonomicAndFunctionalAnnotations.csv: Taxonomic levels, GOs, PFAMs, and KEGG KOs - assigned by short seq ID and the full sequence ID.
-    
 -   03-abundance_tables:
     -   ReadTable_ByContig.csv: Matrix where row names indicate the ShortSeqID, and column headers are the sample IDs. Counts equal raw counts.
     -   SeqID_Dict.csv: same as above.
@@ -31,47 +28,44 @@ editor: visual
 
 ## Compilation scripts
 
-```collate-results.py```: _description of code_
+`collate-results.py`: *description of code*
 
 Output files:
 
-- salmon_length_file_coordinated_1June.csv
-- salmon_tpm_file_coordinated_1June.csv
-- salmon_reads_file_coordinated_1June.csv
+-   salmon_length_file_coordinated_1June.csv
+-   salmon_tpm_file_coordinated_1June.csv
+-   salmon_reads_file_coordinated_1June.csv
 
 ### Obtained library normalized count data
 
 DESeq: Love, M.I., Huber, W., Anders, S. (2014) Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biology, 15:550. 10.1186/s13059-014-0550-8
 
-
-
 Explaination using DESeq: https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html
- 
+
 https://bioconductor.org/packages/release/bioc/manuals/DESeq2/man/DESeq2.pdf
 
 # Set up R environment
 
 Library required to execute code in R
+
 ```{r}
-# if (!require("BiocManager", quietly = TRUE))
-#     install.packages("BiocManager")
-# BiocManager::install("DESeq2")
-# BiocManager::install("tximport")
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("DESeq2")
+BiocManager::install("tximport")
 library(tximport)
 library(DESeq2)
 library(data.table)
 library(tidyverse)
-# library(tictoc) #use for timing
+library(tictoc) #use for timing
 
-# Must install in this order
+
 # library(multidplyr)
-# WHOI: installing ggplot2, dplyr, tidyr? r version 4.2.2
 # library(dbplyr)
 # library(RSQLite)
 # library(vroom)
 # library(edgeR)
-#
-# num_threads <- getDTthreads()
+num_threads <- getDTthreads()
 ```
 
 # Import data
@@ -79,15 +73,105 @@ library(tidyverse)
 Outputs from eukrhythmic that are collated.
 
 ```{r}
+num_threads <- getDTthreads()
+
 # Count data, compiled from salmon output
-count_metat <- read.csv('..', header = TRUE, sep = ",")
+tic()
+count_metat <- fread("/vortexfs1/omics/alexander/data/Hu-2022-ALOHA-SPOT/Hu_et_al_2022_eukrhythmic/intermediate-files/salmon_reads_file_coordinated_1June.csv",
+                 verbose = TRUE,
+                 showProgress = TRUE,
+                 nThread = num_threads,
+                 header = TRUE,
+                 sep = ",", colClasses = NULL)
+toc()
 
 # TPM information from salmon
-tpm_metat <- read.csv('..', header = TRUE, sep = ",")
+tic()
+tpm_metat <- fread("/vortexfs1/omics/alexander/data/Hu-2022-ALOHA-SPOT/Hu_et_al_2022_eukrhythmic/intermediate-files/salmon_tpm_file_coordinated_1June.csv",
+                   verbose = TRUE,
+                 showProgress = TRUE,
+                 nThread = num_threads,
+                 header = TRUE,
+                 sep = ",", colClasses = NULL)
+toc()
 
 # Transcript length
-length_metat <- read.csv('..', header = TRUE, sep = ",")
+tic()
+length_metat <- fread("/vortexfs1/omics/alexander/data/Hu-2022-ALOHA-SPOT/Hu_et_al_2022_eukrhythmic/intermediate-files/salmon_length_file_coordinated_1June.csv",
+                   verbose = TRUE,
+                 showProgress = TRUE,
+                 nThread = num_threads,
+                 header = TRUE,
+                 sep = ",", colClasses = NULL)
+toc()
 ```
+
+```{r}
+length_metat$V1 <- NULL
+tpm_metat$V1 <- NULL
+count_metat$V1 <- NULL
+
+rownames(length_metat) <- length_metat$ShortSeqID
+rownames(tpm_metat) <- tpm_metat$ShortSeqID
+rownames(count_metat) <- count_metat$ShortSeqID
+#
+length_metat$ShortSeqID <- NULL
+tpm_metat$ShortSeqID <- NULL
+count_metat$ShortSeqID <- NULL
+```
+
+
+# Transcript level counts
+
+https://bioconductor.org/packages/devel/bioc/manuals/tximport/man/tximport.pdf
+
+Description: tximport imports transcript-level estimates from Salmon and summarizes abundances, counts, and transcript lengths to output transcript-level matrices (see txOut argument).
+
+txi to DESeqDataSetFromTximport as outlined below is correct: the function creates the appropriate offset for you to perform gene-level differential expression
+
+Use count file, transcript length, and TPM information to obtain length scaled TPM results.
+```{r}
+txi_makecounts <- makeCountsFromAbundance(count_metat, 
+                                          tpm_metat, 
+                                          length_metat, 
+                                          countsFromAbundance = c("scaledTPM", "lengthScaledTPM"))
+```
+
+Save checkpoint step on HPC
+
+```{r}
+save(txi_makecounts, file = "/vortexfs1/scratch/sarahhu/txi_makecounts.RData")
+# move back to project directory
+```
+
+
+# DESeq normalization
+
+_This is the step that I cannot run on poseidon_
+
+Run DESeq2
+```{r}
+dds_tpm_sample <- DESeqDataSetFromTximport(txi_makecounts,
+                                           colData = metadata,
+                                           design = ~SAMPLENAME)
+
+## Notes:
+# DESeqDataSetFromTximport(txi, colData, design, ...)
+# ?DESeqDataSetFromMatrix()
+
+# dds_tpm_sample <- DESeqDataSetFromTximport(txi_makecounts,
+                                    # colData = metadata,
+                                    # design = ~SAMPLENAME)
+
+# colData : Rows of colData correspond to columns of countData
+# design ~ x == serves the purpose of considering biological replicates
+```
+
+```{r}
+sessionInfo()
+```
+
+# STOP HERE
 
 Import metadata.
 
@@ -98,7 +182,6 @@ metadata <- fread("input-data/complete-sample-list.txt",
 # View(metadata)
 # head(metadata)
 ```
-
 
 Make sure metadata lines up with input files.
 
@@ -112,34 +195,6 @@ Make sure metadata lines up with input files.
 # dds is now ready for DESeq() see DESeq2 vignette
 ```
 
-
-# Transcript level counts
-
-https://bioconductor.org/packages/devel/bioc/manuals/tximport/man/tximport.pdf
-
-Description: tximport imports transcript-level estimates from Salmon and summarizes abundances, counts, and transcript lengths to output transcript-level matrices (see txOut argument).
-
-txi to DESeqDataSetFromTximport as outlined below is correct: the function creates the appropriate offset for you to perform gene-level differential expression
-
-```{r}
-# ?makeCountsFromAbundance()
-
-txi_makecounts <- makeCountsFromAbundance(count_metat,
-                                          tpm_metat,
-                                          length_metat,
-                                          countsFromAbundance = c("scaledTPM", "lengthScaledTPM"))
-
-# Length Scaled TPM == scaled using average transcript length over samples and then library size
-## This is the value that we want.
-
-## Example:
-# makeCountsFromAbundance(
-#       countsMat,
-#       abundanceMat,
-#       lengthMat,
-#       countsFromAbundance = c("scaledTPM", "lengthScaledTPM")
-# )
-```
 
 ## Make tx2gene
 
@@ -186,33 +241,6 @@ Don't need this
 #                           "dtuScaledTPM"), # scales using median transcript length among isoforms of a gene, and then library size (requires tx2gene file)
 # )
 ```
-
-
-# DESeq normalization
-
-First need to create DESeq object to work with:
-
-```{r}
-# DESeqDataSetFromTximport(txi, colData, design, ...)
-# ?DESeqDataSetFromMatrix()
-
-dds_tpm_sample <- DESeqDataSetFromTximport(txi_makecounts,
-                                    colData = metadata,
-                                    design = ~SAMPLENAME)
-
-# colData : Rows of colData correspond to columns of countData
-# design ~ x == serves the purpose of considering biological replicates
-```
-
-Ways to query DESeq object:
-
-```{r}
-
-```
-
-
-# STOP HERE
-----
 
 
 # Import count table by contigs
@@ -275,6 +303,7 @@ srr_rename <- as.character(joined_reorder$SRR_EDGER)
 ```
 
 Rename counts table
+
 ```{r}
 # srr_rename
 names(counts_all)
@@ -295,6 +324,7 @@ tic()
 length(unique(counts_all$ShortSeqID)); toc()
 # 54,080,665
 ```
+
 There are over 54 million hits of read on contigs.
 
 ```{r}
@@ -308,7 +338,6 @@ length(unique(annot_all$SequenceID)); toc()
 # 103,636 equate to duplicated ORFs
 ```
 
-
 Of these reads, only 14 million had an annotation. This is 27% of the reads that will be used in downstream analysis.
 
 ```{r}
@@ -316,6 +345,7 @@ Of these reads, only 14 million had an annotation. This is 27% of the reads that
 ```
 
 ### Remove unannotated.
+
 ```{r}
 seqIDs_wannot <- as.character(unique(annot_all$ShortSeqID))
 
@@ -330,14 +360,15 @@ counts_annot <- counts_all %>%
 ```
 
 New counts table.
+
 ```{r}
 dim(counts_annot)
 ```
 
-
-
 # EdgeR library normalization
+
 Automate text for edgeR input
+
 ```{r}
 # head(srr_list_rename)
 srr_edgeR <- srr_list_rename %>% 
@@ -371,10 +402,10 @@ toc()
 
 # save(counts_annot_reorder, file = "/scratch/user/skhu/SPOT-ALOHA/tmp-may6-2023.RData")
 ```
+
 ```{r}
 load(file = "/scratch/user/skhu/SPOT-ALOHA/tmp-may6-2023.RData", verbose = TRUE)
 ```
-
 
 ```{r}
 head(counts_annot_reorder)[,1:4]
@@ -382,8 +413,8 @@ str(counts_annot_reorder)
 dim(counts_annot_reorder)
 # 3:45 should be numeric
 ```
-At this point, I have short seq IDs, long seq IDs, and read counts for all the samples as columns. 
 
+At this point, I have short seq IDs, long seq IDs, and read counts for all the samples as columns.
 
 ```{r}
 tic()
@@ -395,13 +426,13 @@ all_counts_df <- as.data.frame(counts_annot_reorder) %>%
   mutate_if(is.character, as.numeric)
 toc() #69.541 sec elapsed
 ```
+
 ```{r}
 str(all_counts_df)
 head(all_counts_df)[,1:4]
 
 # all_counts_mat <- as.matr
 ```
-
 
 ### EdgeR replicate names as groups
 
@@ -421,10 +452,10 @@ head(all_counts_df)[,1:4]
 #           rep("NPSG_ALOHA_5_March",2))
 ```
 
-
 ## EdgeR
 
 Prep matrix of counts
+
 ```{r}
 head(all_counts_matrix)
 y <- dim(all_counts_matrix)[2]
@@ -437,7 +468,6 @@ y # should be 43
 # dim(annot_all)
 # dim(annot_genes)
 ```
-
 
 ```{r}
 tic()
@@ -469,8 +499,8 @@ class(data_tmm)
 # save(data_tmm, file = "../../../scratch/user/skhu/SPOT-ALOHA/tmm.RData")
 ```
 
-
 ### Checkpoint to load TMM data
+
 ```{r}
 load(file = "../../../scratch/user/skhu/SPOT-ALOHA/tmm.RData", verbose = TRUE)
 
@@ -478,6 +508,7 @@ data_tmm$samples
 ```
 
 Get CPM using normalized library size.
+
 ```{r}
 data_tpm_cpm <- cpm(data_tmm, normalized.lib.sizes = TRUE, log = FALSE)
 class(data_tpm_cpm) ## outputs a matrix array
@@ -487,7 +518,9 @@ head(data_tpm_cpm)[1:4]
 tmp <- t(data_tpm_cpm)
 head(tmp)[,1:2]
 ```
+
 ## SUBSET for test data
+
 ```{r}
 # dim(tmp)
 # # 14,841,331 # 14 million
@@ -500,13 +533,12 @@ subset_tmp <- tmp[,1:1000000]
 # mini_subset_tmp <- tmp[,1:10]
 ```
 
-
-
 # Multidplyr experiment
 
-_This didn't really work_
+*This didn't really work*
 
 Using multidplyr to run tidyverse functions in parallel
+
 ```{r}
 # num_threads
 # parallel::detectCores()
@@ -515,6 +547,7 @@ Using multidplyr to run tidyverse functions in parallel
 ```
 
 mini first
+
 ```{r}
 # Isolate samplenames from SRR IDs, send to clusters
 # tic()
@@ -536,7 +569,6 @@ mini first
 # head(metat_cpm_party_SUBSET)
 # head(metat_cpm_SUBSET)
 ```
-
 
 ```{r}
 # ?pivot_longer()
@@ -566,9 +598,7 @@ mini first
 
 Multidplyr is not optimized for this work.
 
-
 # Estimate mean CPM across replicate samples
-
 
 ```{r}
 # tmp
@@ -582,7 +612,6 @@ metat_mean_cpm <- data.frame(subset_tmp) %>%
 toc()
 ```
 
-
 ```{r}
 dim(tmp)
 dim(metat_mean_cpm)
@@ -591,6 +620,7 @@ save(metat_mean_cpm, data_tpm_cpm, file = "/scratch/user/skhu/SPOT-ALOHA/mean_cp
 ```
 
 ## Add metadata
+
 ```{r}
 # ?left_join()
 # metat_cpm_wannot <- metat_cpm %>% 
@@ -598,7 +628,6 @@ save(metat_mean_cpm, data_tpm_cpm, file = "/scratch/user/skhu/SPOT-ALOHA/mean_cp
 ```
 
 # Repeat above normalization by specific taxonomic groups
-
 
 ```{r}
 load(file = "/scratch/user/skhu/SPOT-ALOHA/tmp-may6-2023.RData", verbose = TRUE)
@@ -610,7 +639,6 @@ head(counts_annot_reorder)[1:4,1:5]
 ```{r}
 head(annot_all)
 ```
-
 
 ```{r}
 dim(annot_all)

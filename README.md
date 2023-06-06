@@ -1,5 +1,6 @@
 # pacificocean-metaT
 
+Hosts website to code all code and analysis for Pacific Ocean-wide metatranscriptome survey study.
 
 ## Update
 June 1, 2023
