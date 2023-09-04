@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.1.251">
+<meta name="generator" content="quarto-1.3.353">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -17,9 +17,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -46,43 +47,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -130,11 +101,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">eukrhythmic compilation</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./process-eukrhythmic-output.html">eukrhythmic output</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
       </button>
     </div>
   </nav>
@@ -142,82 +118,76 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
-      <div class="mt-2 flex-shrink-0 align-items-center">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
         <div id="quarto-search" class="" title="Search"></div>
         </div>
-      </div>
+        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">Home</a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Home</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./env-metadata.html" class="sidebar-item-text sidebar-link">Water column profiles</a>
+  <a href="./env-metadata.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Water column profiles</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./process-eukrhythmic-output.html" class="sidebar-item-text sidebar-link active">eukrhythmic output</a>
+  <a href="./process-eukrhythmic-output.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">eukrhythmic output</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./metat-analysis.html" class="sidebar-item-text sidebar-link">Data analysis</a>
+  <a href="./metat-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data analysis</span></a>
   </div>
 </li>
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#description-of-eukrhythmic-output-files" id="toc-description-of-eukrhythmic-output-files" class="nav-link active" data-scroll-target="#description-of-eukrhythmic-output-files">Description of eukrhythmic output files:</a>
+  <li><a href="#working-with-eukrhythmic-output-files" id="toc-working-with-eukrhythmic-output-files" class="nav-link active" data-scroll-target="#working-with-eukrhythmic-output-files">Working with eukrhythmic output files</a>
   <ul class="collapse">
-  <li><a href="#compilation-scripts" id="toc-compilation-scripts" class="nav-link" data-scroll-target="#compilation-scripts">Compilation scripts</a>
+  <li><a href="#compilation-scripts" id="toc-compilation-scripts" class="nav-link" data-scroll-target="#compilation-scripts">Compilation scripts</a></li>
+  </ul></li>
+  <li><a href="#obtain-library-normalized-count-data" id="toc-obtain-library-normalized-count-data" class="nav-link" data-scroll-target="#obtain-library-normalized-count-data">Obtain library normalized count data</a>
   <ul class="collapse">
-  <li><a href="#obtained-library-normalized-count-data" id="toc-obtained-library-normalized-count-data" class="nav-link" data-scroll-target="#obtained-library-normalized-count-data">Obtained library normalized count data</a></li>
-  </ul></li>
-  </ul></li>
   <li><a href="#set-up-r-environment" id="toc-set-up-r-environment" class="nav-link" data-scroll-target="#set-up-r-environment">Set up R environment</a></li>
-  <li><a href="#import-data" id="toc-import-data" class="nav-link" data-scroll-target="#import-data">Import data</a></li>
-  <li><a href="#transcript-level-counts" id="toc-transcript-level-counts" class="nav-link" data-scroll-target="#transcript-level-counts">Transcript level counts</a></li>
-  <li><a href="#deseq-normalization" id="toc-deseq-normalization" class="nav-link" data-scroll-target="#deseq-normalization">DESeq normalization</a></li>
-  <li><a href="#stop-here" id="toc-stop-here" class="nav-link" data-scroll-target="#stop-here">STOP HERE</a>
-  <ul class="collapse">
-  <li><a href="#make-tx2gene" id="toc-make-tx2gene" class="nav-link" data-scroll-target="#make-tx2gene">Make tx2gene</a></li>
   </ul></li>
-  <li><a href="#import-count-table-by-contigs" id="toc-import-count-table-by-contigs" class="nav-link" data-scroll-target="#import-count-table-by-contigs">Import count table by contigs</a>
+  <li><a href="#deseq2-analysis" id="toc-deseq2-analysis" class="nav-link" data-scroll-target="#deseq2-analysis">DESeq2 analysis</a>
   <ul class="collapse">
-  <li><a href="#import-metadata" id="toc-import-metadata" class="nav-link" data-scroll-target="#import-metadata">Import metadata</a>
+  <li><a href="#by-sample-name" id="toc-by-sample-name" class="nav-link" data-scroll-target="#by-sample-name">By sample name</a></li>
+  <li><a href="#extract-count-table" id="toc-extract-count-table" class="nav-link" data-scroll-target="#extract-count-table">Extract count table</a></li>
+  <li><a href="#extract-centered-data" id="toc-extract-centered-data" class="nav-link" data-scroll-target="#extract-centered-data">Extract centered data</a></li>
+  </ul></li>
+  <li><a href="#deseq2-reanalysis-for-de-genes" id="toc-deseq2-reanalysis-for-de-genes" class="nav-link" data-scroll-target="#deseq2-reanalysis-for-de-genes">DEseq2 reanalysis for DE genes</a>
   <ul class="collapse">
-  <li><a href="#qc-read-counts-with-what-is-annotated" id="toc-qc-read-counts-with-what-is-annotated" class="nav-link" data-scroll-target="#qc-read-counts-with-what-is-annotated">QC read counts with what is annotated</a></li>
-  <li><a href="#remove-unannotated." id="toc-remove-unannotated." class="nav-link" data-scroll-target="#remove-unannotated.">Remove unannotated.</a></li>
-  </ul></li>
-  </ul></li>
-  <li><a href="#edger-library-normalization" id="toc-edger-library-normalization" class="nav-link" data-scroll-target="#edger-library-normalization">EdgeR library normalization</a>
+  <li><a href="#subseting-txi" id="toc-subseting-txi" class="nav-link" data-scroll-target="#subseting-txi">Subseting txi</a>
   <ul class="collapse">
-  <li><a href="#edger-replicate-names-as-groups" id="toc-edger-replicate-names-as-groups" class="nav-link" data-scroll-target="#edger-replicate-names-as-groups">EdgeR replicate names as groups</a></li>
-  <li><a href="#edger" id="toc-edger" class="nav-link" data-scroll-target="#edger">EdgeR</a>
+  <li><a href="#samples" id="toc-samples" class="nav-link" data-scroll-target="#samples">Samples</a></li>
+  <li><a href="#genes" id="toc-genes" class="nav-link" data-scroll-target="#genes">Genes</a></li>
+  <li><a href="#function" id="toc-function" class="nav-link" data-scroll-target="#function">Function</a></li>
+  </ul></li>
+  <li><a href="#euphotic-vs.-subeuphotic-overall" id="toc-euphotic-vs.-subeuphotic-overall" class="nav-link" data-scroll-target="#euphotic-vs.-subeuphotic-overall">Euphotic vs.&nbsp;subeuphotic overall</a>
   <ul class="collapse">
-  <li><a href="#checkpoint-to-load-tmm-data" id="toc-checkpoint-to-load-tmm-data" class="nav-link" data-scroll-target="#checkpoint-to-load-tmm-data">Checkpoint to load TMM data</a></li>
+  <li><a href="#euphotic-vs-subeuphotic-across-regions" id="toc-euphotic-vs-subeuphotic-across-regions" class="nav-link" data-scroll-target="#euphotic-vs-subeuphotic-across-regions">Euphotic vs subeuphotic across regions</a></li>
   </ul></li>
-  <li><a href="#subset-for-test-data" id="toc-subset-for-test-data" class="nav-link" data-scroll-target="#subset-for-test-data">SUBSET for test data</a></li>
+  <li><a href="#subset-to-genes-of-interest-only" id="toc-subset-to-genes-of-interest-only" class="nav-link" data-scroll-target="#subset-to-genes-of-interest-only">Subset to genes of interest only</a></li>
   </ul></li>
-  <li><a href="#multidplyr-experiment" id="toc-multidplyr-experiment" class="nav-link" data-scroll-target="#multidplyr-experiment">Multidplyr experiment</a></li>
-  <li><a href="#estimate-mean-cpm-across-replicate-samples" id="toc-estimate-mean-cpm-across-replicate-samples" class="nav-link" data-scroll-target="#estimate-mean-cpm-across-replicate-samples">Estimate mean CPM across replicate samples</a>
-  <ul class="collapse">
-  <li><a href="#add-metadata" id="toc-add-metadata" class="nav-link" data-scroll-target="#add-metadata">Add metadata</a></li>
-  </ul></li>
-  <li><a href="#repeat-above-normalization-by-specific-taxonomic-groups" id="toc-repeat-above-normalization-by-specific-taxonomic-groups" class="nav-link" data-scroll-target="#repeat-above-normalization-by-specific-taxonomic-groups">Repeat above normalization by specific taxonomic groups</a></li>
-  <li><a href="#query-annotation-data" id="toc-query-annotation-data" class="nav-link" data-scroll-target="#query-annotation-data">Query annotation data</a></li>
   </ul>
 </nav>
     </div>
@@ -226,7 +196,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">eukrhythmic compilation</h1>
+<h1 class="title">eukrhythmic compilation</h1>
 </div>
 
 
@@ -234,607 +204,452 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="quarto-title-meta">
 
     
+  
     
   </div>
   
 
 </header>
 
-<section id="description-of-eukrhythmic-output-files" class="level1">
-<h1>Description of eukrhythmic output files:</h1>
+<section id="working-with-eukrhythmic-output-files" class="level1">
+<h1>Working with eukrhythmic output files</h1>
 <p><strong>List of output directories</strong>:</p>
+<p><code>final-files/</code></p>
 <ul>
-<li>00-nucleotide_assembly:
+<li><code>00-nucleotide_assembly/</code>
 <ul>
-<li>MAD.filtered.nospace.fasta: Full length sequences of merged assembly groups (MAD) that have been de-duplicated</li>
+<li><code>MAD.filtered.nospace.fasta</code>: Full length sequences of merged assembly groups (MAD) that have been de-duplicated</li>
 </ul></li>
-<li>01-predicted_proteins:
+<li><code>01-predicted_proteins/</code>
 <ul>
-<li>MAD.fasta.transdecoder.cds: Identified coding regions of transcripts from the Merged assembly groups (MAD)</li>
-<li>MAD.fasta.transdecoder.pep: Translated peptide sequences from the Merged assembly groups (MAD)</li>
+<li><code>MAD.fasta.transdecoder.cds</code>: Identified coding regions of transcripts from the Merged assembly groups (MAD)</li>
+<li><code>MAD.fasta.transdecoder.pep</code>: Translated peptide sequences from the Merged assembly groups (MAD)</li>
 </ul></li>
-<li>02-annotation_table:
+<li><code>02-annotation_table/</code>
 <ul>
-<li>SeqID_Dict.csv: Original sequence names (MAD-based) that originate from rnaspades, megahit merged/deduplicates and the associated <strong>ShortSeqID</strong> that is found in the other annotation outputs.</li>
-<li>TaxonomicAndFunctionalAnnotations.csv: Taxonomic levels, GOs, PFAMs, and KEGG KOs - assigned by short seq ID and the full sequence ID.</li>
+<li><code>TaxonomicAndFunctionalAnnotations.csv</code>: Taxonomic levels, GOs, PFAMs, and KEGG KOs - assigned by short seq ID and the full sequence ID.</li>
 </ul></li>
-<li>03-abundance_tables:
+<li><code>03-abundance_tables/</code>
 <ul>
-<li>ReadTable_ByContig.csv: Matrix where row names indicate the ShortSeqID, and column headers are the sample IDs. Counts equal raw counts.</li>
-<li>SeqID_Dict.csv: same as above.</li>
-<li>TPMTable_ByContig.csv: Matrix where row names indicate ShortSeqID and column headers are sample IDs. Counts equate to TPM.</li>
+<li><code>SeqID_Dict_NoSpaceNames.csv</code>: key to link long sequence read IDs to ShortSeq IDs that will link to taxonomic and functional annotations</li>
+</ul></li>
+</ul>
+<p><code>intermediate-files/</code></p>
+<ul>
+<li><code>04-compare</code>
+<ul>
+<li><code>14-MAD-mapping-filtered</code>: location of individual salmon outputs for all samples (quant.sf)</li>
 </ul></li>
 </ul>
 <section id="compilation-scripts" class="level2">
 <h2 class="anchored" data-anchor-id="compilation-scripts">Compilation scripts</h2>
 <p><code>collate-results.py</code>: <em>description of code</em></p>
-<p>Output files:</p>
+<p>~Arianna - how do you want to handle this?~</p>
+</section>
+</section>
+<section id="obtain-library-normalized-count-data" class="level1">
+<h1>Obtain library normalized count data</h1>
+<p>R script to run this: <code>run_tximport.R</code>.</p>
+<p>Our goal is to take eukrhthymic estimated counts (from salmon) to get transcript-level abundance estimates that will account for gene length. The outcome from this is that we get average transcript length across samples. For this we want to import all data into DESeq using tximport as an interface.</p>
 <ul>
-<li>salmon_length_file_coordinated_1June.csv</li>
-<li>salmon_tpm_file_coordinated_1June.csv</li>
-<li>salmon_reads_file_coordinated_1June.csv</li>
+<li>tximport
+<ul>
+<li><em>Why tximport</em>? tximport allows us to correct for the changes in gene length across our samples. This way we can use transcript-level estimates for our metatranscriptomic analysis. Also, tximport knows the output from salmon, so we can easily put the salmon output into tximport. Then it can link directly to edgeR or DESeq2.</li>
+</ul></li>
+<li>DESeq
+<ul>
+<li>DESeq: Love, M.I., Huber, W., Anders, S. (2014) Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biology, 15:550. 10.1186/s13059-014-0550-8</li>
+<li>Explaination using DESeq: https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html</li>
+<li>https://bioconductor.org/packages/release/bioc/manuals/DESeq2/man/DESeq2.pdf</li>
+</ul></li>
 </ul>
-<section id="obtained-library-normalized-count-data" class="level3">
-<h3 class="anchored" data-anchor-id="obtained-library-normalized-count-data">Obtained library normalized count data</h3>
-<p>DESeq: Love, M.I., Huber, W., Anders, S. (2014) Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biology, 15:550. 10.1186/s13059-014-0550-8</p>
-<p>Explaination using DESeq: https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html</p>
-<p>https://bioconductor.org/packages/release/bioc/manuals/DESeq2/man/DESeq2.pdf</p>
-</section>
-</section>
-</section>
-<section id="set-up-r-environment" class="level1">
-<h1>Set up R environment</h1>
+<section id="set-up-r-environment" class="level2">
+<h2 class="anchored" data-anchor-id="set-up-r-environment">Set up R environment</h2>
 <p>Library required to execute code in R</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"BiocManager"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(<span class="st">"BiocManager"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"DESeq2"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"tximport"</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tximport)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DESeq2)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tictoc) <span class="co">#use for timing</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># library(multidplyr)</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># library(dbplyr)</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># library(RSQLite)</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># library(vroom)</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># library(edgeR)</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>num_threads <span class="ot">&lt;-</span> <span class="fu">getDTthreads</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Installations</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># if (!require("BiocManager", quietly = TRUE))</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#     install.packages("BiocManager")</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># BiocManager::install("DESeq2")</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># BiocManager::install("tximport")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Load necessary libraries &amp; get number of available threads for data.table.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># | message: false</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># | warning: false</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tximport)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>num_threads <span class="ot">&lt;-</span> <span class="fu">getDTthreads</span>()</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Conflicts between tidyverse and data.table can be ignored</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Output files from<code>run_tximport.R</code> provide an RData file that can be used for the DESeq input file (<code>tximport_metaT-ALOHA-CA.Rdata</code>).</p>
+</section>
+</section>
+<section id="deseq2-analysis" class="level1">
+<h1>DESeq2 analysis</h1>
+<p>Import as DESeq object from tximport.</p>
+<p>DESeq will automatically find a control in your levels or list for the design. There is a way for DESeq to ignore this need for a control.</p>
+<p>SEE SHARON GRIM’S CODE</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DESeq2)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"tximport_metaT-ALOHA-CA.Rdata"</span>, <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># colData : Rows of colData correspond to columns of countData</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># design ~ x == serves the purpose of considering biological replicates</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<blockquote class="blockquote">
+<p>Loading objects: txi sample_merged</p>
+</blockquote>
+<section id="by-sample-name" class="level2">
+<h2 class="anchored" data-anchor-id="by-sample-name">By sample name</h2>
+<p>For taxonomic bar plot and overall cluster analysis. (March and July are separate at ALOHA)</p>
+<p>See how to set up subsetting? https://github.com/WHOIGit/super-waffle/blob/main/01_seqpain_deseq.R</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ds_tpm_samplename <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">colData =</span> sample_merged,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> SAMPLENAME)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><em>optional</em></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>keep <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(<span class="fu">counts</span>(ds_tpm_samplename)) <span class="sc">&gt;=</span> <span class="dv">10</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>dds <span class="ot">&lt;-</span> ds_tpm_samplename[keep,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>dds</code> includes &gt; 10. Now dim is 6972094, it was originally, 14737135. Keeping about 47% of data.</p>
+</section>
+<section id="extract-count-table" class="level2">
+<h2 class="anchored" data-anchor-id="extract-count-table">Extract count table</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tximport)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>counts_scaled <span class="ot">&lt;-</span> <span class="fu">makeCountsFromAbundance</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>(txi<span class="sc">$</span>counts),</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>(txi<span class="sc">$</span>abundance),</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>(txi<span class="sc">$</span>length),</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">countsFromAbundance =</span> <span class="st">"scaledTPM"</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>counts_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(counts_scaled)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Rename so replicates have the same name for counts</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>names_orig <span class="ot">&lt;-</span> <span class="fu">colnames</span>(counts_df)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>names_new <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">"_[^_]+$"</span>, <span class="st">""</span>, names_orig)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(counts_df) <span class="ot">&lt;-</span> names_new</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Mean across columns that have the same name - which are replicates.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>mean_counts_df <span class="ot">&lt;-</span> counts_df <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cbind</span>(<span class="fu">as.list</span>(.) <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Filter</span>(is.numeric, .) <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">split</span>(<span class="fu">names</span>(.)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(as.data.frame) <span class="sc">%&gt;%</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(rowMeans) <span class="sc">%&gt;%</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setNames</span>(<span class="fu">paste0</span>(<span class="st">"mean."</span>, <span class="fu">names</span>(.)))) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"mean"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(mean_counts_df, sample_merged, <span class="at">file =</span> <span class="st">"Avg_scaled_tpm_08222023.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="import-data" class="level1">
-<h1>Import data</h1>
-<p>Outputs from eukrhythmic that are collated.</p>
+<section id="extract-centered-data" class="level2">
+<h2 class="anchored" data-anchor-id="extract-centered-data">Extract centered data</h2>
+<p>See “Count data transformations” in https://introtogenomics.readthedocs.io/en/latest/2021.11.11.DeseqTutorial.html</p>
+<p>Use variance Stabilizing Transformation (<code>vst</code>) command to estimate dispersion.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>num_threads <span class="ot">&lt;-</span> <span class="fu">getDTthreads</span>()</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Count data, compiled from salmon output</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>count_metat <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">"/vortexfs1/omics/alexander/data/Hu-2022-ALOHA-SPOT/Hu_et_al_2022_eukrhythmic/intermediate-files/salmon_reads_file_coordinated_1June.csv"</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">verbose =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">showProgress =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">nThread =</span> num_threads,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">header =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sep =</span> <span class="st">","</span>, <span class="at">colClasses =</span> <span class="cn">NULL</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># TPM information from salmon</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>tpm_metat <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">"/vortexfs1/omics/alexander/data/Hu-2022-ALOHA-SPOT/Hu_et_al_2022_eukrhythmic/intermediate-files/salmon_tpm_file_coordinated_1June.csv"</span>,</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                   <span class="at">verbose =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                 <span class="at">showProgress =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>                 <span class="at">nThread =</span> num_threads,</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                 <span class="at">header =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sep =</span> <span class="st">","</span>, <span class="at">colClasses =</span> <span class="cn">NULL</span>)</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Transcript length</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>length_metat <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">"/vortexfs1/omics/alexander/data/Hu-2022-ALOHA-SPOT/Hu_et_al_2022_eukrhythmic/intermediate-files/salmon_length_file_coordinated_1June.csv"</span>,</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>                   <span class="at">verbose =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>                 <span class="at">showProgress =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>                 <span class="at">nThread =</span> num_threads,</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>                 <span class="at">header =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sep =</span> <span class="st">","</span>, <span class="at">colClasses =</span> <span class="cn">NULL</span>)</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># output is a DESeqtransform object</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>vsd_all <span class="ot">&lt;-</span> <span class="fu">vst</span>(ds_tpm_samplename)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># make a transformed count matrix</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># vsd_blind &lt;- vst(ds_tpm_samplename, blind = FALSE)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Example output: &gt; using ‘avgTxLength’ from assays(dds), correcting for library size</p>
+<p>Look at output with assay.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">assay</span>(vsd_all), <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Extract as a data frame, where values are center normalized - based on avgTxLength.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df_ctr_norm <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">assay</span>(vsd_all))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>length_metat<span class="sc">$</span>V1 <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>tpm_metat<span class="sc">$</span>V1 <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>count_metat<span class="sc">$</span>V1 <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(length_metat) <span class="ot">&lt;-</span> length_metat<span class="sc">$</span>ShortSeqID</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tpm_metat) <span class="ot">&lt;-</span> tpm_metat<span class="sc">$</span>ShortSeqID</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(count_metat) <span class="ot">&lt;-</span> count_metat<span class="sc">$</span>ShortSeqID</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>length_metat<span class="sc">$</span>ShortSeqID <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>tpm_metat<span class="sc">$</span>ShortSeqID <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>count_metat<span class="sc">$</span>ShortSeqID <span class="ot">&lt;-</span> <span class="cn">NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="transcript-level-counts" class="level1">
-<h1>Transcript level counts</h1>
-<p>https://bioconductor.org/packages/devel/bioc/manuals/tximport/man/tximport.pdf</p>
-<p>Description: tximport imports transcript-level estimates from Salmon and summarizes abundances, counts, and transcript lengths to output transcript-level matrices (see txOut argument).</p>
-<p>txi to DESeqDataSetFromTximport as outlined below is correct: the function creates the appropriate offset for you to perform gene-level differential expression</p>
-<p>Use count file, transcript length, and TPM information to obtain length scaled TPM results.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>txi_makecounts <span class="ot">&lt;-</span> <span class="fu">makeCountsFromAbundance</span>(count_metat, </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                                          tpm_metat, </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                                          length_metat, </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                                          <span class="at">countsFromAbundance =</span> <span class="fu">c</span>(<span class="st">"scaledTPM"</span>, <span class="st">"lengthScaledTPM"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Save checkpoint step on HPC</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(txi_makecounts, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi_makecounts.RData"</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># move back to project directory</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="deseq-normalization" class="level1">
-<h1>DESeq normalization</h1>
-<p><em>This is the step that I cannot run on poseidon</em></p>
-<p>Run DESeq2</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dds_tpm_sample <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_makecounts,</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">colData =</span> metadata,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                                           <span class="at">design =</span> <span class="sc">~</span>SAMPLENAME)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Notes:</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># DESeqDataSetFromTximport(txi, colData, design, ...)</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># ?DESeqDataSetFromMatrix()</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># dds_tpm_sample &lt;- DESeqDataSetFromTximport(txi_makecounts,</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                                    <span class="co"># colData = metadata,</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                                    <span class="co"># design = ~SAMPLENAME)</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># colData : Rows of colData correspond to columns of countData</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="co"># design ~ x == serves the purpose of considering biological replicates</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="stop-here" class="level1">
-<h1>STOP HERE</h1>
-<p>Import metadata.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">"input-data/complete-sample-list.txt"</span>, </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">header =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># class(metadata)</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># View(metadata)</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># head(metadata)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Make sure metadata lines up with input files.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># colData : Rows of colData correspond to columns of countData</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># example code:</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># sampleTable &lt;- data.frame(condition = factor(rep(c("A", "B"), each = 3)))</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># rownames(sampleTable) &lt;- colnames(txi$counts)</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># dds &lt;- DESeqDataSetFromTximport(txi, sampleTable, ~condition)</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># dds is now ready for DESeq() see DESeq2 vignette</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<section id="make-tx2gene" class="level2">
-<h2 class="anchored" data-anchor-id="make-tx2gene">Make tx2gene</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tic()</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># annot_all &lt;- fread("../../../scratch/user/skhu/SPOT-ALOHA/02-annotation_table/TaxonomicAndFunctionalAnnotations.csv", </span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                  verbose = TRUE,</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#                  showProgress = TRUE,</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#                  nThread = num_threads,</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">#                  header = TRUE)</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># toc() # 7.046 sec elapsed</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># ?fread()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Don’t need this</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tx2gene_ko &lt;- annot_all %&gt;% </span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># select(TXNAME = ShortSeqID, GENEID = KEGG_ko)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Don’t need this</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># txi_gene &lt;- summarizeToGene(txi_makecounts,</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#                 tx2gene = tx2gene_ko,</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                 varReduce = FALSE,</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#       ignoreTxVersion = FALSE,</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co">#       ignoreAfterBar = FALSE,</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">#       countsFromAbundance = c("no", "scaledTPM", "lengthScaledTPM")</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Don’t need this</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tximport(</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   files = txifiles,</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   type = "salmon",</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   txIn = TRUE, #Incoming are transcript level</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   txOut = FALSE, # output transcript-level</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   countsFromAbundance = c("scaledTPM", # scale to library size</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "lengthScaledTPM", # scaled using average transcript length over samples and then library size</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#                           "dtuScaledTPM"), # scales using median transcript length among isoforms of a gene, and then library size (requires tx2gene file)</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(df_ctr_norm, <span class="at">file =</span> <span class="st">"normed_center_df_08222023.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
-<section id="import-count-table-by-contigs" class="level1">
-<h1>Import count table by contigs</h1>
-<p>Uncomment and only run on HPC.</p>
+<section id="deseq2-reanalysis-for-de-genes" class="level1">
+<h1>DEseq2 reanalysis for DE genes</h1>
+<p>Repeat DESeq2 design to extracted differentially expressed genes for specific patterns below. Subset is required ahead of time - we can do this with txi directly.</p>
+<p>See script <code>run_subset_deseq2.R</code></p>
+<section id="subseting-txi" class="level2">
+<h2 class="anchored" data-anchor-id="subseting-txi">Subseting txi</h2>
+<section id="samples" class="level3">
+<h3 class="anchored" data-anchor-id="samples">Samples</h3>
+<p>Use the metadata data frame to create sample lists for the comparisons we want to do.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tic()</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># counts_all &lt;- fread("../../../scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/ReadTable_ByContig.csv", </span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                  verbose = TRUE,</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">#                  drop = 1,</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#                  showProgress = TRUE,</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#                  nThread = num_threads)</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># toc() # 59.262 sec elapsed</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"input-data/sample-list-revised.txt"</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># head(metadata)</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># unique(metadata$REGION)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>As is, we can do LIGHT and PACIFIC_REGION - these are binary.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tic()</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># annot_all &lt;- fread("../../../scratch/user/skhu/SPOT-ALOHA/02-annotation_table/TaxonomicAndFunctionalAnnotations.csv", </span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co">#                  verbose = TRUE,</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#                  showProgress = TRUE,</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#                  nThread = num_threads,</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">#                  header = TRUE)</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># toc() # 7.046 sec elapsed</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># ?fread()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>ds_tpm_light <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi,</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> sample_merged,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> LIGHT)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>ds_tpm_pac <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> sample_merged,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> PACIFIC_REGION)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>ds_tpm_lightpac <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> sample_merged,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> PACIFIC_REGION <span class="sc">+</span> LIGHT)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ds_tpm_light, ds_tpm_pac, ds_tpm_lightpac, <span class="at">file =</span> <span class="st">"light-pacregion-deseq.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="import-metadata" class="level2">
-<h2 class="anchored" data-anchor-id="import-metadata">Import metadata</h2>
+<p>Compare and contrast within regions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">"input-data/complete-sample-list.txt"</span>, </span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                 <span class="co"># verbose = TRUE,</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">showProgress =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">nThread =</span> num_threads,</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">header =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>() <span class="co"># 0.042 sec elapsed</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(metadata)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Order of current names of table</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>srr_order <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">RUN =</span> (<span class="fu">names</span>(counts_all)[<span class="dv">2</span><span class="sc">:</span><span class="dv">44</span>]))</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># set re-name from metadata, include RUN srr IDs</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>srr_list_rename <span class="ot">&lt;-</span> <span class="fu">select</span>(metadata, SAMPLENAME, RUN) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unite</span>(SRR_EDGER, SAMPLENAME, RUN, <span class="at">sep =</span> <span class="st">"-"</span>, <span class="at">remove =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Re-order these based on table</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>joined_reorder <span class="ot">&lt;-</span> srr_order <span class="sc">%&gt;%</span> </span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(srr_list_rename)</span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="co"># All should be equal to TRUE</span></span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>srr_order <span class="sc">==</span> <span class="fu">as.character</span>(joined_reorder<span class="sc">$</span>RUN)</span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Set new names</span></span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>srr_rename <span class="ot">&lt;-</span> <span class="fu">as.character</span>(joined_reorder<span class="sc">$</span>SRR_EDGER)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Rename counts table</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># srr_rename</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(counts_all)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(counts_all)[<span class="dv">2</span><span class="sc">:</span><span class="dv">44</span>] <span class="ot">&lt;-</span> srr_rename</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(counts_all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<section id="qc-read-counts-with-what-is-annotated" class="level3">
-<h3 class="anchored" data-anchor-id="qc-read-counts-with-what-is-annotated">QC read counts with what is annotated</h3>
-<p>What sequences were not annotated? Remove them from the data.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ID seqID associated </span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(counts_all<span class="sc">$</span>ShortSeqID) <span class="co"># There are more of these here, than was annotated</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># What is total number of ShortSeqIDs?</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(counts_all<span class="sc">$</span>ShortSeqID)); <span class="fu">toc</span>()</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 54,080,665</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>There are over 54 million hits of read on contigs.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># head(annot_all)</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(annot_all<span class="sc">$</span>ShortSeqID)); <span class="fu">toc</span>() <span class="co">#14,737,135 # 14 million with annotations</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(annot_all<span class="sc">$</span>SequenceID)); <span class="fu">toc</span>()</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 14840771 - 14737135</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 103,636 equate to duplicated ORFs</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Of these reads, only 14 million had an annotation. This is 27% of the reads that will be used in downstream analysis.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="dv">100</span><span class="sc">*</span>(<span class="dv">14840771</span><span class="sc">/</span><span class="dv">54080665</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>npsg_only <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PACIFIC_REGION <span class="sc">==</span> <span class="st">"NPSG"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare euphotic and subeuphotic</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Use this to compare across months too</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>ca_only <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PACIFIC_REGION <span class="sc">!=</span> <span class="st">"NPSG"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare euphotic and subeuphotic</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>ca_coast <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PACIFIC_REGION <span class="sc">!=</span> <span class="st">"NPSG"</span> <span class="sc">&amp;</span> REGION <span class="sc">!=</span> <span class="st">"SPOT"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co"># compare POLA vs. Catalina</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>stations_only <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(REGION <span class="sc">==</span> <span class="st">"SPOT"</span> <span class="sc">|</span> REGION <span class="sc">==</span> <span class="st">"ALOHA"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="co"># compare SPOT vs. ALOHA as is</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>euphotic <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(LIGHT <span class="sc">==</span> <span class="st">"Euphotic"</span>)<span class="sc">%&gt;%</span> </span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare NPSG to CA euphotic zone</span></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>subeuphotic <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(LIGHT <span class="sc">!=</span> <span class="st">"Euphotic"</span>)<span class="sc">%&gt;%</span> </span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare NPSG to CA subeuphotic zone</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="remove-unannotated." class="level3">
-<h3 class="anchored" data-anchor-id="remove-unannotated.">Remove unannotated.</h3>
+<section id="genes" class="level3">
+<h3 class="anchored" data-anchor-id="genes">Genes</h3>
+<p>Need to make a list of the <code>SequenceID</code> from the taxonomy and functional annotations.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>seqIDs_wannot <span class="ot">&lt;-</span> <span class="fu">as.character</span>(<span class="fu">unique</span>(annot_all<span class="sc">$</span>ShortSeqID))</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Save unannotated</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>unannot_counts <span class="ot">&lt;-</span> counts_all <span class="sc">%&gt;%</span> </span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(ShortSeqID <span class="sc">%in%</span> seqIDs_wannot))</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>counts_annot <span class="ot">&lt;-</span> counts_all <span class="sc">%&gt;%</span> </span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ShortSeqID <span class="sc">%in%</span> seqIDs_wannot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>taxfxn <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"TaxonomicAndFunctionalAnnotations.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>New counts table.</p>
+<p>R objects that are character lists will be most useful.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(counts_annot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get list of annotations where a GO, PFAM, and KEGG ID were assigned.</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>genes_fxn_all <span class="ot">&lt;-</span> <span class="fu">as.character</span>(</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(taxfxn, GOs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]]) <span class="co">#this line outputs the selected vector from the pipe</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Removing unclassified and unannotated sequences</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>genes_tax_fxn_all <span class="ot">&lt;-</span> <span class="fu">as.character</span>(</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(taxfxn, GOs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>         <span class="sc">&amp;</span> Domain <span class="sc">==</span> <span class="st">"Eukaryota"</span> <span class="sc">&amp;</span> Supergroup <span class="sc">!=</span> <span class="st">"Unclassified"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>From KEGG database reformatting, extract this Robject, <code>key_geneid</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># head(key_geneid)</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>kegg_keep <span class="ot">&lt;-</span> <span class="fu">as.character</span>(key_geneid <span class="sc">%&gt;%</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Category01 <span class="sc">!=</span> <span class="st">""</span> <span class="sc">&amp;</span> <span class="sc">!</span>(<span class="fu">is.na</span>(Category01))) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(KEGG) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  .[[<span class="st">"KEGG"</span>]])</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(kegg_keep)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>genes_kegg_curated <span class="ot">&lt;-</span> <span class="fu">as.character</span>(taxfxn <span class="sc">%&gt;%</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">KEGG_mod =</span> <span class="fu">str_remove_all</span>(KEGG_ko, <span class="st">"ko:"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(KEGG_mod <span class="sc">%in%</span> kegg_keep) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Save objects for subsetting.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(genes_fxn_all, genes_tax_fxn_all, key_geneid,</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>     npsg_only, ca_only, ca_coast, stations_only, euphotic, subeuphotic,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">file =</span> <span class="st">"sample-gene-lists_TXISUBSET.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="function" class="level3">
+<h3 class="anchored" data-anchor-id="function">Function</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset txi directly</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>subsetTxi <span class="ot">&lt;-</span> <span class="cf">function</span>(txi, samples, <span class="at">include_genes=</span><span class="fu">rownames</span>(txi<span class="sc">$</span>counts))</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  {</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  genes <span class="ot">&lt;-</span> <span class="fu">rownames</span>(txi<span class="sc">$</span>counts)[<span class="fu">rownames</span>(txi<span class="sc">$</span>counts) <span class="sc">%in%</span> include_genes]</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  txi<span class="sc">$</span>abundance <span class="ot">&lt;-</span> txi<span class="sc">$</span>abundance[genes, samples<span class="sc">$</span>sample]</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  txi<span class="sc">$</span>counts <span class="ot">&lt;-</span> txi<span class="sc">$</span>counts[genes, samples<span class="sc">$</span>sample]</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  txi<span class="sc">$</span>length <span class="ot">&lt;-</span> txi<span class="sc">$</span>length[genes, samples<span class="sc">$</span>sample]</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(txi)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Example usage </span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="co"># tmp &lt;- sample(taxfxn$SequenceID,10,replace = FALSE)</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="co"># pola &lt;- data.frame(sample = c("PortofLA_1", "PortofLA_2"))</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="co"># txi_pola &lt;- subsetTxi(txi, pola, tmp)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
-</section>
-<section id="edger-library-normalization" class="level1">
-<h1>EdgeR library normalization</h1>
-<p>Automate text for edgeR input</p>
+<section id="euphotic-vs.-subeuphotic-overall" class="level2">
+<h2 class="anchored" data-anchor-id="euphotic-vs.-subeuphotic-overall">Euphotic vs.&nbsp;subeuphotic overall</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># head(srr_list_rename)</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>srr_edgeR <span class="ot">&lt;-</span> srr_list_rename <span class="sc">%&gt;%</span> </span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SAMPLENAME) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">NUM =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(SAMPLENAME)</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>edger_text <span class="ot">&lt;-</span> srr_edgeR <span class="sc">%&gt;%</span> </span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(SAMPLENAME, NUM) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">TEXT =</span> <span class="fu">paste</span>(</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">'rep("'</span>, SAMPLENAME,<span class="st">'",'</span>,NUM,<span class="st">')'</span>,<span class="at">sep =</span> <span class="st">""</span>))</span>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset txi</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>txi_npsg <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, npsg_only, genes_tax_fxn_all)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(npsg_only<span class="sc">$</span>sample))</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_npsg<span class="sc">$</span>counts)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>ds_tpm_npsg_light <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_npsg,</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> LIGHT)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>ds_tpm_npsg_month <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_npsg,</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> MONTH)</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ds_tpm_npsg_light, ds_tpm_npsg_month, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi-objs-metaT/npsg-deseq.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>txi_ca <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, ca_only, genes_tax_fxn_all)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(ca_only<span class="sc">$</span>sample))</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_ca<span class="sc">$</span>counts)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>ds_tpm_ca_light <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_ca,</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> LIGHT)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ds_tpm_ca_light, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi-objs-metaT/ca-deseq.RData"</span>)</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(txi_npsg, txi_ca, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi-objs-metaT/station_txi.RData"</span>)</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(txi_npsg);<span class="fu">rm</span>(txi_ca) <span class="co">#Save room</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="euphotic-vs-subeuphotic-across-regions" class="level3">
+<h3 class="anchored" data-anchor-id="euphotic-vs-subeuphotic-across-regions">Euphotic vs subeuphotic across regions</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset txi</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>txi_euph <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, euphotic, genes_tax_fxn_all)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(euphotic<span class="sc">$</span>sample))</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_euph<span class="sc">$</span>counts)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>ds_tpm_euphotic <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_euph,</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> PACIFIC_REGION)</span>
 <span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="co"># edit(edger_text$TEXT)</span></span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co"># ?edit()</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>txi_subeuph <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, subeuphotic, genes_tax_fxn_all)</span>
 <span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>reorder_col_names <span class="ot">&lt;-</span> <span class="fu">as.character</span>(srr_edgeR<span class="sc">$</span>SRR_EDGER)</span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>reorder_col_names_alpha <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ShortSeqID"</span>,<span class="st">"SequenceID"</span>, reorder_col_names)</span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>reorder_col_names_alpha</span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(reorder_col_names_alpha)</span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a><span class="co"># dim(counts_annot)</span></span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a><span class="co"># length(reorder_col_names_alpha)</span></span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>counts_annot_reorder <span class="ot">&lt;-</span> annot_all <span class="sc">%&gt;%</span> </span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ShortSeqID, SequenceID) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(counts_annot) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(reorder_col_names_alpha) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># column_to_rownames(var = "SequenceID") %&gt;%</span></span>
-<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>  as.matrix</span>
-<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span>
-<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a><span class="co"># save(counts_annot_reorder, file = "/scratch/user/skhu/SPOT-ALOHA/tmp-may6-2023.RData")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"/scratch/user/skhu/SPOT-ALOHA/tmp-may6-2023.RData"</span>, <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(counts_annot_reorder)[,<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(counts_annot_reorder)</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(counts_annot_reorder)</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 3:45 should be numeric</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>At this point, I have short seq IDs, long seq IDs, and read counts for all the samples as columns.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>all_counts_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(counts_annot_reorder) <span class="sc">%&gt;%</span> </span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">row_id =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unite</span>(<span class="st">"READ_ID_FULL"</span>, <span class="fu">c</span>(<span class="st">"ShortSeqID"</span>, <span class="st">"row_id"</span>), <span class="at">sep =</span> <span class="st">";"</span>) <span class="sc">%&gt;%</span> <span class="co"># make unique</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>SequenceID) <span class="sc">%&gt;%</span> </span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">"READ_ID_FULL"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.character, as.numeric)</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>() <span class="co">#69.541 sec elapsed</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(all_counts_df)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(all_counts_df)[,<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># all_counts_mat &lt;- as.matr</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<section id="edger-replicate-names-as-groups" class="level3">
-<h3 class="anchored" data-anchor-id="edger-replicate-names-as-groups">EdgeR replicate names as groups</h3>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># group = c(rep("CA_Catalina_5_May",6),</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co">#           rep("CA_PortofLA_5_May",6),</span></span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co">#           rep("CA_SPOT_150_May",3),</span></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co">#           rep("CA_SPOT_5_May",12),</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="co">#           rep("CA_SPOT_890_May",4),</span></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co">#           rep("NPSG_ALOHA_1000_July",1),</span></span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co">#           rep("NPSG_ALOHA_1000_March",1),</span></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="co">#           rep("NPSG_ALOHA_119_July",2),</span></span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co">#           rep("NPSG_ALOHA_120_March",2),</span></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="co">#           rep("NPSG_ALOHA_150_July",1),</span></span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a><span class="co">#           rep("NPSG_ALOHA_150_March",1),</span></span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="co">#           rep("NPSG_ALOHA_5_July",2),</span></span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="co">#           rep("NPSG_ALOHA_5_March",2))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="edger" class="level2">
-<h2 class="anchored" data-anchor-id="edger">EdgeR</h2>
-<p>Prep matrix of counts</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(all_counts_matrix)</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">dim</span>(all_counts_matrix)[<span class="dv">2</span>]</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>y <span class="co"># should be 43</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ?DGEList()</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co"># annot_genes &lt;- annot_all %&gt;% </span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># distinct()</span></span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># column_to_rownames(var = "ShortSeqID")</span></span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="co"># dim(annot_all)</span></span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="co"># dim(annot_genes)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>dge_obj_spot_aloha <span class="ot">&lt;-</span> <span class="fu">DGEList</span>(<span class="at">counts =</span> all_counts_df,</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">group =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">"CA_Catalina_5_May"</span>,<span class="dv">6</span>),</span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>          <span class="fu">rep</span>(<span class="st">"CA_PortofLA_5_May"</span>,<span class="dv">6</span>),</span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>          <span class="fu">rep</span>(<span class="st">"CA_SPOT_150_May"</span>,<span class="dv">3</span>),</span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>          <span class="fu">rep</span>(<span class="st">"CA_SPOT_5_May"</span>,<span class="dv">12</span>),</span>
-<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>          <span class="fu">rep</span>(<span class="st">"CA_SPOT_890_May"</span>,<span class="dv">4</span>),</span>
-<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>          <span class="fu">rep</span>(<span class="st">"NPSG_ALOHA_1000_July"</span>,<span class="dv">1</span>),</span>
-<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>          <span class="fu">rep</span>(<span class="st">"NPSG_ALOHA_1000_March"</span>,<span class="dv">1</span>),</span>
-<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>          <span class="fu">rep</span>(<span class="st">"NPSG_ALOHA_119_July"</span>,<span class="dv">2</span>),</span>
-<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>          <span class="fu">rep</span>(<span class="st">"NPSG_ALOHA_120_March"</span>,<span class="dv">2</span>),</span>
-<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>          <span class="fu">rep</span>(<span class="st">"NPSG_ALOHA_150_July"</span>,<span class="dv">1</span>),</span>
-<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>          <span class="fu">rep</span>(<span class="st">"NPSG_ALOHA_150_March"</span>,<span class="dv">1</span>),</span>
-<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>          <span class="fu">rep</span>(<span class="st">"NPSG_ALOHA_5_July"</span>,<span class="dv">2</span>),</span>
-<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>          <span class="fu">rep</span>(<span class="st">"NPSG_ALOHA_5_March"</span>,<span class="dv">2</span>)))</span>
-<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>dge_obj_spot_aloha<span class="sc">$</span>samples</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>data_tmm <span class="ot">&lt;-</span> <span class="fu">calcNormFactors</span>(dge_obj_spot_aloha, <span class="at">method=</span><span class="st">"TMM"</span>) <span class="co"># TMM normalization</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>() <span class="co"># 1290.48 sec elapsed</span></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(data_tmm)</span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="co"># save(data_tmm, file = "../../../scratch/user/skhu/SPOT-ALOHA/tmm.RData")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<section id="checkpoint-to-load-tmm-data" class="level3">
-<h3 class="anchored" data-anchor-id="checkpoint-to-load-tmm-data">Checkpoint to load TMM data</h3>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"../../../scratch/user/skhu/SPOT-ALOHA/tmm.RData"</span>, <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>data_tmm<span class="sc">$</span>samples</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Get CPM using normalized library size.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>data_tpm_cpm <span class="ot">&lt;-</span> <span class="fu">cpm</span>(data_tmm, <span class="at">normalized.lib.sizes =</span> <span class="cn">TRUE</span>, <span class="at">log =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(data_tpm_cpm) <span class="do">## outputs a matrix array</span></span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(data_tpm_cpm)[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Transpose</span></span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>tmp <span class="ot">&lt;-</span> <span class="fu">t</span>(data_tpm_cpm)</span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tmp)[,<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(subeuphotic<span class="sc">$</span>sample))</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_subeuph<span class="sc">$</span>counts)</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>ds_tpm_subeuphotic <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_subeuph,</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> PACIFIC_REGION)</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ds_tpm_subeuphotic, ds_tpm_euphotic, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi-objs-metaT/euphotic-subeuphotic-deseq.RData"</span>)</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(txi_euph, txi_subeuph, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi-objs-metaT/light_txi.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
-<section id="subset-for-test-data" class="level2">
-<h2 class="anchored" data-anchor-id="subset-for-test-data">SUBSET for test data</h2>
+<section id="subset-to-genes-of-interest-only" class="level2">
+<h2 class="anchored" data-anchor-id="subset-to-genes-of-interest-only">Subset to genes of interest only</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># dim(tmp)</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co"># # 14,841,331 # 14 million</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>subset_tmp <span class="ot">&lt;-</span> tmp[,<span class="dv">1</span><span class="sc">:</span><span class="dv">1000000</span>]</span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="co"># class(subset_tmp)</span></span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="co"># head(subset_tmp)[,1:5]</span></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="co"># # Create a mini one too.</span></span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="co"># mini_subset_tmp &lt;- tmp[,1:10]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-</section>
-<section id="multidplyr-experiment" class="level1">
-<h1>Multidplyr experiment</h1>
-<p><em>This didn’t really work</em></p>
-<p>Using multidplyr to run tidyverse functions in parallel</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># num_threads</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co"># parallel::detectCores()</span></span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co"># cluster &lt;- new_cluster(num_threads)</span></span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co"># cluster</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>mini first</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Isolate samplenames from SRR IDs, send to clusters</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co"># tic()</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="co"># metat_cpm_party_SUBSET &lt;- data.frame(mini_subset_tmp) %&gt;%</span></span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   rownames_to_column(var = "SAMPLENAME") %&gt;%</span></span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   separate(SAMPLENAME, into = c("SAMPLE", "RUN"), sep = "-") %&gt;%</span></span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   group_by(SAMPLE) %&gt;%</span></span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="co">#     partition(cluster)</span></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="co"># toc() #mini via partition = 4.38 seconds</span></span>
-<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="co"># tic()</span></span>
-<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="co"># metat_cpm_SUBSET &lt;- data.frame(mini_subset_tmp) %&gt;%</span></span>
-<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   rownames_to_column(var = "SAMPLENAME") %&gt;%</span></span>
-<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   separate(SAMPLENAME, into = c("SAMPLE", "RUN"), sep = "-") </span></span>
-<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="co"># toc() # without particion = 0.03 seconds</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>taxfxn <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"TaxonomicAndFunctionalAnnotations.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># head(metat_cpm_party_SUBSET)</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co"># head(metat_cpm_SUBSET)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tximport)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>all_samples <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>txi_curated <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, all_samples, genes_kegg_curated)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>counts_scaled_curated <span class="ot">&lt;-</span> <span class="fu">makeCountsFromAbundance</span>(</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>(txi_curated<span class="sc">$</span>counts),</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>(txi_curated<span class="sc">$</span>abundance),</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>(txi_curated<span class="sc">$</span>length),</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">countsFromAbundance =</span> <span class="st">"scaledTPM"</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>counts_df_curated <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(counts_scaled_curated)</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>names_orig <span class="ot">&lt;-</span> <span class="fu">colnames</span>(counts_df_curated)</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>names_new <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">"_[^_]+$"</span>, <span class="st">""</span>, names_orig)</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(counts_df_curated) <span class="ot">&lt;-</span> names_new</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>mean_counts_df_curated <span class="ot">&lt;-</span> counts_df_curated <span class="sc">%&gt;%</span></span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cbind</span>(<span class="fu">as.list</span>(.) <span class="sc">%&gt;%</span></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Filter</span>(is.numeric, .) <span class="sc">%&gt;%</span></span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">split</span>(<span class="fu">names</span>(.)) <span class="sc">%&gt;%</span></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(as.data.frame) <span class="sc">%&gt;%</span></span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(rowMeans) <span class="sc">%&gt;%</span></span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setNames</span>(<span class="fu">paste0</span>(<span class="st">"mean."</span>, <span class="fu">names</span>(.)))) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"mean"</span>))</span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>counts_curated <span class="ot">&lt;-</span> mean_counts_df_curated <span class="sc">%&gt;%</span> </span>
+<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"SequenceID"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(taxfxn)</span>
+<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(counts_curated, sample_merged, <span class="at">file =</span> <span class="st">"Avg_scaled_tpm_curated_08252023.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ?pivot_longer()</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co"># ?pivot_longer</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="co"># tic()</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="co"># metat_cpm &lt;- metat_cpm_party_SUBSET %&gt;% </span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   # pivot_longer(cols = starts_with("Seq_"), names_to = "ShortSeqID_num", values_to = "CPM") %&gt;% </span></span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   # separate(ShortSeqID_num, into = c("ShortSeqID", "num"), sep = "//.") %&gt;% </span></span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   group_by(SAMPLE) %&gt;% </span></span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a><span class="co">#     # summarise(MEAN_CPM = mean(starts_with("Seq_"))) %&gt;% </span></span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   summarise_if(is.numeric, mean, na.rm = TRUE) %&gt;% </span></span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   collect()</span></span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="co"># toc() # With mini subset, 10.337 second</span></span>
-<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a><span class="co"># tic()</span></span>
-<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a><span class="co"># metat_cpm &lt;- metat_cpm_SUBSET %&gt;% </span></span>
-<span id="cb39-15"><a href="#cb39-15" aria-hidden="true" tabindex="-1"></a><span class="co">#   group_by(SAMPLE) %&gt;% </span></span>
-<span id="cb39-16"><a href="#cb39-16" aria-hidden="true" tabindex="-1"></a><span class="co">#   summarise_if(is.numeric, mean, na.rm = TRUE)</span></span>
-<span id="cb39-17"><a href="#cb39-17" aria-hidden="true" tabindex="-1"></a><span class="co"># toc()</span></span>
-<span id="cb39-18"><a href="#cb39-18" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb39-19"><a href="#cb39-19" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb39-20"><a href="#cb39-20" aria-hidden="true" tabindex="-1"></a><span class="co"># dim(metat_cpm)</span></span>
-<span id="cb39-21"><a href="#cb39-21" aria-hidden="true" tabindex="-1"></a><span class="co"># head(metat_cpm)</span></span>
-<span id="cb39-22"><a href="#cb39-22" aria-hidden="true" tabindex="-1"></a><span class="co"># head(annot_all)</span></span>
-<span id="cb39-23"><a href="#cb39-23" aria-hidden="true" tabindex="-1"></a><span class="co"># save(metat_cpm, file = "../../../scratch/user/skhu/SPOT-ALOHA/normalized_avg_reps.RData")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Multidplyr is not optimized for this work.</p>
-</section>
-<section id="estimate-mean-cpm-across-replicate-samples" class="level1">
-<h1>Estimate mean CPM across replicate samples</h1>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tmp</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="co"># subset_tmp</span></span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>metat_mean_cpm <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(subset_tmp) <span class="sc">%&gt;%</span></span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"SAMPLENAME"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(SAMPLENAME, <span class="at">into =</span> <span class="fu">c</span>(<span class="st">"SAMPLE"</span>, <span class="st">"RUN"</span>), <span class="at">sep =</span> <span class="st">"-"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(SAMPLE) <span class="sc">%&gt;%</span> </span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise_if</span>(is.numeric, mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(all_samples<span class="sc">$</span>sample))</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_curated<span class="sc">$</span>counts)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>ds_tpm_curated <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_curated,</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">colData =</span> tmp_sample_merged,</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> SAMPLENAME)</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>vsd_all <span class="ot">&lt;-</span> <span class="fu">vst</span>(ds_tpm_curated)</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>df_ctr_norm_curated <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">assay</span>(vsd_all))</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>ctr_norm_curated <span class="ot">&lt;-</span> df_ctr_norm_curated <span class="sc">%&gt;%</span> </span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"SequenceID"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(taxfxn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(tmp)</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(metat_mean_cpm)</span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(metat_mean_cpm, data_tpm_cpm, <span class="at">file =</span> <span class="st">"/scratch/user/skhu/SPOT-ALOHA/mean_cpm_all.Rdata"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<section id="add-metadata" class="level2">
-<h2 class="anchored" data-anchor-id="add-metadata">Add metadata</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ?left_join()</span></span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="co"># metat_cpm_wannot &lt;- metat_cpm %&gt;% </span></span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   left_join(annot_all, )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-</section>
-<section id="repeat-above-normalization-by-specific-taxonomic-groups" class="level1">
-<h1>Repeat above normalization by specific taxonomic groups</h1>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"/scratch/user/skhu/SPOT-ALOHA/tmp-may6-2023.RData"</span>, <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(counts_annot_reorder)[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="query-annotation-data" class="level1">
-<h1>Query annotation data</h1>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(annot_all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(annot_all)</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(annot_all<span class="sc">$</span>ShortSeqID))</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="dv">14841331</span> <span class="sc">-</span> <span class="dv">14737135</span></span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="co"># setdiff((annot_all$ShortSeqID), unique(annot_all$ShortSeqID))</span></span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>tmp <span class="ot">&lt;-</span> annot_all[<span class="fu">duplicated</span>(annot_all<span class="sc">$</span>ShortSeqID)]</span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(annot_all <span class="sc">%&gt;%</span> <span class="fu">filter</span>(ShortSeqID <span class="sc">==</span> <span class="st">"Seq_9995515"</span>))</span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>tmp <span class="ot">&lt;-</span> (annot_all <span class="sc">%&gt;%</span> <span class="fu">filter</span>(ShortSeqID <span class="sc">==</span> <span class="st">"Seq_9995515"</span>))</span>
-<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>tmp<span class="sc">$</span>SequenceID</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ctr_norm_curated, ds_tpm_curated, <span class="at">file =</span> <span class="st">"normed_center_df_curated_08252023.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -865,9 +680,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -879,7 +708,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
     button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
     setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
       button.setAttribute("title", currentTitle);
       button.classList.remove('code-copy-button-checked');
     }, 1000);
@@ -915,24 +761,128 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
   var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
   for (var i=0; i<bibliorefs.length; i++) {
     const ref = bibliorefs[i];
-    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
-    tippyHover(ref, function() {
-      var popup = window.document.createElement('div');
-      cites.forEach(function(cite) {
-        var citeDiv = window.document.createElement('div');
-        citeDiv.classList.add('hanging-indent');
-        citeDiv.classList.add('csl-entry');
-        var biblioDiv = window.document.getElementById('ref-' + cite);
-        if (biblioDiv) {
-          citeDiv.innerHTML = biblioDiv.innerHTML;
-        }
-        popup.appendChild(citeDiv);
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
       });
-      return popup.innerHTML;
-    });
+    }
   }
 });
 </script>

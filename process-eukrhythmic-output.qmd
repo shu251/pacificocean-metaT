@@ -9,367 +9,646 @@ format:
 editor: visual
 ---
 
-# Working with eukrhythmic output files
+# Description of eukrhythmic output files:
 
 **List of output directories**:
 
-`final-files/`
-
--   `00-nucleotide_assembly/`
-    -   `MAD.filtered.nospace.fasta`: Full length sequences of merged assembly groups (MAD) that have been de-duplicated
--   `01-predicted_proteins/`
-    -   `MAD.fasta.transdecoder.cds`: Identified coding regions of transcripts from the Merged assembly groups (MAD)
-    -   `MAD.fasta.transdecoder.pep`: Translated peptide sequences from the Merged assembly groups (MAD)
--   `02-annotation_table/`
-    -   `TaxonomicAndFunctionalAnnotations.csv`: Taxonomic levels, GOs, PFAMs, and KEGG KOs - assigned by short seq ID and the full sequence ID.
--   `03-abundance_tables/`
-    -   `SeqID_Dict_NoSpaceNames.csv`: key to link long sequence read IDs to ShortSeq IDs that will link to taxonomic and functional annotations
-
-`intermediate-files/`
-
--   `04-compare`
-    -   `14-MAD-mapping-filtered`: location of individual salmon outputs for all samples (quant.sf)
+-   00-nucleotide_assembly:
+    -   MAD.filtered.nospace.fasta: Full length sequences of merged assembly groups (MAD) that have been de-duplicated
+-   01-predicted_proteins:
+    -   MAD.fasta.transdecoder.cds: Identified coding regions of transcripts from the Merged assembly groups (MAD)
+    -   MAD.fasta.transdecoder.pep: Translated peptide sequences from the Merged assembly groups (MAD)
+-   02-annotation_table:
+    -   SeqID_Dict.csv: Original sequence names (MAD-based) that originate from rnaspades, megahit merged/deduplicates and the associated **ShortSeqID** that is found in the other annotation outputs.
+    -   TaxonomicAndFunctionalAnnotations.csv: Taxonomic levels, GOs, PFAMs, and KEGG KOs - assigned by short seq ID and the full sequence ID.
+-   03-abundance_tables:
+    -   ReadTable_ByContig.csv: Matrix where row names indicate the ShortSeqID, and column headers are the sample IDs. Counts equal raw counts.
+    -   SeqID_Dict.csv: same as above.
+    -   TPMTable_ByContig.csv: Matrix where row names indicate ShortSeqID and column headers are sample IDs. Counts equate to TPM.
 
 ## Compilation scripts
 
 `collate-results.py`: *description of code*
 
-\~Arianna - how do you want to handle this?\~
+Output files:
 
-# Obtain library normalized count data
+-   salmon_length_file_coordinated_1June.csv
+-   salmon_tpm_file_coordinated_1June.csv
+-   salmon_reads_file_coordinated_1June.csv
 
-R script to run this: `run_tximport.R`.
+### Obtained library normalized count data
 
-Our goal is to take eukrhthymic estimated counts (from salmon) to get transcript-level abundance estimates that will account for gene length. The outcome from this is that we get average transcript length across samples. For this we want to import all data into DESeq using tximport as an interface.
+DESeq: Love, M.I., Huber, W., Anders, S. (2014) Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biology, 15:550. 10.1186/s13059-014-0550-8
 
--   tximport
-    -   *Why tximport*? tximport allows us to correct for the changes in gene length across our samples. This way we can use transcript-level estimates for our metatranscriptomic analysis. Also, tximport knows the output from salmon, so we can easily put the salmon output into tximport. Then it can link directly to edgeR or DESeq2.
--   DESeq
-    -   DESeq: Love, M.I., Huber, W., Anders, S. (2014) Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biology, 15:550. 10.1186/s13059-014-0550-8
-    -   Explaination using DESeq: https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html
-    -   https://bioconductor.org/packages/release/bioc/manuals/DESeq2/man/DESeq2.pdf
+Explaination using DESeq: https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html
 
-## Set up R environment
+https://bioconductor.org/packages/release/bioc/manuals/DESeq2/man/DESeq2.pdf
+
+# Set up R environment
 
 Library required to execute code in R
 
 ```{r}
-## Installations
-# if (!require("BiocManager", quietly = TRUE))
-#     install.packages("BiocManager")
-# BiocManager::install("DESeq2")
-# BiocManager::install("tximport")
-```
-
-Load necessary libraries & get number of available threads for data.table.
-
-```{r}
-# | message: false
-# | warning: false
-library(data.table)
-library(tidyr)
-library(dplyr)
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("DESeq2")
+BiocManager::install("tximport")
 library(tximport)
-library(readr)
+library(DESeq2)
+library(data.table)
+library(tidyverse)
+library(tictoc) #use for timing
 
+
+# library(multidplyr)
+# library(dbplyr)
+# library(RSQLite)
+# library(vroom)
+# library(edgeR)
 num_threads <- getDTthreads()
-# Conflicts between tidyverse and data.table can be ignored
 ```
 
-Output files from`run_tximport.R` provide an RData file that can be used for the DESeq input file (`tximport_metaT-ALOHA-CA.Rdata`).
+# Import data
 
-# DESeq2 analysis
-
-Import as DESeq object from tximport.
-
-DESeq will automatically find a control in your levels or list for the design. There is a way for DESeq to ignore this need for a control.
-
-SEE SHARON GRIM'S CODE
+Outputs from eukrhythmic that are collated.
 
 ```{r}
-library(DESeq2)
-library(tidyverse)
-load("tximport_metaT-ALOHA-CA.Rdata", verbose = TRUE)
+num_threads <- getDTthreads()
+
+# Count data, compiled from salmon output
+tic()
+count_metat <- fread("/vortexfs1/omics/alexander/data/Hu-2022-ALOHA-SPOT/Hu_et_al_2022_eukrhythmic/intermediate-files/salmon_reads_file_coordinated_1June.csv",
+                 verbose = TRUE,
+                 showProgress = TRUE,
+                 nThread = num_threads,
+                 header = TRUE,
+                 sep = ",", colClasses = NULL)
+toc()
+
+# TPM information from salmon
+tic()
+tpm_metat <- fread("/vortexfs1/omics/alexander/data/Hu-2022-ALOHA-SPOT/Hu_et_al_2022_eukrhythmic/intermediate-files/salmon_tpm_file_coordinated_1June.csv",
+                   verbose = TRUE,
+                 showProgress = TRUE,
+                 nThread = num_threads,
+                 header = TRUE,
+                 sep = ",", colClasses = NULL)
+toc()
+
+# Transcript length
+tic()
+length_metat <- fread("/vortexfs1/omics/alexander/data/Hu-2022-ALOHA-SPOT/Hu_et_al_2022_eukrhythmic/intermediate-files/salmon_length_file_coordinated_1June.csv",
+                   verbose = TRUE,
+                 showProgress = TRUE,
+                 nThread = num_threads,
+                 header = TRUE,
+                 sep = ",", colClasses = NULL)
+toc()
+```
+
+```{r}
+length_metat$V1 <- NULL
+tpm_metat$V1 <- NULL
+count_metat$V1 <- NULL
+
+rownames(length_metat) <- length_metat$ShortSeqID
+rownames(tpm_metat) <- tpm_metat$ShortSeqID
+rownames(count_metat) <- count_metat$ShortSeqID
+#
+length_metat$ShortSeqID <- NULL
+tpm_metat$ShortSeqID <- NULL
+count_metat$ShortSeqID <- NULL
+```
+
+
+# Transcript level counts
+
+https://bioconductor.org/packages/devel/bioc/manuals/tximport/man/tximport.pdf
+
+Description: tximport imports transcript-level estimates from Salmon and summarizes abundances, counts, and transcript lengths to output transcript-level matrices (see txOut argument).
+
+txi to DESeqDataSetFromTximport as outlined below is correct: the function creates the appropriate offset for you to perform gene-level differential expression
+
+Use count file, transcript length, and TPM information to obtain length scaled TPM results.
+```{r}
+txi_makecounts <- makeCountsFromAbundance(count_metat, 
+                                          tpm_metat, 
+                                          length_metat, 
+                                          countsFromAbundance = c("scaledTPM", "lengthScaledTPM"))
+```
+
+Save checkpoint step on HPC
+
+```{r}
+save(txi_makecounts, file = "/vortexfs1/scratch/sarahhu/txi_makecounts.RData")
+# move back to project directory
+```
+
+
+# DESeq normalization
+
+_This is the step that I cannot run on poseidon_
+
+Run DESeq2
+```{r}
+dds_tpm_sample <- DESeqDataSetFromTximport(txi_makecounts,
+                                           colData = metadata,
+                                           design = ~SAMPLENAME)
+
+## Notes:
+# DESeqDataSetFromTximport(txi, colData, design, ...)
+# ?DESeqDataSetFromMatrix()
+
+# dds_tpm_sample <- DESeqDataSetFromTximport(txi_makecounts,
+                                    # colData = metadata,
+                                    # design = ~SAMPLENAME)
+
 # colData : Rows of colData correspond to columns of countData
 # design ~ x == serves the purpose of considering biological replicates
 ```
 
-> Loading objects: txi sample_merged
-
-## By sample name
-
-For taxonomic bar plot and overall cluster analysis. (March and July are separate at ALOHA)
-
-See how to set up subsetting? https://github.com/WHOIGit/super-waffle/blob/main/01_seqpain_deseq.R
-
 ```{r}
-ds_tpm_samplename <- DESeqDataSetFromTximport(txi,
-                                    colData = sample_merged,
-                                    design = ~0 + SAMPLENAME)
-
+sessionInfo()
 ```
 
-*optional*
+# STOP HERE
+
+Import metadata.
 
 ```{r}
-keep <- rowSums(counts(ds_tpm_samplename)) >= 10
-dds <- ds_tpm_samplename[keep,]
+metadata <- fread("input-data/complete-sample-list.txt", 
+                 header = TRUE)
+# class(metadata)
+# View(metadata)
+# head(metadata)
 ```
 
-`dds` includes \> 10. Now dim is 6972094, it was originally, 14737135. Keeping about 47% of data.
-
-## Extract count table
+Make sure metadata lines up with input files.
 
 ```{r}
-library(tximport)
+# colData : Rows of colData correspond to columns of countData
 
-counts_scaled <- makeCountsFromAbundance(
-  as.matrix(txi$counts),
-  as.matrix(txi$abundance),
-  as.matrix(txi$length),
-  countsFromAbundance = "scaledTPM"
-)
-
-counts_df <- as.data.frame(counts_scaled)
-
-```
-
-Rename so replicates have the same name for counts
-
-```{r}
-names_orig <- colnames(counts_df)
-names_new <- sub("_[^_]+$", "", names_orig)
-colnames(counts_df) <- names_new
-```
-
-Mean across columns that have the same name - which are replicates.
-
-```{r}
-mean_counts_df <- counts_df %>%
-  cbind(as.list(.) %>%
-    Filter(is.numeric, .) %>%
-    split(names(.)) %>%
-    lapply(as.data.frame) %>%
-    lapply(rowMeans) %>%
-    setNames(paste0("mean.", names(.)))) %>% 
-  select(starts_with("mean"))
-```
-
-```{r}
-save(mean_counts_df, sample_merged, file = "Avg_scaled_tpm_08222023.RData")
-```
-
-## Extract centered data
-
-See "Count data transformations" in https://introtogenomics.readthedocs.io/en/latest/2021.11.11.DeseqTutorial.html
-
-Use variance Stabilizing Transformation (`vst`) command to estimate dispersion.
-
-```{r}
-# output is a DESeqtransform object
-vsd_all <- vst(ds_tpm_samplename)
-
-# make a transformed count matrix
-# vsd_blind <- vst(ds_tpm_samplename, blind = FALSE)
-```
-
-Example output: \> using 'avgTxLength' from assays(dds), correcting for library size
-
-Look at output with assay.
-
-```{r}
-head(assay(vsd_all), 4)
-```
-
-Extract as a data frame, where values are center normalized - based on avgTxLength.
-
-```{r}
-df_ctr_norm <- as.data.frame(assay(vsd_all))
-```
-
-```{r}
-save(df_ctr_norm, file = "normed_center_df_08222023.RData")
-```
-
-# DEseq2 reanalysis for DE genes
-
-Repeat DESeq2 design to extracted differentially expressed genes for specific patterns below. Subset is required ahead of time - we can do this with txi directly.
-
-See script `run_subset_deseq2.R`
-
-
-## Subseting txi
-
-### Samples
-Use the metadata data frame to create sample lists for the comparisons we want to do.
-
-```{r}
-metadata <- read.csv("input-data/sample-list-revised.txt")
-head(metadata)
-unique(metadata$REGION)
-```
-
-As is, we can do LIGHT and PACIFIC_REGION - these are binary.
-
-Compare and contrast within regions.
-
-```{r}
-npsg_only <- metadata %>% 
-  filter(PACIFIC_REGION == "NPSG") %>% 
-  select(sample = SAMPLE)
-# Compare euphotic and subeuphotic
-# Use this to compare across months too
-
-ca_only <- metadata %>% 
-  filter(PACIFIC_REGION != "NPSG") %>% 
-  select(sample = SAMPLE)
-# Compare euphotic and subeuphotic
-
-ca_coast <- metadata %>% 
-  filter(PACIFIC_REGION != "NPSG" & REGION != "SPOT") %>% 
-  select(sample = SAMPLE)
-# compare POLA vs. Catalina
-
-stations_only <- metadata %>% 
-  filter(REGION == "SPOT" | REGION == "ALOHA") %>% 
-  select(sample = SAMPLE)
-# compare SPOT vs. ALOHA as is
-
-euphotic <- metadata %>% 
-  filter(LIGHT == "Euphotic")%>% 
-  select(sample = SAMPLE)
-# Compare NPSG to CA euphotic zone
-
-subeuphotic <- metadata %>% 
-  filter(LIGHT != "Euphotic")%>% 
-  select(sample = SAMPLE)
-# Compare NPSG to CA subeuphotic zone
+# example code:
+# sampleTable <- data.frame(condition = factor(rep(c("A", "B"), each = 3)))
+# rownames(sampleTable) <- colnames(txi$counts)
+# dds <- DESeqDataSetFromTximport(txi, sampleTable, ~condition)
+# dds is now ready for DESeq() see DESeq2 vignette
 ```
 
 
-
-### Genes
-
-Need to make a list of the `SequenceID` from the taxonomy and functional annotations.
+## Make tx2gene
 
 ```{r}
-taxfxn <- read.csv("TaxonomicAndFunctionalAnnotations.csv")
+# tic()
+# annot_all <- fread("../../../scratch/user/skhu/SPOT-ALOHA/02-annotation_table/TaxonomicAndFunctionalAnnotations.csv", 
+#                  verbose = TRUE,
+#                  showProgress = TRUE,
+#                  nThread = num_threads,
+#                  header = TRUE)
+# toc() # 7.046 sec elapsed
+# ?fread()
 ```
 
-R objects that are character lists will be most useful.
+Don't need this
 
 ```{r}
-# Get list of annotations where a GO, PFAM, and KEGG ID were assigned.
-genes_fxn_all <- as.character(
-  filter(taxfxn, GOs != "-" & PFAMs != "-" & KEGG_ko != "-") %>% 
-    select(SequenceID) %>% 
-    .[["SequenceID"]]) #this line outputs the selected vector from the pipe
-
-# Removing unclassified and unannotated sequences
-genes_tax_fxn_all <- as.character(
-  filter(taxfxn, GOs != "-" & PFAMs != "-" & KEGG_ko != "-"
-         & Domain == "Eukaryota" & Supergroup != "Unclassified") %>% 
-    select(SequenceID) %>% 
-    .[["SequenceID"]])
+# tx2gene_ko <- annot_all %>% 
+  # select(TXNAME = ShortSeqID, GENEID = KEGG_ko)
 ```
 
-
-From KEGG database reformatting, extract this Robject, `key_geneid`
-
-```{r}
-# head(key_geneid)
-kegg_keep <- as.character(key_geneid %>% 
-  filter(Category01 != "" & !(is.na(Category01))) %>% 
-  select(KEGG) %>% 
-  .[["KEGG"]])
- 
-length(kegg_keep)
-
-genes_kegg_curated <- as.character(taxfxn %>%
-    mutate(KEGG_mod = str_remove_all(KEGG_ko, "ko:")) %>% 
-    filter(KEGG_mod %in% kegg_keep) %>% 
-    select(SequenceID) %>% 
-    .[["SequenceID"]])
-```
-
-Save objects for subsetting.
+Don't need this
 
 ```{r}
-# save(genes_fxn_all, genes_tax_fxn_all, key_geneid, 
-#      npsg_only, ca_only, ca_coast, stations_only, euphotic, subeuphotic,
-#      file = "sample-gene-lists_TXISUBSET.RData")
-```
-
-
-### Function
-
-```{r}
-# Subset txi directly
-subsetTxi <- function(txi, samples, include_genes=rownames(txi$counts))
-  {
-  genes <- rownames(txi$counts)[rownames(txi$counts) %in% include_genes]
-  txi$abundance <- txi$abundance[genes, samples$sample]
-  txi$counts <- txi$counts[genes, samples$sample]
-  txi$length <- txi$length[genes, samples$sample]
-  return(txi)
-  }
-
-# Example usage 
-# tmp <- sample(taxfxn$SequenceID,10,replace = FALSE)
-# pola <- data.frame(sample = c("PortofLA_1", "PortofLA_2"))
-# txi_pola <- subsetTxi(txi, pola, tmp)
-```
-
-
-## Euphotic vs. subeuphotic overall
-
-```{r}
-# Subset txi
-txi_npsg <- subsetTxi(txi, npsg_only, genes_tax_fxn_all)
-# txi_npsg_curated <- subsetTxi(txi, npsg_only, genes_kegg_curated)
-
-txi_ca <- subsetTxi(txi, ca_only, genes_tax_fxn_all)
-# txi_ca_curated <- subsetTxi(txi, ca_only, genes_kegg_curated)
-
-# counts_scaled <- makeCountsFromAbundance(
-#   as.matrix(txi$counts),
-#   as.matrix(txi$abundance),
-#   as.matrix(txi$length),
-#   countsFromAbundance = "scaledTPM"
+# txi_gene <- summarizeToGene(txi_makecounts,
+#                 tx2gene = tx2gene_ko,
+#                 varReduce = FALSE,
+#       ignoreTxVersion = FALSE,
+#       ignoreAfterBar = FALSE,
+#       countsFromAbundance = c("no", "scaledTPM", "lengthScaledTPM")
 # )
-# counts_df <- as.data.frame(counts_scaled)
-
-ds_tpm_light <- DESeqDataSetFromTximport(txi,
-                                              colData = sample_merged,
-                                              design = ~0 + LIGHT)
-
-ds_tpm_npsg_light <- DESeqDataSetFromTximport(txi_npsg,
-                                              colData = sample_merged,
-                                              design = ~0 + LIGHT)
-
-ds_tpm_npsg_month <- DESeqDataSetFromTximport(txi_npsg,
-                                              colData = sample_merged,
-                                              design = ~0 + MONTH)
-
-ds_tpm_ca_light <- DESeqDataSetFromTximport(txi_ca,
-                                              colData = sample_merged,
-                                              design = ~0 + LIGHT)
 ```
 
-### Euphotic vs subeuphotic across regions
+Don't need this
 
 ```{r}
-# Subset txi
-txi_euph <- subsetTxi(txi, euphotic, genes_tax_fxn_all)
-
-txi_subeuph <- subsetTxi(txi, subeuphotic, genes_tax_fxn_all)
-
-ds_tpm_euphotic <- DESeqDataSetFromTximport(txi_euph,
-                                              colData = sample_merged,
-                                              design = ~0 + PACIFIC_REGION)
-
-ds_tpm_subeuphotic <- DESeqDataSetFromTximport(txi_subeuph,
-                                              colData = sample_merged,
-                                              design = ~0 + PACIFIC_REGION)
+# tximport(
+#   files = txifiles,
+#   type = "salmon",
+#   txIn = TRUE, #Incoming are transcript level
+#   txOut = FALSE, # output transcript-level
+#   countsFromAbundance = c("scaledTPM", # scale to library size
+#                           "lengthScaledTPM", # scaled using average transcript length over samples and then library size
+#                           "dtuScaledTPM"), # scales using median transcript length among isoforms of a gene, and then library size (requires tx2gene file)
+# )
 ```
 
+
+# Import count table by contigs
+
+Uncomment and only run on HPC.
+
+```{r}
+# tic()
+# counts_all <- fread("../../../scratch/user/skhu/SPOT-ALOHA/03-abundance_tables/ReadTable_ByContig.csv", 
+#                  verbose = TRUE,
+#                  drop = 1,
+#                  showProgress = TRUE,
+#                  nThread = num_threads)
+# toc() # 59.262 sec elapsed
+```
+
+```{r}
+# tic()
+# annot_all <- fread("../../../scratch/user/skhu/SPOT-ALOHA/02-annotation_table/TaxonomicAndFunctionalAnnotations.csv", 
+#                  verbose = TRUE,
+#                  showProgress = TRUE,
+#                  nThread = num_threads,
+#                  header = TRUE)
+# toc() # 7.046 sec elapsed
+# ?fread()
+```
+
+## Import metadata
+
+```{r}
+tic()
+metadata <- fread("input-data/complete-sample-list.txt", 
+                 # verbose = TRUE,
+                 showProgress = TRUE,
+                 nThread = num_threads,
+                 header = TRUE)
+toc() # 0.042 sec elapsed
+```
+
+```{r}
+head(metadata)
+
+# Order of current names of table
+srr_order <- data.frame(RUN = (names(counts_all)[2:44]))
+
+# set re-name from metadata, include RUN srr IDs
+srr_list_rename <- select(metadata, SAMPLENAME, RUN) %>% 
+  distinct() %>% 
+  unite(SRR_EDGER, SAMPLENAME, RUN, sep = "-", remove = FALSE)
+
+# Re-order these based on table
+joined_reorder <- srr_order %>% 
+  left_join(srr_list_rename)
+
+# All should be equal to TRUE
+srr_order == as.character(joined_reorder$RUN)
+
+# Set new names
+srr_rename <- as.character(joined_reorder$SRR_EDGER)
+```
+
+Rename counts table
+
+```{r}
+# srr_rename
+names(counts_all)
+colnames(counts_all)[2:44] <- srr_rename
+names(counts_all)
+```
+
+### QC read counts with what is annotated
+
+What sequences were not annotated? Remove them from the data.
+
+```{r}
+# ID seqID associated 
+head(counts_all$ShortSeqID) # There are more of these here, than was annotated
+
+# What is total number of ShortSeqIDs?
+tic()
+length(unique(counts_all$ShortSeqID)); toc()
+# 54,080,665
+```
+
+There are over 54 million hits of read on contigs.
+
+```{r}
+# head(annot_all)
+tic()
+length(unique(annot_all$ShortSeqID)); toc() #14,737,135 # 14 million with annotations
+
+tic()
+length(unique(annot_all$SequenceID)); toc()
+# 14840771 - 14737135
+# 103,636 equate to duplicated ORFs
+```
+
+Of these reads, only 14 million had an annotation. This is 27% of the reads that will be used in downstream analysis.
+
+```{r}
+100*(14840771/54080665)
+```
+
+### Remove unannotated.
+
+```{r}
+seqIDs_wannot <- as.character(unique(annot_all$ShortSeqID))
+
+# Save unannotated
+unannot_counts <- counts_all %>% 
+  filter(!(ShortSeqID %in% seqIDs_wannot))
+
+counts_annot <- counts_all %>% 
+  filter(ShortSeqID %in% seqIDs_wannot)
+
+
+```
+
+New counts table.
+
+```{r}
+dim(counts_annot)
+```
+
+# EdgeR library normalization
+
+Automate text for edgeR input
+
+```{r}
+# head(srr_list_rename)
+srr_edgeR <- srr_list_rename %>% 
+  group_by(SAMPLENAME) %>% 
+  mutate(NUM = n()) %>% 
+  arrange(SAMPLENAME)
+
+edger_text <- srr_edgeR %>% 
+  select(SAMPLENAME, NUM) %>% 
+  distinct() %>% 
+  mutate(TEXT = paste(
+    'rep("', SAMPLENAME,'",',NUM,')',sep = ""))
+
+# edit(edger_text$TEXT)
+# ?edit()
+
+reorder_col_names <- as.character(srr_edgeR$SRR_EDGER)
+reorder_col_names_alpha <- c("ShortSeqID","SequenceID", reorder_col_names)
+reorder_col_names_alpha
+typeof(reorder_col_names_alpha)
+# dim(counts_annot)
+# length(reorder_col_names_alpha)
+tic()
+counts_annot_reorder <- annot_all %>% 
+  select(ShortSeqID, SequenceID) %>% 
+  left_join(counts_annot) %>% 
+  select(reorder_col_names_alpha) %>% 
+  # column_to_rownames(var = "SequenceID") %>%
+  as.matrix
+toc()
+
+# save(counts_annot_reorder, file = "/scratch/user/skhu/SPOT-ALOHA/tmp-may6-2023.RData")
+```
+
+```{r}
+load(file = "/scratch/user/skhu/SPOT-ALOHA/tmp-may6-2023.RData", verbose = TRUE)
+```
+
+```{r}
+head(counts_annot_reorder)[,1:4]
+str(counts_annot_reorder)
+dim(counts_annot_reorder)
+# 3:45 should be numeric
+```
+
+At this point, I have short seq IDs, long seq IDs, and read counts for all the samples as columns.
+
+```{r}
+tic()
+all_counts_df <- as.data.frame(counts_annot_reorder) %>% 
+  mutate(row_id = row_number()) %>% 
+  unite("READ_ID_FULL", c("ShortSeqID", "row_id"), sep = ";") %>% # make unique
+  select(-SequenceID) %>% 
+  column_to_rownames(var = "READ_ID_FULL") %>% 
+  mutate_if(is.character, as.numeric)
+toc() #69.541 sec elapsed
+```
+
+```{r}
+str(all_counts_df)
+head(all_counts_df)[,1:4]
+
+# all_counts_mat <- as.matr
+```
+
+### EdgeR replicate names as groups
+
+```{r}
+# group = c(rep("CA_Catalina_5_May",6),
+#           rep("CA_PortofLA_5_May",6),
+#           rep("CA_SPOT_150_May",3),
+#           rep("CA_SPOT_5_May",12),
+#           rep("CA_SPOT_890_May",4),
+#           rep("NPSG_ALOHA_1000_July",1),
+#           rep("NPSG_ALOHA_1000_March",1),
+#           rep("NPSG_ALOHA_119_July",2),
+#           rep("NPSG_ALOHA_120_March",2),
+#           rep("NPSG_ALOHA_150_July",1),
+#           rep("NPSG_ALOHA_150_March",1),
+#           rep("NPSG_ALOHA_5_July",2),
+#           rep("NPSG_ALOHA_5_March",2))
+```
+
+## EdgeR
+
+Prep matrix of counts
+
+```{r}
+head(all_counts_matrix)
+y <- dim(all_counts_matrix)[2]
+y # should be 43
+# ?DGEList()
+
+# annot_genes <- annot_all %>% 
+  # distinct()
+  # column_to_rownames(var = "ShortSeqID")
+# dim(annot_all)
+# dim(annot_genes)
+```
+
+```{r}
+tic()
+dge_obj_spot_aloha <- DGEList(counts = all_counts_df,
+                              group = c(rep("CA_Catalina_5_May",6),
+          rep("CA_PortofLA_5_May",6),
+          rep("CA_SPOT_150_May",3),
+          rep("CA_SPOT_5_May",12),
+          rep("CA_SPOT_890_May",4),
+          rep("NPSG_ALOHA_1000_July",1),
+          rep("NPSG_ALOHA_1000_March",1),
+          rep("NPSG_ALOHA_119_July",2),
+          rep("NPSG_ALOHA_120_March",2),
+          rep("NPSG_ALOHA_150_July",1),
+          rep("NPSG_ALOHA_150_March",1),
+          rep("NPSG_ALOHA_5_July",2),
+          rep("NPSG_ALOHA_5_March",2)))
+toc()
+```
+
+```{r}
+dge_obj_spot_aloha$samples
+
+tic()
+data_tmm <- calcNormFactors(dge_obj_spot_aloha, method="TMM") # TMM normalization
+toc() # 1290.48 sec elapsed
+
+class(data_tmm)
+# save(data_tmm, file = "../../../scratch/user/skhu/SPOT-ALOHA/tmm.RData")
+```
+
+### Checkpoint to load TMM data
+
+```{r}
+load(file = "../../../scratch/user/skhu/SPOT-ALOHA/tmm.RData", verbose = TRUE)
+
+data_tmm$samples
+```
+
+Get CPM using normalized library size.
+
+```{r}
+data_tpm_cpm <- cpm(data_tmm, normalized.lib.sizes = TRUE, log = FALSE)
+class(data_tpm_cpm) ## outputs a matrix array
+
+head(data_tpm_cpm)[1:4]
+# Transpose
+tmp <- t(data_tpm_cpm)
+head(tmp)[,1:2]
+```
+
+## SUBSET for test data
+
+```{r}
+# dim(tmp)
+# # 14,841,331 # 14 million
+# 
+subset_tmp <- tmp[,1:1000000]
+# class(subset_tmp)
+# head(subset_tmp)[,1:5]
+# 
+# # Create a mini one too.
+# mini_subset_tmp <- tmp[,1:10]
+```
+
+# Multidplyr experiment
+
+*This didn't really work*
+
+Using multidplyr to run tidyverse functions in parallel
+
+```{r}
+# num_threads
+# parallel::detectCores()
+# cluster <- new_cluster(num_threads)
+# cluster
+```
+
+mini first
+
+```{r}
+# Isolate samplenames from SRR IDs, send to clusters
+# tic()
+# metat_cpm_party_SUBSET <- data.frame(mini_subset_tmp) %>%
+#   rownames_to_column(var = "SAMPLENAME") %>%
+#   separate(SAMPLENAME, into = c("SAMPLE", "RUN"), sep = "-") %>%
+#   group_by(SAMPLE) %>%
+#     partition(cluster)
+# toc() #mini via partition = 4.38 seconds
+# 
+# tic()
+# metat_cpm_SUBSET <- data.frame(mini_subset_tmp) %>%
+#   rownames_to_column(var = "SAMPLENAME") %>%
+#   separate(SAMPLENAME, into = c("SAMPLE", "RUN"), sep = "-") 
+# toc() # without particion = 0.03 seconds
+```
+
+```{r}
+# head(metat_cpm_party_SUBSET)
+# head(metat_cpm_SUBSET)
+```
+
+```{r}
+# ?pivot_longer()
+# ?pivot_longer
+# tic()
+# metat_cpm <- metat_cpm_party_SUBSET %>% 
+#   # pivot_longer(cols = starts_with("Seq_"), names_to = "ShortSeqID_num", values_to = "CPM") %>% 
+#   # separate(ShortSeqID_num, into = c("ShortSeqID", "num"), sep = "//.") %>% 
+#   group_by(SAMPLE) %>% 
+#     # summarise(MEAN_CPM = mean(starts_with("Seq_"))) %>% 
+#   summarise_if(is.numeric, mean, na.rm = TRUE) %>% 
+#   collect()
+# toc() # With mini subset, 10.337 second
+# 
+# tic()
+# metat_cpm <- metat_cpm_SUBSET %>% 
+#   group_by(SAMPLE) %>% 
+#   summarise_if(is.numeric, mean, na.rm = TRUE)
+# toc()
+# 
+# 
+# dim(metat_cpm)
+# head(metat_cpm)
+# head(annot_all)
+# save(metat_cpm, file = "../../../scratch/user/skhu/SPOT-ALOHA/normalized_avg_reps.RData")
+```
+
+Multidplyr is not optimized for this work.
+
+# Estimate mean CPM across replicate samples
+
+```{r}
+# tmp
+# subset_tmp
+tic()
+metat_mean_cpm <- data.frame(subset_tmp) %>%
+  rownames_to_column(var = "SAMPLENAME") %>%
+  separate(SAMPLENAME, into = c("SAMPLE", "RUN"), sep = "-") %>%
+    group_by(SAMPLE) %>% 
+  summarise_if(is.numeric, mean, na.rm = TRUE)
+toc()
+```
+
+```{r}
+dim(tmp)
+dim(metat_mean_cpm)
+
+save(metat_mean_cpm, data_tpm_cpm, file = "/scratch/user/skhu/SPOT-ALOHA/mean_cpm_all.Rdata")
+```
+
+## Add metadata
+
+```{r}
+# ?left_join()
+# metat_cpm_wannot <- metat_cpm %>% 
+#   left_join(annot_all, )
+```
+
+# Repeat above normalization by specific taxonomic groups
+
+```{r}
+load(file = "/scratch/user/skhu/SPOT-ALOHA/tmp-may6-2023.RData", verbose = TRUE)
+head(counts_annot_reorder)[1:4,1:5]
+```
+
+# Query annotation data
+
+```{r}
+head(annot_all)
+```
+
+```{r}
+dim(annot_all)
+length(unique(annot_all$ShortSeqID))
+14841331 - 14737135
+
+# setdiff((annot_all$ShortSeqID), unique(annot_all$ShortSeqID))
+
+tmp <- annot_all[duplicated(annot_all$ShortSeqID)]
+View(annot_all %>% filter(ShortSeqID == "Seq_9995515"))
+tmp <- (annot_all %>% filter(ShortSeqID == "Seq_9995515"))
+tmp$SequenceID
+```

@@ -183,28 +183,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#import-metatranscriptome-r-data-objects" id="toc-import-metatranscriptome-r-data-objects" class="nav-link" data-scroll-target="#import-metatranscriptome-r-data-objects">Import metatranscriptome R data objects</a>
   <ul class="collapse">
   <li><a href="#input-all-tpm-results" id="toc-input-all-tpm-results" class="nav-link" data-scroll-target="#input-all-tpm-results">Input all TPM results</a></li>
-  </ul></li>
   <li><a href="#taxonomic-composition-distribution" id="toc-taxonomic-composition-distribution" class="nav-link" data-scroll-target="#taxonomic-composition-distribution">Taxonomic composition &amp; distribution</a>
   <ul class="collapse">
-  <li><a href="#taxonomic-level-curation-and-estimate-relative-abundance" id="toc-taxonomic-level-curation-and-estimate-relative-abundance" class="nav-link" data-scroll-target="#taxonomic-level-curation-and-estimate-relative-abundance">Taxonomic level curation and estimate relative abundance</a></li>
-  <li><a href="#taxonomy-bar-plot" id="toc-taxonomy-bar-plot" class="nav-link" data-scroll-target="#taxonomy-bar-plot">Taxonomy bar plot</a></li>
+  <li><a href="#plot-domain-level" id="toc-plot-domain-level" class="nav-link" data-scroll-target="#plot-domain-level">Plot domain level</a></li>
+  <li><a href="#plot-to-supergroup" id="toc-plot-to-supergroup" class="nav-link" data-scroll-target="#plot-to-supergroup">Plot to supergroup</a></li>
+  </ul></li>
   </ul></li>
   <li><a href="#whole-community-functional-profile" id="toc-whole-community-functional-profile" class="nav-link" data-scroll-target="#whole-community-functional-profile">Whole community functional profile</a>
   <ul class="collapse">
-  <li><a href="#pcoa-with-whole-community-functional-profile" id="toc-pcoa-with-whole-community-functional-profile" class="nav-link" data-scroll-target="#pcoa-with-whole-community-functional-profile">PCoA with whole community functional profile</a>
-  <ul class="collapse">
-  <li><a href="#does-pcoa-change-when-only-taxonomic-information-is-input" id="toc-does-pcoa-change-when-only-taxonomic-information-is-input" class="nav-link" data-scroll-target="#does-pcoa-change-when-only-taxonomic-information-is-input">Does PCoA change when only taxonomic information is input?</a></li>
-  </ul></li>
+  <li><a href="#pcoa-with-whole-community-functional-profile" id="toc-pcoa-with-whole-community-functional-profile" class="nav-link" data-scroll-target="#pcoa-with-whole-community-functional-profile">PCoA with whole community functional profile</a></li>
   <li><a href="#define-each-site-by-module" id="toc-define-each-site-by-module" class="nav-link" data-scroll-target="#define-each-site-by-module">Define each site by module</a></li>
   </ul></li>
-  <li><a href="#transcriptional-profiles-for-taxonomic-groups" id="toc-transcriptional-profiles-for-taxonomic-groups" class="nav-link" data-scroll-target="#transcriptional-profiles-for-taxonomic-groups">Transcriptional profiles for taxonomic groups</a>
-  <ul class="collapse">
-  <li><a href="#pcoa-with-curated-functional-profiles-and-known-taxonomic-ids." id="toc-pcoa-with-curated-functional-profiles-and-known-taxonomic-ids." class="nav-link" data-scroll-target="#pcoa-with-curated-functional-profiles-and-known-taxonomic-ids.">PCoA with curated functional profiles and known taxonomic IDs.</a>
+  <li><a href="#exploring-differentially-expressed-genes" id="toc-exploring-differentially-expressed-genes" class="nav-link" data-scroll-target="#exploring-differentially-expressed-genes">Exploring differentially-expressed genes</a>
   <ul class="collapse">
   <li><a href="#heterotrophy" id="toc-heterotrophy" class="nav-link" data-scroll-target="#heterotrophy">Heterotrophy</a></li>
   <li><a href="#n-p-metabolism" id="toc-n-p-metabolism" class="nav-link" data-scroll-target="#n-p-metabolism">N &amp; P metabolism</a></li>
   <li><a href="#determine-statistical-significance" id="toc-determine-statistical-significance" class="nav-link" data-scroll-target="#determine-statistical-significance">Determine statistical significance</a></li>
-  </ul></li>
   </ul></li>
   <li><a href="#functional-redundancy" id="toc-functional-redundancy" class="nav-link" data-scroll-target="#functional-redundancy">Functional redundancy</a></li>
   <li><a href="#session-info" id="toc-session-info" class="nav-link" data-scroll-target="#session-info">Session info</a></li>
@@ -233,13 +227,58 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="set-up-working-r-environment" class="level1">
 <h1>Set up working R environment</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(multidplyr)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dbplyr)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RSQLite)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(compositions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.2     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.2     ✔ tibble    3.2.1
+✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+✔ purrr     1.0.1     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'data.table'
+
+The following objects are masked from 'package:lubridate':
+
+    hour, isoweek, mday, minute, month, quarter, second, wday, week,
+    yday, year
+
+The following objects are masked from 'package:dplyr':
+
+    between, first, last
+
+The following object is masked from 'package:purrr':
+
+    transpose</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(compositions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Welcome to compositions, a package for compositional data analysis.
+Find an intro with "? compositions"
+
+
+Attaching package: 'compositions'
+
+The following objects are masked from 'package:stats':
+
+    anova, cor, cov, dist, var
+
+The following object is masked from 'package:graphics':
+
+    segments
+
+The following objects are masked from 'package:base':
+
+    %*%, norm, scale, scale.default</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="import-metatranscriptome-r-data-objects" class="level1">
@@ -248,70 +287,326 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 class="anchored" data-anchor-id="input-all-tpm-results">Input all TPM results</h2>
 <p>Below R objects sourced by first isolating only the eukaryotic transcripts, averaging across replicates, and placing into long format.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"/scratch/user/skhu/SPOT-ALOHA/Avg_tpm_ALL_acrossreps_annot.RData"</span>, <span class="at">verbose =</span> T)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tpm_ALL_mean_reps_annot)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(tpm_ALL_mean_reps_annot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># | echo: true</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># | eval: false</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="at">file =</span> <span class="st">"Avg_scaled_tpm_08222023.RData"</span>, <span class="at">verbose =</span> T)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>taxfxn <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"TaxonomicAndFunctionalAnnotations.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Use <code>multidplyr</code> to perform tidyverse functions in parallel.</p>
+<p>Import metadata as well.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cluster</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tic</span>()</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>all_shard <span class="ot">&lt;-</span> tpm_ALL_mean_reps_annot <span class="sc">%&gt;%</span> </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SAMPLENAME) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">partition</span>(cluster)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">toc</span>() <span class="co">#95.245 sec elapsed</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Supergroup</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>supergroup_all <span class="ot">&lt;-</span> all_shard <span class="sc">%&gt;%</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Domain, Supergroup, PACIFIC_REGION, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">SUM_TPM_supergroup =</span> <span class="fu">sum</span>(MEAN_TPM)) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>()</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>supergroup_all <span class="sc">%&gt;%</span> </span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Domain <span class="sc">==</span> <span class="st">"Eukaryota"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> SAMPLE_ID_PARSED, <span class="at">y =</span> SUM_TPM_supergroup, <span class="at">fill =</span> Supergroup)) <span class="sc">+</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"fill"</span>, <span class="at">color =</span> <span class="st">"black"</span>)<span class="sc">+</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Phylum</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>phylum_all <span class="ot">&lt;-</span> all_shard <span class="sc">%&gt;%</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Domain, Supergroup, Phylum, PACIFIC_REGION, SAMPLENAME, SAMPLE_ID_PARSED, DEPTH_CATEGORY) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">SUM_TPM_supergroup =</span> <span class="fu">sum</span>(MEAN_TPM)) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unite</span>(Supergroup_phylum, Supergroup, Phylum, <span class="at">sep =</span> <span class="st">" "</span>)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>phylum_all <span class="sc">%&gt;%</span> </span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Domain <span class="sc">==</span> <span class="st">"Eukaryota"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> SAMPLE_ID_PARSED, <span class="at">y =</span> SUM_TPM_supergroup, <span class="at">fill =</span> Supergroup_phylum)) <span class="sc">+</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"fill"</span>, <span class="at">color =</span> <span class="st">"black"</span>)<span class="sc">+</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># metadata_tmp &lt;- read.delim("input-data/complete-sample-list.txt", header = TRUE, sep = ",")</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># sample_table &lt;- read.csv("input-data/sample_table.csv") %&gt;% </span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   unite(SAMPLE, Sample, Replicate, sep = "_", remove = FALSE)</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># metadata &lt;- metadata_tmp %&gt;% left_join(sample_table, by = c("RUN" = "SRR"))</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># write.csv(metadata, file = "input-data/sample-list-revised.txt")</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"input-data/sample-list-revised.txt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-</section>
-<section id="taxonomic-composition-distribution" class="level1">
-<h1>Taxonomic composition &amp; distribution</h1>
+<section id="taxonomic-composition-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="taxonomic-composition-distribution">Taxonomic composition &amp; distribution</h2>
 <p>Evaluate taxonomic diversity and composition across all sites.</p>
-<section id="taxonomic-level-curation-and-estimate-relative-abundance" class="level2">
-<h2 class="anchored" data-anchor-id="taxonomic-level-curation-and-estimate-relative-abundance">Taxonomic level curation and estimate relative abundance</h2>
-<p>Taxa curation 3) Average across replicates (or how should replicates be considered) 4) Sum to each sample</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># | echo: true</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># | eval: false</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(taxfxn<span class="sc">$</span>SequenceID))</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 14840771</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unique</span>(<span class="fu">rownames</span>(mean_counts_df)))</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 14737135</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># | echo: true</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># | eval: false</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>annotated_mean <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">left_join</span>(mean_counts_df <span class="sc">%&gt;%</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">mutate</span>(<span class="at">SequenceID =</span> <span class="fu">rownames</span>(mean_counts_df)),</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                                 taxfxn,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">by =</span> <span class="st">"SequenceID"</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 14737135-14737693</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="do">## 558 were duplicated</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Remove the duplicated annotations and make a base taxonomic dataframe for downstream work.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># | echo: true</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># | eval: false</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>tax_plot <span class="ot">&lt;-</span> annotated_mean <span class="sc">%&gt;%</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Domain<span class="sc">:</span>Species, <span class="fu">starts_with</span>(<span class="st">"mean"</span>), SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># dim(tax_plot) #14737624\</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># | echo: true</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># | eval: false</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"input-data/tax_plot_08222023.RData"</span>, <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># | echo: true</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># | eval: false</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>tax_only <span class="ot">&lt;-</span> tax_plot <span class="sc">%&gt;%</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"mean"</span>), <span class="at">names_to =</span> <span class="st">"SAMPLE"</span>, <span class="at">values_to =</span> <span class="st">"scaledTPM"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SAMPLE, Domain, Supergroup, Phylum, Class, Order, Family, Genus, Species) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">SUM_scaledTPM =</span> <span class="fu">sum</span>(scaledTPM)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"input-data/tax_only_08242023.RData"</span>, <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loading objects:
+  tax_only</code></pre>
+</div>
+</div>
+<section id="plot-domain-level" class="level3">
+<h3 class="anchored" data-anchor-id="plot-domain-level">Plot domain level</h3>
+<p>Creating plot to see total number and relative abundance of non-eukaryotic hits in the data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>(tax_only <span class="sc">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DOMAIN =</span> <span class="fu">str_squish</span>(Domain),</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">SAMPLE =</span> <span class="fu">str_remove</span>(SAMPLE, <span class="st">"mean."</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SAMPLE, DOMAIN) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">SUM =</span> <span class="fu">sum</span>(SUM_scaledTPM)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> SAMPLE, <span class="at">y =</span> SUM, <span class="at">fill =</span> DOMAIN)) <span class="sc">+</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"stack"</span>, <span class="at">color =</span> <span class="st">"black"</span>)<span class="sc">+</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">hjust =</span> <span class="dv">1</span>))) <span class="sc">/</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>(tax_only <span class="sc">%&gt;%</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DOMAIN =</span> <span class="fu">str_squish</span>(Domain),</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">SAMPLE =</span> <span class="fu">str_remove</span>(SAMPLE, <span class="st">"mean."</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SAMPLE, DOMAIN) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">SUM =</span> <span class="fu">sum</span>(SUM_scaledTPM)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> SAMPLE, <span class="at">y =</span> SUM, <span class="at">fill =</span> DOMAIN)) <span class="sc">+</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"fill"</span>, <span class="at">color =</span> <span class="st">"black"</span>)<span class="sc">+</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">hjust =</span> <span class="dv">1</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'SAMPLE'. You can override using the
+`.groups` argument.
+`summarise()` has grouped output by 'SAMPLE'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="metat-analysis_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="480"></p>
+</div>
+</div>
+<p>Stats on what % of the data are eukaryotic vs.&nbsp;not.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>SUM_TOTAL_TPM <span class="ot">&lt;-</span> <span class="fu">sum</span>(tax_only<span class="sc">$</span>SUM_scaledTPM)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>tax_only <span class="sc">%&gt;%</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DOMAIN =</span> <span class="fu">str_squish</span>(Domain),</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">SAMPLE =</span> <span class="fu">str_remove</span>(SAMPLE, <span class="st">"mean."</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SUM_scaledTPM <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span>  <span class="co"># Remove zeroes</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(DOMAIN) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">Sum_of_TPM =</span> <span class="fu">sum</span>(SUM_scaledTPM),</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">Perc_of_total =</span> <span class="dv">100</span><span class="sc">*</span>(Sum_of_TPM<span class="sc">/</span>SUM_TOTAL_TPM),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">.groups =</span> <span class="st">"rowwise"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+# Rowwise:  DOMAIN
+  DOMAIN       Sum_of_TPM Perc_of_total
+  &lt;chr&gt;             &lt;dbl&gt;         &lt;dbl&gt;
+1 Archaea         305556.        0.159 
+2 Bacteria       5438767.        2.84  
+3 Eukaryota    185858173.       96.9   
+4 Unclassified    174159.        0.0908</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Count = count(DOMAIN))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
-<section id="taxonomy-bar-plot" class="level2">
-<h2 class="anchored" data-anchor-id="taxonomy-bar-plot">Taxonomy bar plot</h2>
-<ol start="5" type="1">
-<li>bar plot of relative TPM? CPM? for major taxnomic groups Keep ALOHA July and April separate, ALOHA on the left side and on the right side, all CA sites. Also place “sun” emoji for samples that are within the euphotic zone</li>
-</ol>
+<section id="plot-to-supergroup" class="level3">
+<h3 class="anchored" data-anchor-id="plot-to-supergroup">Plot to supergroup</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># head(tax_only)</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>tax_only <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DOMAIN =</span> <span class="fu">str_squish</span>(Domain),</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">SUPERGROUP =</span> <span class="fu">str_squish</span>(Supergroup),</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">PHYLUM =</span> <span class="fu">str_squish</span>(Phylum),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">SAMPLE =</span> <span class="fu">str_remove</span>(SAMPLE, <span class="st">"mean."</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(DOMAIN <span class="sc">==</span> <span class="st">"Eukaryota"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SAMPLE, Supergroup) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">SUM =</span> <span class="fu">sum</span>(SUM_scaledTPM)) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> SAMPLE, <span class="at">y =</span> SUM, <span class="at">fill =</span> Supergroup)) <span class="sc">+</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"fill"</span>, <span class="at">color =</span> <span class="st">"black"</span>)<span class="sc">+</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'SAMPLE'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="metat-analysis_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Tally composition of the supergroup.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(tax_only)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "SAMPLE"        "Domain"        "Supergroup"    "Phylum"       
+ [5] "Class"         "Order"         "Family"        "Genus"        
+ [9] "Species"       "SUM_scaledTPM"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># unique(tax_only$Phylum)</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>tax_names <span class="ot">&lt;-</span> tax_only <span class="sc">%&gt;%</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DOMAIN =</span> <span class="fu">str_squish</span>(Domain),</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">SUPERGROUP =</span> <span class="fu">str_squish</span>(Supergroup),</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">PHYLUM =</span> <span class="fu">str_squish</span>(Phylum),</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">SAMPLE =</span> <span class="fu">str_remove</span>(SAMPLE, <span class="st">"mean."</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(DOMAIN <span class="sc">==</span> <span class="st">"Eukaryota"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(DOMAIN, SUPERGROUP, Class<span class="sc">:</span>Species) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Adding missing grouping variables: `SAMPLE`, `Domain`, `Supergroup`, `Phylum`</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(tax_names<span class="sc">$</span>Phylum)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] " Apicomplexa"      " Ciliophora"       " Dinoflagellata"  
+ [4] " Perkinsea"        "Unclassified"      " Conosa"          
+ [7] " Discosea"         " Lobosa"           " Chlorophyta"     
+[10] " Glaucophyta"      " Rhodophyta"       " Discoba"         
+[13] " Cryptophyta"      " Hacrobia_X"       " Haptophyta"      
+[16] " Choanoflagellida" " Fungi"            " Cercozoa"        
+[19] " Foraminifera"     " Ochrophyta"       " Opalozoa"        
+[22] " Sagenista"        " Stramenopiles_X" </code></pre>
+</div>
+</div>
+<p>Now, reformat taxonomic information to visualize.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># unique(tax_only$SAMPLE)</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co"># colnames(tax_only)</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>tax_formatted <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(tax_only) <span class="sc">%&gt;%</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove preceding spaces in taxonomic names</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(Domain, Supergroup, Phylum, Class, Order, Family, Genus, Species), <span class="sc">~</span> <span class="fu">as.character</span>(<span class="fu">str_squish</span>(.)))) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Domain <span class="sc">==</span> <span class="st">"Eukaryota"</span> <span class="sc">&amp;</span> SUM_scaledTPM <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">SAMPLE =</span> <span class="fu">str_remove</span>(SAMPLE, <span class="st">"mean."</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(metadata, <span class="at">by =</span> <span class="st">"SAMPLE"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Taxonomic group curation</span></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">SUPERGROUP =</span> <span class="fu">case_when</span>(</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>    Supergroup <span class="sc">==</span> <span class="st">"Alveolata"</span> <span class="sc">~</span> <span class="fu">paste</span>(Supergroup, Phylum, <span class="at">sep =</span> <span class="st">"-"</span>),</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> Supergroup</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Assign levels for taxonomic groups.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>tax_order_color<span class="ot">&lt;-</span><span class="fu">c</span>(<span class="st">"#612741"</span>,<span class="st">"#b74a70"</span>,<span class="st">"#b7757c"</span>,<span class="st">"#eecfbf"</span>,<span class="st">"#92462f"</span>,<span class="st">"#bb603c"</span>,<span class="st">"#dfa837"</span>,<span class="st">"#ccc050"</span>,<span class="st">"#33431e"</span>,<span class="st">"#93b778"</span>,<span class="st">"#61ac86"</span>,<span class="st">"#657abb"</span>,<span class="st">"#1c1949"</span>,<span class="st">"#8a8d84"</span>)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>supergroup_order <span class="ot">&lt;-</span> (<span class="fu">as.character</span>(<span class="fu">unique</span>(tax_formatted<span class="sc">$</span>SUPERGROUP)))</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(tax_order_color) <span class="ot">&lt;-</span> (supergroup_order)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="figure-1" class="level4">
+<h4 class="anchored" data-anchor-id="figure-1">Figure 1</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>tax_formatted <span class="sc">%&gt;%</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">SUPERGROUP =</span> <span class="fu">factor</span>(tax_formatted<span class="sc">$</span>SUPERGROUP, <span class="at">levels =</span> supergroup_order)) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SAMPLE_ID_PARSED, PACIFIC_REGION, LIGHT, DEPTH, SUPERGROUP) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">SUM =</span> <span class="fu">sum</span>(SUM_scaledTPM)) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> SAMPLE_ID_PARSED, <span class="at">y =</span> SUM, <span class="at">fill =</span> SUPERGROUP)) <span class="sc">+</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"fill"</span>, <span class="at">color =</span> <span class="st">"black"</span>)<span class="sc">+</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_grid</span>(<span class="at">rows =</span> <span class="fu">vars</span>(PACIFIC_REGION), <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">space =</span> <span class="st">"free"</span>) <span class="sc">+</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> tax_order_color) <span class="sc">+</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">"TPM Relative Abundance"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'SAMPLE_ID_PARSED', 'PACIFIC_REGION',
+'LIGHT', 'DEPTH'. You can override using the `.groups` argument.</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="metat-analysis_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
 </section>
 </section>
 <section id="whole-community-functional-profile" class="level1">
 <h1>Whole community functional profile</h1>
 <p>Prepare data ahead of time. Use normalization to the whole community. Include functional modules that were curated for this work.</p>
+<p>Import normalized over center data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load("normed_center_df_08222023.RData", verbose = TRUE)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This represents a toy dataset to troubleshoot code.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"input-data/toy_1000.Rdata"</span>, <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loading objects:
+  annotated_mean_10000
+  ctr_norm_10000</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Change to original names, so code below can be written</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>annotated_mean <span class="ot">&lt;-</span> annotated_mean_10000</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>df_ctr_norm <span class="ot">&lt;-</span> ctr_norm_10000</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <blockquote class="blockquote">
-<p>What percentage of the data are represented when we only look at the curated data?</p>
+<p>How many transcripts are annotated?</p>
 </blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(annotated_mean <span class="sc">%&gt;%</span> </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>             <span class="fu">count</span>(<span class="at">output =</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span>, </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">name =</span> <span class="st">"KEGGs"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>             <span class="fu">left_join</span>(annotated_mean <span class="sc">%&gt;%</span> </span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">count</span>(<span class="at">output =</span> PFAMs <span class="sc">!=</span> <span class="st">"-"</span>, </span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>                           <span class="at">name =</span> <span class="st">"PFAMs"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>             <span class="fu">left_join</span>(annotated_mean <span class="sc">%&gt;%</span> </span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">count</span>(<span class="at">output =</span> GOs <span class="sc">!=</span> <span class="st">"-"</span>, </span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>                           <span class="at">name =</span> <span class="st">"GOs"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>             <span class="fu">left_join</span>(annotated_mean <span class="sc">%&gt;%</span> </span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>                     <span class="fu">count</span>(<span class="at">output =</span> (GOs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span>), </span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>                           <span class="at">name =</span> <span class="st">"All"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(output <span class="sc">==</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>output) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>(), <span class="at">values_to =</span> <span class="st">"Number annotated"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Percent_annotated =</span> <span class="dv">100</span><span class="sc">*</span>(<span class="st">`</span><span class="at">Number annotated</span><span class="st">`</span><span class="sc">/</span><span class="fu">length</span>(annotated_mean<span class="sc">$</span>SequenceID)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<table class="table">
+<thead>
+<tr class="header">
+<th>DB</th>
+<th>Number of seqs annotated</th>
+<th>Percent annotated</th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>KEGGs</td>
+<td>9970784</td>
+<td>67.7</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>PFAMs</td>
+<td>13595566</td>
+<td>92.3</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>GOs</td>
+<td>5442486</td>
+<td>36.9</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>All</td>
+<td>4963542</td>
+<td>33.7</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>summary_annotated <span class="ot">&lt;-</span> annotated_mean <span class="sc">%&gt;%</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">SUM =</span> <span class="fu">rowSums</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric)))) <span class="sc">%&gt;%</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(SUM, GOs, PFAMs, KEGG_ko, Domain, Supergroup)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(summary_annotated, <span class="at">file =</span> <span class="st">"summary_of_annotated_totalTPM.csv"</span>)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="co"># sum(summary_annotated$SUM) # TPM amount that is annotated</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># head(annotated_mean)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <p>Change input data to all numeric for downstream transformations, etc.</p>
 <ol type="1">
 <li><p>all data, change zeros to 1 (or to below the lowest value)</p></li>
@@ -321,32 +616,57 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="pcoa-with-whole-community-functional-profile" class="level2">
 <h2 class="anchored" data-anchor-id="pcoa-with-whole-community-functional-profile">PCoA with whole community functional profile</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(tpm_all_euk_clr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># head(df_ctr_norm)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pca_lr <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(<span class="fu">as.data.frame</span>(tpm_all_euk_clr))</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>variance_lr <span class="ot">&lt;-</span> (pca_lr<span class="sc">$</span>sdev<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span><span class="fu">sum</span>(pca_lr<span class="sc">$</span>sdev<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="do">## View bar plot</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(variance_lr, <span class="at">main =</span> <span class="st">"Log-Ratio PCA Screeplot"</span>, <span class="at">xlab =</span> <span class="st">"PC Axis"</span>, <span class="at">ylab =</span> <span class="st">"% Variance"</span>, </span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">cex.names =</span> <span class="fl">1.5</span>, <span class="at">cex.axis =</span> <span class="fl">1.5</span>, <span class="at">cex.lab =</span> <span class="fl">1.5</span>, <span class="at">cex.main =</span> <span class="fl">1.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>pca_lr <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(<span class="fu">as.data.frame</span>(<span class="fu">t</span>(df_ctr_norm)))</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>variance_lr <span class="ot">&lt;-</span> (pca_lr<span class="sc">$</span>sdev<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span><span class="fu">sum</span>(pca_lr<span class="sc">$</span>sdev<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ## View bar plot</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(variance_lr, <span class="at">main =</span> <span class="st">"Log-Ratio PCA Screeplot"</span>, <span class="at">xlab =</span> <span class="st">"PC Axis"</span>, <span class="at">ylab =</span> <span class="st">"% Variance"</span>, <span class="at">cex.names =</span> <span class="fl">1.5</span>, <span class="at">cex.axis =</span> <span class="fl">1.5</span>, <span class="at">cex.lab =</span> <span class="fl">1.5</span>, <span class="at">cex.main =</span> <span class="fl">1.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="metat-analysis_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
 </div>
-<section id="does-pcoa-change-when-only-taxonomic-information-is-input" class="level3">
-<h3 class="anchored" data-anchor-id="does-pcoa-change-when-only-taxonomic-information-is-input">Does PCoA change when only taxonomic information is input?</h3>
-<p>(supplementary)</p>
-</section>
+</div>
+<p>Bring PCA objects local from HPC.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>pc1 <span class="ot">&lt;-</span> <span class="fu">round</span>(variance_lr[<span class="dv">1</span>] <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">2</span>)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>pc2 <span class="ot">&lt;-</span> <span class="fu">round</span>(variance_lr[<span class="dv">2</span>] <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">2</span>)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="co"># svg("Rplot_metat_pca_wholecommunity.svg", width = 7, height = 7)</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(pca_lr<span class="sc">$</span>x, <span class="at">SAMPLE =</span> <span class="fu">rownames</span>(pca_lr<span class="sc">$</span>x)) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(SAMPLE, PC1, PC2, PC3) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(metadata) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2)) <span class="sc">+</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">stroke =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">6</span>, <span class="fu">aes</span>(<span class="at">shape =</span> REGION, <span class="at">fill =</span> DEPTH_CATEGORY, <span class="at">color =</span> LIGHT)) <span class="sc">+</span></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_shape_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">22</span>, <span class="dv">23</span>, <span class="dv">24</span>)) <span class="sc">+</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#6a51a3"</span>, <span class="st">"#f768a1"</span>, <span class="st">"#8c96c6"</span>, <span class="st">"#fd8d3c"</span>, <span class="st">"#238b45"</span>)) <span class="sc">+</span></span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#cccccc"</span>, <span class="st">"#252525"</span>)) <span class="sc">+</span></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_linedraw</span>() <span class="sc">+</span> <span class="fu">coord_fixed</span>(<span class="at">ratio =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">override.aes =</span> <span class="fu">list</span>(<span class="at">shape =</span> <span class="fu">c</span>(<span class="dv">22</span>)))) <span class="sc">+</span></span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>) <span class="sc">+</span> <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="dv">0</span>) <span class="sc">+</span></span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.title =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">"black"</span>, <span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">size =</span> <span class="dv">13</span>)) <span class="sc">+</span></span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span>  <span class="fu">paste</span>(pc1, <span class="st">"%"</span>), <span class="at">y =</span> <span class="fu">paste</span>(pc2, <span class="st">"%"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining with `by = join_by(SAMPLE)`</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="metat-analysis_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># dev.off()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># save(pca_lr, variance_lr, file = "pca_objects.RData")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="define-each-site-by-module" class="level2">
 <h2 class="anchored" data-anchor-id="define-each-site-by-module">Define each site by module</h2>
-<p>(k-means?)</p>
+<p>Try tidyclust? (k-means?)</p>
 </section>
 </section>
-<section id="transcriptional-profiles-for-taxonomic-groups" class="level1">
-<h1>Transcriptional profiles for taxonomic groups</h1>
-<p>(supplementary?) Normalized by individual taxonomic groups.</p>
-<section id="pcoa-with-curated-functional-profiles-and-known-taxonomic-ids." class="level2">
-<h2 class="anchored" data-anchor-id="pcoa-with-curated-functional-profiles-and-known-taxonomic-ids.">PCoA with curated functional profiles and known taxonomic IDs.</h2>
-<p>(subset this way to increase confidence?)</p>
+<section id="exploring-differentially-expressed-genes" class="level1">
+<h1>Exploring differentially-expressed genes</h1>
 <section id="heterotrophy" class="level3">
 <h3 class="anchored" data-anchor-id="heterotrophy">Heterotrophy</h3>
 <p>Isolate and sum to pathways associated with heterotrophy. Gene level is likely too much. Determine for each</p>
@@ -368,7 +688,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Estimate statistical significance for N&amp;P genes, pairwise comparisons. Then add a column for each gene ID that lists the number of samples that are statistically different.</p>
 </section>
 </section>
-</section>
 <section id="functional-redundancy" class="level1">
 <h1>Functional redundancy</h1>
 <p>Input data is all normalized. Then perform pairwise Jaccard dissimilarity with taxa and then with KEGG/pfam IDs - plot as x/y</p>
@@ -376,7 +695,44 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="session-info" class="level1">
 <h1>Session info</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.3.0 (2023-04-21)
+Platform: x86_64-apple-darwin20 (64-bit)
+Running under: macOS Ventura 13.1
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.3-x86_64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: America/Chicago
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] patchwork_1.1.2    compositions_2.0-6 data.table_1.14.8  lubridate_1.9.2   
+ [5] forcats_1.0.0      stringr_1.5.0      dplyr_1.1.2        purrr_1.0.1       
+ [9] readr_2.1.4        tidyr_1.3.0        tibble_3.2.1       ggplot2_3.4.2     
+[13] tidyverse_2.0.0   
+
+loaded via a namespace (and not attached):
+ [1] tensorA_0.36.2    utf8_1.2.3        generics_0.1.3    robustbase_0.95-1
+ [5] stringi_1.7.12    hms_1.1.3         digest_0.6.31     magrittr_2.0.3   
+ [9] evaluate_0.21     grid_4.3.0        timechange_0.2.0  bayesm_3.1-5     
+[13] fastmap_1.1.1     jsonlite_1.8.5    fansi_1.0.4       scales_1.2.1     
+[17] cli_3.6.1         rlang_1.1.1       munsell_0.5.0     withr_2.5.0      
+[21] yaml_2.3.7        tools_4.3.0       tzdb_0.4.0        colorspace_2.1-0 
+[25] vctrs_0.6.2       R6_2.5.1          lifecycle_1.0.3   htmlwidgets_1.6.2
+[29] MASS_7.3-60       pkgconfig_2.0.3   pillar_1.9.0      gtable_0.3.3     
+[33] glue_1.6.2        Rcpp_1.0.10       DEoptimR_1.0-13   xfun_0.39        
+[37] tidyselect_1.2.0  rstudioapi_0.14   knitr_1.43        farver_2.1.1     
+[41] htmltools_0.5.5   labeling_0.4.2    rmarkdown_2.22    compiler_4.3.0   </code></pre>
+</div>
 </div>
 
 
