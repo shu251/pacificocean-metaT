@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.353">
+<meta name="generator" content="quarto-1.1.251">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -17,10 +17,9 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  margin: 0 0.8em 0.2em -1.6em;
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -47,13 +46,43 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
+    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -101,16 +130,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-        <i class="bi bi-layout-text-sidebar-reverse"></i>
-      </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./process-eukrhythmic-output.html">eukrhythmic output</a></li></ol></nav>
-      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-      </a>
-      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
-        <i class="bi bi-search"></i>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">eukrhythmic compilation</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
       </button>
     </div>
   </nav>
@@ -118,42 +142,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
-        <div class="mt-2 flex-shrink-0 align-items-center">
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+      <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
         <div id="quarto-search" class="" title="Search"></div>
         </div>
-        </div>
+      </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Home</span></a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Home</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./env-metadata.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Water column profiles</span></a>
+  <a href="./env-metadata.html" class="sidebar-item-text sidebar-link">Water column profiles</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./process-eukrhythmic-output.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">eukrhythmic output</span></a>
+  <a href="./process-eukrhythmic-output.html" class="sidebar-item-text sidebar-link active">eukrhythmic output</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./metat-analysis.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Data analysis</span></a>
+  <a href="./metat-analysis.html" class="sidebar-item-text sidebar-link">Data analysis</a>
   </div>
 </li>
     </ul>
     </div>
 </nav>
-<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -176,18 +195,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#deseq2-reanalysis-for-de-genes" id="toc-deseq2-reanalysis-for-de-genes" class="nav-link" data-scroll-target="#deseq2-reanalysis-for-de-genes">DEseq2 reanalysis for DE genes</a>
   <ul class="collapse">
-  <li><a href="#subseting-txi" id="toc-subseting-txi" class="nav-link" data-scroll-target="#subseting-txi">Subseting txi</a>
+  <li><a href="#create-subset-parameters" id="toc-create-subset-parameters" class="nav-link" data-scroll-target="#create-subset-parameters">Create subset parameters</a>
   <ul class="collapse">
-  <li><a href="#samples" id="toc-samples" class="nav-link" data-scroll-target="#samples">Samples</a></li>
-  <li><a href="#genes" id="toc-genes" class="nav-link" data-scroll-target="#genes">Genes</a></li>
-  <li><a href="#function" id="toc-function" class="nav-link" data-scroll-target="#function">Function</a></li>
+  <li><a href="#subset-samples-as-parameters" id="toc-subset-samples-as-parameters" class="nav-link" data-scroll-target="#subset-samples-as-parameters">Subset samples as parameters</a></li>
+  <li><a href="#subset-genes-taxa-as-parameters" id="toc-subset-genes-taxa-as-parameters" class="nav-link" data-scroll-target="#subset-genes-taxa-as-parameters">Subset genes &amp; taxa as parameters</a></li>
+  <li><a href="#txi-function" id="toc-txi-function" class="nav-link" data-scroll-target="#txi-function">Txi function</a></li>
   </ul></li>
-  <li><a href="#euphotic-vs.-subeuphotic-overall" id="toc-euphotic-vs.-subeuphotic-overall" class="nav-link" data-scroll-target="#euphotic-vs.-subeuphotic-overall">Euphotic vs.&nbsp;subeuphotic overall</a>
+  </ul></li>
+  <li><a href="#whole-community-deseq-script" id="toc-whole-community-deseq-script" class="nav-link" data-scroll-target="#whole-community-deseq-script">Whole community DESeq script</a>
   <ul class="collapse">
-  <li><a href="#euphotic-vs-subeuphotic-across-regions" id="toc-euphotic-vs-subeuphotic-across-regions" class="nav-link" data-scroll-target="#euphotic-vs-subeuphotic-across-regions">Euphotic vs subeuphotic across regions</a></li>
+  <li><a href="#all-samples" id="toc-all-samples" class="nav-link" data-scroll-target="#all-samples">All samples</a></li>
+  <li><a href="#by-region" id="toc-by-region" class="nav-link" data-scroll-target="#by-region">By region</a></li>
+  <li><a href="#by-light-availability" id="toc-by-light-availability" class="nav-link" data-scroll-target="#by-light-availability">By light availability</a></li>
   </ul></li>
-  <li><a href="#subset-to-genes-of-interest-only" id="toc-subset-to-genes-of-interest-only" class="nav-link" data-scroll-target="#subset-to-genes-of-interest-only">Subset to genes of interest only</a></li>
+  <li><a href="#by-taxonomic-groups---deseq" id="toc-by-taxonomic-groups---deseq" class="nav-link" data-scroll-target="#by-taxonomic-groups---deseq">By taxonomic groups - DESeq</a>
+  <ul class="collapse">
+  <li><a href="#question-1" id="toc-question-1" class="nav-link" data-scroll-target="#question-1">Question 1</a></li>
+  <li><a href="#question-2" id="toc-question-2" class="nav-link" data-scroll-target="#question-2">Question 2</a></li>
   </ul></li>
+  <li><a href="#curated-genes-only" id="toc-curated-genes-only" class="nav-link" data-scroll-target="#curated-genes-only">Curated genes only</a></li>
+  <li><a href="#july-versus-march-for-npsg" id="toc-july-versus-march-for-npsg" class="nav-link" data-scroll-target="#july-versus-march-for-npsg">July versus March for NPSG</a></li>
   </ul>
 </nav>
     </div>
@@ -196,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">eukrhythmic compilation</h1>
+<h1 class="title d-none d-lg-block">eukrhythmic compilation</h1>
 </div>
 
 
@@ -204,7 +231,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-title-meta">
 
     
-  
     
   </div>
   
@@ -245,11 +271,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="compilation-scripts">Compilation scripts</h2>
 <p><code>collate-results.py</code>: <em>description of code</em></p>
 <p>~Arianna - how do you want to handle this?~</p>
+<blockquote class="blockquote">
+<p>Notes for Sarah &amp; Arianna: hopefully we can include a description of taking outputs from eukrhythmic and putting them in specific directories, etc. that can go stright into the run_tximport.R below.</p>
+</blockquote>
 </section>
 </section>
 <section id="obtain-library-normalized-count-data" class="level1">
 <h1>Obtain library normalized count data</h1>
-<p>R script to run this: <code>run_tximport.R</code>.</p>
+<p>R script to run this: <code>scripts/run_tximport.R</code>.</p>
 <p>Our goal is to take eukrhthymic estimated counts (from salmon) to get transcript-level abundance estimates that will account for gene length. The outcome from this is that we get average transcript length across samples. For this we want to import all data into DESeq using tximport as an interface.</p>
 <ul>
 <li>tximport
@@ -383,273 +412,493 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="deseq2-reanalysis-for-de-genes" class="level1">
 <h1>DEseq2 reanalysis for DE genes</h1>
 <p>Repeat DESeq2 design to extracted differentially expressed genes for specific patterns below. Subset is required ahead of time - we can do this with txi directly.</p>
-<p>See script <code>run_subset_deseq2.R</code></p>
-<section id="subseting-txi" class="level2">
-<h2 class="anchored" data-anchor-id="subseting-txi">Subseting txi</h2>
-<section id="samples" class="level3">
-<h3 class="anchored" data-anchor-id="samples">Samples</h3>
+<p>There are a few different ways we want to perform the untargeted analysis. First we will do a ‘whole community’ series of analyses to look at overall amount of differentially expressed genes. Below we will set up parameters associated with the queries we’ve planned.</p>
+<p>See script <code>scripts/run_get_params.R</code> This is stored on GRACE.</p>
+<section id="create-subset-parameters" class="level2">
+<h2 class="anchored" data-anchor-id="create-subset-parameters">Create subset parameters</h2>
+<section id="subset-samples-as-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="subset-samples-as-parameters">Subset samples as parameters</h3>
 <p>Use the metadata data frame to create sample lists for the comparisons we want to do.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"input-data/sample-list-revised.txt"</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># head(metadata)</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># unique(metadata$REGION)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>metadata <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"input-data/sample-list-revised.txt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>As is, we can do LIGHT and PACIFIC_REGION - these are binary.</p>
+<p>For the whole community work, we want to compare CA vs NPSG and euphotic vs.&nbsp;subeuphotic.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>ds_tpm_light <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi,</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> sample_merged,</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> LIGHT)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>ds_tpm_pac <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi,</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> sample_merged,</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> PACIFIC_REGION)</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>ds_tpm_lightpac <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi,</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> sample_merged,</span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> PACIFIC_REGION <span class="sc">+</span> LIGHT)</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ds_tpm_light, ds_tpm_pac, ds_tpm_lightpac, <span class="at">file =</span> <span class="st">"light-pacregion-deseq.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Compare and contrast within regions.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>npsg_only <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PACIFIC_REGION <span class="sc">==</span> <span class="st">"NPSG"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare euphotic and subeuphotic</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Use this to compare across months too</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>ca_only <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PACIFIC_REGION <span class="sc">!=</span> <span class="st">"NPSG"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare euphotic and subeuphotic</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>ca_coast <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PACIFIC_REGION <span class="sc">!=</span> <span class="st">"NPSG"</span> <span class="sc">&amp;</span> REGION <span class="sc">!=</span> <span class="st">"SPOT"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="co"># compare POLA vs. Catalina</span></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>stations_only <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(REGION <span class="sc">==</span> <span class="st">"SPOT"</span> <span class="sc">|</span> REGION <span class="sc">==</span> <span class="st">"ALOHA"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="co"># compare SPOT vs. ALOHA as is</span></span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>euphotic <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(LIGHT <span class="sc">==</span> <span class="st">"Euphotic"</span>)<span class="sc">%&gt;%</span> </span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare NPSG to CA euphotic zone</span></span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>subeuphotic <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(LIGHT <span class="sc">!=</span> <span class="st">"Euphotic"</span>)<span class="sc">%&gt;%</span> </span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare NPSG to CA subeuphotic zone</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>all_samples <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>npsg_only <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PACIFIC_REGION <span class="sc">==</span> <span class="st">"NPSG"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare euphotic and subeuphotic</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Use this to compare across months too</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>ca_only <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PACIFIC_REGION <span class="sc">!=</span> <span class="st">"NPSG"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare euphotic and subeuphotic</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>euphotic <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(LIGHT <span class="sc">==</span> <span class="st">"Euphotic"</span>)<span class="sc">%&gt;%</span> </span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare NPSG to CA euphotic zone</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>subeuphotic <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(LIGHT <span class="sc">!=</span> <span class="st">"Euphotic"</span>)<span class="sc">%&gt;%</span> </span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare NPSG to CA subeuphotic zone</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="genes" class="level3">
-<h3 class="anchored" data-anchor-id="genes">Genes</h3>
+<section id="subset-genes-taxa-as-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="subset-genes-taxa-as-parameters">Subset genes &amp; taxa as parameters</h3>
 <p>Need to make a list of the <code>SequenceID</code> from the taxonomy and functional annotations.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>taxfxn <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"TaxonomicAndFunctionalAnnotations.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>taxfxn <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"TaxonomicAndFunctionalAnnotations.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>R objects that are character lists will be most useful.</p>
+<section id="genes" class="level4">
+<h4 class="anchored" data-anchor-id="genes">Genes</h4>
+<p>Determine character lists from gene list as subsets for our later queries.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get list of annotations where a GO, PFAM, and KEGG ID were assigned.</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>genes_fxn_all <span class="ot">&lt;-</span> <span class="fu">as.character</span>(</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(taxfxn, GOs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]]) <span class="co">#this line outputs the selected vector from the pipe</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Removing unclassified and unannotated sequences</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>genes_tax_fxn_all <span class="ot">&lt;-</span> <span class="fu">as.character</span>(</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(taxfxn, GOs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>         <span class="sc">&amp;</span> Domain <span class="sc">==</span> <span class="st">"Eukaryota"</span> <span class="sc">&amp;</span> Supergroup <span class="sc">!=</span> <span class="st">"Unclassified"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get list of annotations where a GO, PFAM, and KEGG ID were assigned.</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>genes_fxn_all <span class="ot">&lt;-</span> <span class="fu">as.character</span>(</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(taxfxn, GOs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]]) <span class="co">#this line outputs the selected vector from the pipe</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Removing unclassified and unannotated sequences</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>genes_tax_fxn_all <span class="ot">&lt;-</span> <span class="fu">as.character</span>(</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(taxfxn, GOs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">&amp;</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>         <span class="sc">&amp;</span> Domain <span class="sc">==</span> <span class="st">"Eukaryota"</span> <span class="sc">&amp;</span> Supergroup <span class="sc">!=</span> <span class="st">"Unclassified"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>From KEGG database reformatting, extract this Robject, <code>key_geneid</code></p>
+<p>From KEGG database reformatting make <code>key_geneid</code>. Isolate genes that are curated.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># head(key_geneid)</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>kegg_keep <span class="ot">&lt;-</span> <span class="fu">as.character</span>(key_geneid <span class="sc">%&gt;%</span> </span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Category01 <span class="sc">!=</span> <span class="st">""</span> <span class="sc">&amp;</span> <span class="sc">!</span>(<span class="fu">is.na</span>(Category01))) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(KEGG) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  .[[<span class="st">"KEGG"</span>]])</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(kegg_keep)</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>genes_kegg_curated <span class="ot">&lt;-</span> <span class="fu">as.character</span>(taxfxn <span class="sc">%&gt;%</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">KEGG_mod =</span> <span class="fu">str_remove_all</span>(KEGG_ko, <span class="st">"ko:"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(KEGG_mod <span class="sc">%in%</span> kegg_keep) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>kegg <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"../KEGG_DB/combined_kegg.csv"</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(kegg<span class="sc">$</span>KO_number)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>curated_kegg <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"../KEGG_DB/reformat-kegg-pfam-skh.csv"</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>key_geneid <span class="ot">&lt;-</span> curated_kegg <span class="sc">%&gt;%</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>X) <span class="sc">%&gt;%</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(kegg <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="at">KEGG =</span> KO_number, <span class="fu">everything</span>(), <span class="sc">-</span>X)) <span class="sc">%&gt;%</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"KeggOrthology_"</span>), Category01, Category02, FullName, GeneID, Gene_identification, KEGG, PFAM, Descriptions, <span class="at">REF =</span> REFs)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co"># write.csv(key_geneid, file = "keygene_id.csv")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>Save objects for subsetting.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(genes_fxn_all, genes_tax_fxn_all, key_geneid,</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>     npsg_only, ca_only, ca_coast, stations_only, euphotic, subeuphotic,</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">file =</span> <span class="st">"sample-gene-lists_TXISUBSET.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="function" class="level3">
-<h3 class="anchored" data-anchor-id="function">Function</h3>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset txi directly</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>subsetTxi <span class="ot">&lt;-</span> <span class="cf">function</span>(txi, samples, <span class="at">include_genes=</span><span class="fu">rownames</span>(txi<span class="sc">$</span>counts))</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  {</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  genes <span class="ot">&lt;-</span> <span class="fu">rownames</span>(txi<span class="sc">$</span>counts)[<span class="fu">rownames</span>(txi<span class="sc">$</span>counts) <span class="sc">%in%</span> include_genes]</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  txi<span class="sc">$</span>abundance <span class="ot">&lt;-</span> txi<span class="sc">$</span>abundance[genes, samples<span class="sc">$</span>sample]</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  txi<span class="sc">$</span>counts <span class="ot">&lt;-</span> txi<span class="sc">$</span>counts[genes, samples<span class="sc">$</span>sample]</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  txi<span class="sc">$</span>length <span class="ot">&lt;-</span> txi<span class="sc">$</span>length[genes, samples<span class="sc">$</span>sample]</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(txi)</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Example usage </span></span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="co"># tmp &lt;- sample(taxfxn$SequenceID,10,replace = FALSE)</span></span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="co"># pola &lt;- data.frame(sample = c("PortofLA_1", "PortofLA_2"))</span></span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="co"># txi_pola &lt;- subsetTxi(txi, pola, tmp)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>kegg_keep <span class="ot">&lt;-</span> <span class="fu">as.character</span>(key_geneid <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Category01 <span class="sc">!=</span> <span class="st">""</span> <span class="sc">&amp;</span> <span class="sc">!</span>(<span class="fu">is.na</span>(Category01))) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(KEGG) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  .[[<span class="st">"KEGG"</span>]])</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co"># length(kegg_keep)</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>genes_kegg_curated <span class="ot">&lt;-</span> <span class="fu">as.character</span>(taxfxn <span class="sc">%&gt;%</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">KEGG_mod =</span> <span class="fu">str_remove_all</span>(KEGG_ko, <span class="st">"ko:"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(KEGG_mod <span class="sc">%in%</span> kegg_keep) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-</section>
-<section id="euphotic-vs.-subeuphotic-overall" class="level2">
-<h2 class="anchored" data-anchor-id="euphotic-vs.-subeuphotic-overall">Euphotic vs.&nbsp;subeuphotic overall</h2>
+<section id="taxa" class="level4">
+<h4 class="anchored" data-anchor-id="taxa">Taxa</h4>
+<p>Isolate transcript IDs (<em>SequenceID</em>) of individual taxa. For each taxa subset, we are also only selecting transcript IDs with PFAM or KEGG IDs.</p>
+<p>For queries, we want to isolate:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset txi</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>txi_npsg <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, npsg_only, genes_tax_fxn_all)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(npsg_only<span class="sc">$</span>sample))</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_npsg<span class="sc">$</span>counts)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>ds_tpm_npsg_light <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_npsg,</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> LIGHT)</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>ds_tpm_npsg_month <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_npsg,</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> MONTH)</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ds_tpm_npsg_light, ds_tpm_npsg_month, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi-objs-metaT/npsg-deseq.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>euks_only <span class="ot">&lt;-</span> <span class="fu">as.character</span>(</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(taxfxn, Domain <span class="sc">==</span> <span class="st">"Eukaryota"</span> <span class="sc">&amp;</span> (PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">|</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]])</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>diatom <span class="ot">&lt;-</span> <span class="fu">as.character</span>(</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(taxfxn, Class <span class="sc">==</span> <span class="st">"Bacillariophyta"</span> <span class="sc">&amp;</span> (PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">|</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]]) </span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co">#Dinoflagellata pPhylum</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>dinos <span class="ot">&lt;-</span> <span class="fu">as.character</span>(</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(taxfxn, Phylum <span class="sc">==</span> <span class="st">"Dinoflagellata"</span> <span class="sc">&amp;</span> (PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">|</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]]) </span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="co">#Haptophyta in phylum</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>hapto <span class="ot">&lt;-</span> <span class="fu">as.character</span>(</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(taxfxn, Phylum <span class="sc">==</span> <span class="st">"Haptophyta"</span> <span class="sc">&amp;</span> (PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">|</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]])</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Chlorophyta</span></span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>chloro <span class="ot">&lt;-</span> <span class="fu">as.character</span>(</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(taxfxn, Phylum <span class="sc">==</span> <span class="st">"Chlorophyta"</span> <span class="sc">&amp;</span> (PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">|</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]])</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a><span class="co">#Ciliophora</span></span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>ciliate <span class="ot">&lt;-</span> <span class="fu">as.character</span>(</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(taxfxn, Phylum <span class="sc">==</span> <span class="st">"Ciliophora"</span> <span class="sc">&amp;</span> (PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">|</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]])</span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a><span class="co"># Rhizaria at supergroup</span></span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>rhizaria <span class="ot">&lt;-</span> <span class="fu">as.character</span>(</span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(taxfxn, Supergroup <span class="sc">==</span> <span class="st">"Rhizaria"</span> <span class="sc">&amp;</span> (PFAMs <span class="sc">!=</span> <span class="st">"-"</span> <span class="sc">|</span> KEGG_ko <span class="sc">!=</span> <span class="st">"-"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(SequenceID) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>    .[[<span class="st">"SequenceID"</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Save objects for subseting.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>txi_ca <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, ca_only, genes_tax_fxn_all)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(ca_only<span class="sc">$</span>sample))</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_ca<span class="sc">$</span>counts)</span>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># These are data frames</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  all_samples, npsg_only, ca_only, euphotic, subeuphotic,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># these are lists (character lists)</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>     genes_fxn_all, genes_tax_fxn_all, key_geneid, genes_kegg_curated, </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>     euks_only, diatom, dinos, hapto, chloro, ciliate, rhizaria,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">file =</span> <span class="st">"sample-gene-lists-forTXI.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="txi-function" class="level3">
+<h3 class="anchored" data-anchor-id="txi-function">Txi function</h3>
+<p>Code for this function is from: https://rdrr.io/github/hcnh174/hlsgr/man/subsetTxi.html Code: https://rdrr.io/github/hcnh174/hlsgr/src/R/rnaseq.R</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset txi directly</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>subsetTxi <span class="ot">&lt;-</span> <span class="cf">function</span>(txi, samples, <span class="at">include_genes=</span><span class="fu">rownames</span>(txi<span class="sc">$</span>counts))</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  {</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  genes <span class="ot">&lt;-</span> <span class="fu">rownames</span>(txi<span class="sc">$</span>counts)[<span class="fu">rownames</span>(txi<span class="sc">$</span>counts) <span class="sc">%in%</span> include_genes]</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  txi<span class="sc">$</span>abundance <span class="ot">&lt;-</span> txi<span class="sc">$</span>abundance[genes, samples<span class="sc">$</span>sample]</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  txi<span class="sc">$</span>counts <span class="ot">&lt;-</span> txi<span class="sc">$</span>counts[genes, samples<span class="sc">$</span>sample]</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  txi<span class="sc">$</span>length <span class="ot">&lt;-</span> txi<span class="sc">$</span>length[genes, samples<span class="sc">$</span>sample]</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(txi)</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Example usage </span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="co"># tmp &lt;- sample(taxfxn$SequenceID,10,replace = FALSE)</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="co"># pola &lt;- data.frame(sample = c("PortofLA_1", "PortofLA_2"))</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="co"># txi_pola &lt;- subsetTxi(txi, pola, tmp)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="whole-community-deseq-script" class="level1">
+<h1>Whole community DESeq script</h1>
+<p>Compare across light and pacific region, first isolate only eukaryotes and annotated transcripts.</p>
+<section id="all-samples" class="level2">
+<h2 class="anchored" data-anchor-id="all-samples">All samples</h2>
+<p>See script <code>scripts/run_txi_wholecomm.R</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset eukaryotes only, and keep all samples.</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>txi_euk_annot <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, all_samples, euks_only)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>ds_tpm_light <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_euk_annot,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> sample_merged,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> LIGHT)</span>
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>ds_tpm_ca_light <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_ca,</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> LIGHT)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>ds_tpm_pac <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_euk_annot,</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> sample_merged,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> PACIFIC_REGION)</span>
 <span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ds_tpm_ca_light, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi-objs-metaT/ca-deseq.RData"</span>)</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(txi_npsg, txi_ca, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi-objs-metaT/station_txi.RData"</span>)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>ds_tpm_lightpac <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_euk_annot,</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> sample_merged,</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> PACIFIC_REGION <span class="sc">+</span> LIGHT)</span>
 <span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(txi_npsg);<span class="fu">rm</span>(txi_ca) <span class="co">#Save room</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ds_tpm_light, ds_tpm_pac, ds_tpm_lightpac, <span class="at">file =</span> <span class="st">"light-pacregion-deseq.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="euphotic-vs-subeuphotic-across-regions" class="level3">
-<h3 class="anchored" data-anchor-id="euphotic-vs-subeuphotic-across-regions">Euphotic vs subeuphotic across regions</h3>
+</section>
+<section id="by-region" class="level2">
+<h2 class="anchored" data-anchor-id="by-region">By region</h2>
+<p>See script <code>scripts/run_txi_region.r</code>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset txi</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>txi_euph <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, euphotic, genes_tax_fxn_all)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>txi_npsg <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, npsg_only, euks_only)</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(euphotic<span class="sc">$</span>sample))</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_euph<span class="sc">$</span>counts)</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>ds_tpm_euphotic <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_euph,</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> PACIFIC_REGION)</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>txi_subeuph <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, subeuphotic, genes_tax_fxn_all)</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(subeuphotic<span class="sc">$</span>sample))</span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_subeuph<span class="sc">$</span>counts)</span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Reset sample_merged</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Subset</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(npsg_only<span class="sc">$</span>sample))</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="do">## Set names</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_npsg<span class="sc">$</span>counts)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare Euphotic vs. sub-euphotic samples in the NPSG</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>ds_tpm_npsg_light <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_npsg,</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> LIGHT)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare July vs. March in the NPSG</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>ds_tpm_npsg_month <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_npsg,</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> MONTH)</span>
 <span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>ds_tpm_subeuphotic <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_subeuph,</span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> PACIFIC_REGION)</span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ds_tpm_subeuphotic, ds_tpm_euphotic, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi-objs-metaT/euphotic-subeuphotic-deseq.RData"</span>)</span>
-<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(txi_euph, txi_subeuph, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi-objs-metaT/light_txi.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-</section>
-<section id="subset-to-genes-of-interest-only" class="level2">
-<h2 class="anchored" data-anchor-id="subset-to-genes-of-interest-only">Subset to genes of interest only</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>taxfxn <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"TaxonomicAndFunctionalAnnotations.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ds_tpm_npsg_light, ds_tpm_npsg_month, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi-objs-metaT/npsg-deseq.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tximport)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>txi_ca <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, ca_only, euks_only)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(ca_only<span class="sc">$</span>sample))</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_ca<span class="sc">$</span>counts)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare euphotic vs. subeuphotic in coastal California</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="do">## Includes Port of LA and Catalina</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>ds_tpm_ca_light <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_ca,</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> LIGHT)</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ds_tpm_ca_light, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi-objs-metaT/ca-deseq.RData"</span>)</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a><span class="do">##</span></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(txi_npsg);<span class="fu">rm</span>(txi_ca) <span class="co">#Save room</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="by-light-availability" class="level2">
+<h2 class="anchored" data-anchor-id="by-light-availability">By light availability</h2>
+<p>See script <code>scripts/run_txi_light.r</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Subset txi</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>txi_euph <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, euphotic, euks_only)</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>all_samples <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>txi_curated <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, all_samples, genes_kegg_curated)</span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>counts_scaled_curated <span class="ot">&lt;-</span> <span class="fu">makeCountsFromAbundance</span>(</span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>(txi_curated<span class="sc">$</span>counts),</span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>(txi_curated<span class="sc">$</span>abundance),</span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>(txi_curated<span class="sc">$</span>length),</span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">countsFromAbundance =</span> <span class="st">"scaledTPM"</span></span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(euphotic<span class="sc">$</span>sample))</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_euph<span class="sc">$</span>counts)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare CA versus NPSG within euphotic samples</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>ds_tpm_euphotic <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_euph,</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> PACIFIC_REGION)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>txi_subeuph <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, subeuphotic, euks_only)</span>
 <span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>counts_df_curated <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(counts_scaled_curated)</span>
-<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>names_orig <span class="ot">&lt;-</span> <span class="fu">colnames</span>(counts_df_curated)</span>
-<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>names_new <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">"_[^_]+$"</span>, <span class="st">""</span>, names_orig)</span>
-<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(counts_df_curated) <span class="ot">&lt;-</span> names_new</span>
-<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>mean_counts_df_curated <span class="ot">&lt;-</span> counts_df_curated <span class="sc">%&gt;%</span></span>
-<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cbind</span>(<span class="fu">as.list</span>(.) <span class="sc">%&gt;%</span></span>
-<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Filter</span>(is.numeric, .) <span class="sc">%&gt;%</span></span>
-<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">split</span>(<span class="fu">names</span>(.)) <span class="sc">%&gt;%</span></span>
-<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(as.data.frame) <span class="sc">%&gt;%</span></span>
-<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(rowMeans) <span class="sc">%&gt;%</span></span>
-<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setNames</span>(<span class="fu">paste0</span>(<span class="st">"mean."</span>, <span class="fu">names</span>(.)))) <span class="sc">%&gt;%</span> </span>
-<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"mean"</span>))</span>
-<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-33"><a href="#cb26-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-34"><a href="#cb26-34" aria-hidden="true" tabindex="-1"></a>counts_curated <span class="ot">&lt;-</span> mean_counts_df_curated <span class="sc">%&gt;%</span> </span>
-<span id="cb26-35"><a href="#cb26-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"SequenceID"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb26-36"><a href="#cb26-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(taxfxn)</span>
-<span id="cb26-37"><a href="#cb26-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-38"><a href="#cb26-38" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(counts_curated, sample_merged, <span class="at">file =</span> <span class="st">"Avg_scaled_tpm_curated_08252023.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(subeuphotic<span class="sc">$</span>sample))</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_subeuph<span class="sc">$</span>counts)</span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare CA versus NPSG at subeuphotic depths</span></span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>ds_tpm_subeuphotic <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_subeuph,</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">colData =</span> tmp_sample_merged,</span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> PACIFIC_REGION)</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ds_tpm_subeuphotic, ds_tpm_euphotic, <span class="at">file =</span> <span class="st">"/vortexfs1/scratch/sarahhu/txi-objs-metaT/euphotic-subeuphotic-deseq.RData"</span>)</span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a><span class="co"># save(txi_euph, txi_subeuph, file = "/vortexfs1/scratch/sarahhu/txi-objs-metaT/light_txi.RData")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(all_samples<span class="sc">$</span>sample))</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_curated<span class="sc">$</span>counts)</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>ds_tpm_curated <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_curated,</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">colData =</span> tmp_sample_merged,</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> SAMPLENAME)</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>vsd_all <span class="ot">&lt;-</span> <span class="fu">vst</span>(ds_tpm_curated)</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>df_ctr_norm_curated <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">assay</span>(vsd_all))</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>ctr_norm_curated <span class="ot">&lt;-</span> df_ctr_norm_curated <span class="sc">%&gt;%</span> </span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"SequenceID"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(taxfxn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ctr_norm_curated, ds_tpm_curated, <span class="at">file =</span> <span class="st">"normed_center_df_curated_08252023.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-
-
 </section>
+</section>
+<section id="by-taxonomic-groups---deseq" class="level1">
+<h1>By taxonomic groups - DESeq</h1>
+<p>Compare and contrast within regions. For part of our analysis we want to subset only the euphotic zone samples. Specifically targeting the difference between the SPOT station surface compared to: NPSG surface, NPSG DCM, NPSG 150m, Port of LA, and Catalina.</p>
+<section id="question-1" class="level2">
+<h2 class="anchored" data-anchor-id="question-1">Question 1</h2>
+<p>For the first of our two core questions, we want to know what genes are significantly differentially expressed among the euphotic zone samples for the dominant protistan phytoplankton. We are specifically focusing on diatoms, chlorophytes, archaeplastidia (chlorophya), dinoflagellates, and haptophytes for this.</p>
+<blockquote class="blockquote">
+<p>How does nutrient utilization among euphotic zone phytoplankton vary between coastal California and the NPSG?</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to subset txi by individual taxa and perform DESeq</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>deseq_region_bytax <span class="ot">&lt;-</span> <span class="cf">function</span>(sample_set, gene_set){</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># First incorporate the txi subset fxn</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  subsetTxi <span class="ot">&lt;-</span> <span class="cf">function</span>(txi, samples, <span class="at">include_genes=</span><span class="fu">rownames</span>(txi<span class="sc">$</span>counts))</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  {</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    genes <span class="ot">&lt;-</span> <span class="fu">rownames</span>(txi<span class="sc">$</span>counts)[<span class="fu">rownames</span>(txi<span class="sc">$</span>counts) <span class="sc">%in%</span> include_genes]</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    txi<span class="sc">$</span>abundance <span class="ot">&lt;-</span> txi<span class="sc">$</span>abundance[genes, samples<span class="sc">$</span>sample]</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    txi<span class="sc">$</span>counts <span class="ot">&lt;-</span> txi<span class="sc">$</span>counts[genes, samples<span class="sc">$</span>sample]</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    txi<span class="sc">$</span>length <span class="ot">&lt;-</span> txi<span class="sc">$</span>length[genes, samples<span class="sc">$</span>sample]</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(txi)</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Run subset and sample merge re-set</span></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>  txi_output <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, sample_set, gene_set)</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># This script will keep replacing tmp_sample_merged</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>  tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(sample_set<span class="sc">$</span>sample))</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_output<span class="sc">$</span>counts)</span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>  <span class="co">#</span></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Import as DESeq object - use PACIFIC_REGION in the design</span></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># DESeq</span></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>  ds_tpm_output <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_output,</span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">colData =</span> tmp_sample_merged,</span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> PACIFIC_REGION)</span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># return(ds_tpm_output)</span></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Further process DESeq</span></span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>  groupsize <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="co"># Transcript to consider, must be in at least 3 samples</span></span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>  keep <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(<span class="fu">counts</span>(ds_tpm_output) <span class="sc">&gt;=</span> <span class="dv">10</span>) <span class="sc">&gt;=</span> groupsize <span class="co"># And have &gt;= to 10 counts</span></span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>  ds_tpm_output_filtered <span class="ot">&lt;-</span> ds_tpm_output[keep,]</span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>  <span class="do">###</span></span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Filtering stats:</span></span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Started with "</span>, <span class="fu">dim</span>(ds_tpm_output)[<span class="dv">1</span>], <span class="st">"observations. Filtering by 2 samples and 10 counts resulted in,"</span>, <span class="fu">dim</span>(ds_tpm_output_filtered)[<span class="dv">1</span>], <span class="st">", which is"</span>, (<span class="dv">100</span><span class="sc">*</span>(<span class="fu">dim</span>(ds_tpm_output_filtered)[<span class="dv">1</span>]<span class="sc">/</span><span class="fu">dim</span>(ds_tpm_output)[<span class="dv">1</span>])), <span class="st">"% of the data.</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>  <span class="do">###</span></span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>  <span class="co">#</span></span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Positive log fold change == up regulared in CA, compared to NPSG</span></span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>  ds_tpm_output_filtered<span class="sc">$</span>PACIFIC_REGION <span class="ot">&lt;-</span> <span class="fu">factor</span>(ds_tpm_output_filtered<span class="sc">$</span>PACIFIC_REGION, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"NPSG"</span>, <span class="st">"CA"</span>))</span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>  de_tax_output <span class="ot">&lt;-</span> DESeq2<span class="sc">::</span><span class="fu">DESeq</span>(ds_tpm_output_filtered)</span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">resultsNames</span>(de_tax_output)</span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>(de_tax_output)</span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(de_tax_output)</span>
+<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n\n</span><span class="st">Completed.</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Apply to each taxa</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co"># From the euphotic samples, what are DE genes among haptophytes between CA and NPSG?</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n\n</span><span class="st">Diatoms start.</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>de_diatom <span class="ot">&lt;-</span> <span class="fu">deseq_region_bytax</span>(euphotic, diatom)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">\Haptophytes start.</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co"># From the euphotic samples, what are DE genes among haptophytes between CA and NPSG?</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>de_hapto <span class="ot">&lt;-</span> <span class="fu">deseq_region_bytax</span>(euphotic, hapto)</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">\Dinoflagellates start.</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="co"># From the euphotic samples, what are DE genes among Dinoflagellates between CA and NPSG?</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>de_dinos <span class="ot">&lt;-</span> <span class="fu">deseq_region_bytax</span>(euphotic, dinos)</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">\Chlorophytes start.</span><span class="sc">\n\n</span><span class="st">"</span>)</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="co"># From the euphotic samples, what are DE genes among chlorophytes between CA and NPSG?</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>de_chloro <span class="ot">&lt;-</span> <span class="fu">deseq_region_bytax</span>(euphotic, chloro)</span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(de_diatom, de_hapto, de_dinos, de_chloro, <span class="at">file =</span> <span class="st">"/scratch/group/hu-lab/pacocean-metaT/Robjs/euphotic_by_taxa.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="question-2" class="level2">
+<h2 class="anchored" data-anchor-id="question-2">Question 2</h2>
+<p>We can repeat the above approach, but select different taxa.</p>
+<blockquote class="blockquote">
+<p>Do we see a similar euphotic vs.&nbsp;sub-euphotic shift in the metabolic potential of taxa observed at coastal California and the NPSG?</p>
+</blockquote>
+<p>~ repeat code above with euphotic versus euphotic ~</p>
+</section>
+</section>
+<section id="curated-genes-only" class="level1">
+<h1>Curated genes only</h1>
+<p>Here, we isolated annotated transcripts that we curated ourselves.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tximport)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>all_samples <span class="ot">&lt;-</span> metadata <span class="sc">%&gt;%</span> </span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">sample =</span> SAMPLE)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>txi_curated <span class="ot">&lt;-</span> <span class="fu">subsetTxi</span>(txi, all_samples, genes_kegg_curated)</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>counts_scaled_curated <span class="ot">&lt;-</span> <span class="fu">makeCountsFromAbundance</span>(</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>(txi_curated<span class="sc">$</span>counts),</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>(txi_curated<span class="sc">$</span>abundance),</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>(txi_curated<span class="sc">$</span>length),</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">countsFromAbundance =</span> <span class="st">"scaledTPM"</span></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>counts_df_curated <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(counts_scaled_curated)</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>names_orig <span class="ot">&lt;-</span> <span class="fu">colnames</span>(counts_df_curated)</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>names_new <span class="ot">&lt;-</span> <span class="fu">sub</span>(<span class="st">"_[^_]+$"</span>, <span class="st">""</span>, names_orig)</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(counts_df_curated) <span class="ot">&lt;-</span> names_new</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>mean_counts_df_curated <span class="ot">&lt;-</span> counts_df_curated <span class="sc">%&gt;%</span></span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cbind</span>(<span class="fu">as.list</span>(.) <span class="sc">%&gt;%</span></span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Filter</span>(is.numeric, .) <span class="sc">%&gt;%</span></span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">split</span>(<span class="fu">names</span>(.)) <span class="sc">%&gt;%</span></span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(as.data.frame) <span class="sc">%&gt;%</span></span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(rowMeans) <span class="sc">%&gt;%</span></span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setNames</span>(<span class="fu">paste0</span>(<span class="st">"mean."</span>, <span class="fu">names</span>(.)))) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"mean"</span>))</span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>counts_curated <span class="ot">&lt;-</span> mean_counts_df_curated <span class="sc">%&gt;%</span> </span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"SequenceID"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(taxfxn)</span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(counts_curated, sample_merged, <span class="at">file =</span> <span class="st">"Avg_scaled_tpm_curated_08252023.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>tmp_sample_merged <span class="ot">&lt;-</span> sample_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Sample_rep <span class="sc">%in%</span> <span class="fu">as.character</span>(all_samples<span class="sc">$</span>sample))</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> tmp_sample_merged<span class="sc">$</span>Sample_rep</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(tmp_sample_merged) <span class="ot">&lt;-</span> <span class="fu">colnames</span>(txi_curated<span class="sc">$</span>counts)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>ds_tpm_curated <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromTximport</span>(txi_curated,</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">colData =</span> tmp_sample_merged,</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">design =</span> <span class="sc">~</span><span class="dv">0</span> <span class="sc">+</span> SAMPLENAME)</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>vsd_all <span class="ot">&lt;-</span> <span class="fu">vst</span>(ds_tpm_curated)</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>df_ctr_norm_curated <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">assay</span>(vsd_all))</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>ctr_norm_curated <span class="ot">&lt;-</span> df_ctr_norm_curated <span class="sc">%&gt;%</span> </span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"SequenceID"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(taxfxn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">save</span>(ctr_norm_curated, ds_tpm_curated, <span class="at">file =</span> <span class="st">"normed_center_df_curated_08252023.RData"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="july-versus-march-for-npsg" class="level1">
+<h1>July versus March for NPSG</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DESeq2)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"/scratch/group/hu-lab/pacocean-metaT/Robjs/npsg-deseq.RData"</span>, <span class="at">verbose =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare July vs. March in the NPSG</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co"># ds_tpm_npsg_month &lt;- DESeqDataSetFromTximport(txi_npsg,</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="co">#                                               colData = tmp_sample_merged,</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="co">#                                               design = ~0 + MONTH)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>How many genes are differentially expressed between July and March?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Positive log fold change == up regulated in July, compared to March</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>ds_tpm_npsg_month<span class="sc">$</span>MONTH <span class="ot">&lt;-</span> <span class="fu">factor</span>(ds_tpm_npsg_month<span class="sc">$</span>MONTH, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"March"</span>, <span class="st">"July"</span>))</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>de_month <span class="ot">&lt;-</span> <span class="fu">DESeq</span>(ds_tpm_npsg_month)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>results_month <span class="ot">&lt;-</span> <span class="fu">results</span>(de_month, <span class="at">alpha=</span><span class="fl">0.05</span>)</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co"># plotMA(results_month)</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">summary</span>(results_month)</span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(out, <span class="at">file =</span> <span class="st">"summary-months.csv"</span>)</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot log fold change</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="fu">svg</span>(<span class="st">"rplot-month.csv"</span>, <span class="at">width =</span> <span class="dv">9</span>, <span class="at">height =</span> <span class="dv">8</span>)</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(results_month) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">REGULATION =</span> <span class="fu">case_when</span>(</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>    log2FoldChange <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"upregulated in July"</span>,</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>    log2FoldChange <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"upregulated in March"</span></span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">SIGNIFICANT =</span> <span class="fu">case_when</span>(</span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>    pvalue <span class="sc">&lt;=</span> <span class="fl">0.05</span> <span class="sc">~</span> <span class="st">"Significantly"</span>,</span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Not significantly"</span></span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> baseMean, <span class="at">y =</span> log2FoldChange, <span class="at">color =</span> SIGNIFICANT)) <span class="sc">+</span></span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#878787"</span>, <span class="st">"#d73027"</span>)) <span class="sc">+</span></span>
+<span id="cb33-27"><a href="#cb33-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">mcols</span>(results_month)<span class="sc">$</span>description[<span class="dv">2</span>])</span>
+<span id="cb33-28"><a href="#cb33-28" aria-hidden="true" tabindex="-1"></a><span class="fu">dev.off</span>()</span>
+<span id="cb33-29"><a href="#cb33-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-30"><a href="#cb33-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Get table</span></span>
+<span id="cb33-31"><a href="#cb33-31" aria-hidden="true" tabindex="-1"></a>month_transcripts <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(results_month) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-32"><a href="#cb33-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">REGULATION =</span> <span class="fu">case_when</span>(</span>
+<span id="cb33-33"><a href="#cb33-33" aria-hidden="true" tabindex="-1"></a>    log2FoldChange <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"upregulated in July"</span>,</span>
+<span id="cb33-34"><a href="#cb33-34" aria-hidden="true" tabindex="-1"></a>    log2FoldChange <span class="sc">&lt;</span> <span class="dv">0</span> <span class="sc">~</span> <span class="st">"upregulated in March"</span></span>
+<span id="cb33-35"><a href="#cb33-35" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb33-36"><a href="#cb33-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">SIGNIFICANT =</span> <span class="fu">case_when</span>(</span>
+<span id="cb33-37"><a href="#cb33-37" aria-hidden="true" tabindex="-1"></a>    pvalue <span class="sc">&lt;=</span> <span class="fl">0.05</span> <span class="sc">~</span> <span class="st">"Significantly"</span>,</span>
+<span id="cb33-38"><a href="#cb33-38" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Not significantly"</span></span>
+<span id="cb33-39"><a href="#cb33-39" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-40"><a href="#cb33-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SIGNIFICANT <span class="sc">==</span> <span class="st">"Significantly"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-41"><a href="#cb33-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">"SequenceID"</span>)</span>
+<span id="cb33-42"><a href="#cb33-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-43"><a href="#cb33-43" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(month_transcripts, <span class="at">file =</span> <span class="st">"/scratch/group/hu-lab/pacocean-metaT/month-transcripts.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
 </section>
 
 </main> <!-- /main -->
@@ -680,23 +929,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
-  const isCodeAnnotation = (el) => {
-    for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {                     
-        return true;
-      }
-    }
-    return false;
-  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
+    target: function(trigger) {
+      return trigger.previousElementSibling;
     }
   });
   clipboard.on('success', function(e) {
@@ -708,24 +943,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
     button.setAttribute("title", "Copied!");
-    let tooltip;
-    if (window.bootstrap) {
-      button.setAttribute("data-bs-toggle", "tooltip");
-      button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button, 
-        { trigger: "manual", 
-          customClass: "code-copy-button-tooltip",
-          offset: [0, -8]});
-      tooltip.show();    
-    }
     setTimeout(function() {
-      if (tooltip) {
-        tooltip.hide();
-        button.removeAttribute("data-bs-title");
-        button.removeAttribute("data-bs-toggle");
-        button.removeAttribute("data-bs-placement");
-      }
       button.setAttribute("title", currentTitle);
       button.classList.remove('code-copy-button-checked');
     }, 1000);
@@ -761,128 +979,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
-      let selectedAnnoteEl;
-      const selectorForAnnotation = ( cell, annotation) => {
-        let cellAttr = 'data-code-cell="' + cell + '"';
-        let lineAttr = 'data-code-annotation="' +  annotation + '"';
-        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-        return selector;
-      }
-      const selectCodeLines = (annoteEl) => {
-        const doc = window.document;
-        const targetCell = annoteEl.getAttribute("data-target-cell");
-        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-        const lineIds = lines.map((line) => {
-          return targetCell + "-" + line;
-        })
-        let top = null;
-        let height = null;
-        let parent = null;
-        if (lineIds.length > 0) {
-            //compute the position of the single el (top and bottom and make a div)
-            const el = window.document.getElementById(lineIds[0]);
-            top = el.offsetTop;
-            height = el.offsetHeight;
-            parent = el.parentElement.parentElement;
-          if (lineIds.length > 1) {
-            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-            height = bottom - top;
-          }
-          if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it 
-            let div = window.document.getElementById("code-annotation-line-highlight");
-            if (div === null) {
-              div = window.document.createElement("div");
-              div.setAttribute("id", "code-annotation-line-highlight");
-              div.style.position = 'absolute';
-              parent.appendChild(div);
-            }
-            div.style.top = top - 2 + "px";
-            div.style.height = height + 4 + "px";
-            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-            if (gutterDiv === null) {
-              gutterDiv = window.document.createElement("div");
-              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-              gutterDiv.style.position = 'absolute';
-              const codeCell = window.document.getElementById(targetCell);
-              const gutter = codeCell.querySelector('.code-annotation-gutter');
-              gutter.appendChild(gutterDiv);
-            }
-            gutterDiv.style.top = top - 2 + "px";
-            gutterDiv.style.height = height + 4 + "px";
-          }
-          selectedAnnoteEl = annoteEl;
-        }
-      };
-      const unselectCodeLines = () => {
-        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-        elementsIds.forEach((elId) => {
-          const div = window.document.getElementById(elId);
-          if (div) {
-            div.remove();
-          }
-        });
-        selectedAnnoteEl = undefined;
-      };
-      // Attach click handler to the DT
-      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-      for (const annoteDlNode of annoteDls) {
-        annoteDlNode.addEventListener('click', (event) => {
-          const clickedEl = event.target;
-          if (clickedEl !== selectedAnnoteEl) {
-            unselectCodeLines();
-            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-            if (activeEl) {
-              activeEl.classList.remove('code-annotation-active');
-            }
-            selectCodeLines(clickedEl);
-            clickedEl.classList.add('code-annotation-active');
-          } else {
-            // Unselect the line
-            unselectCodeLines();
-            clickedEl.classList.remove('code-annotation-active');
-          }
-        });
-      }
-  const findCites = (el) => {
-    const parentEl = el.parentElement;
-    if (parentEl) {
-      const cites = parentEl.dataset.cites;
-      if (cites) {
-        return {
-          el,
-          cites: cites.split(' ')
-        };
-      } else {
-        return findCites(el.parentElement)
-      }
-    } else {
-      return undefined;
-    }
-  };
   var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
   for (var i=0; i<bibliorefs.length; i++) {
     const ref = bibliorefs[i];
-    const citeInfo = findCites(ref);
-    if (citeInfo) {
-      tippyHover(citeInfo.el, function() {
-        var popup = window.document.createElement('div');
-        citeInfo.cites.forEach(function(cite) {
-          var citeDiv = window.document.createElement('div');
-          citeDiv.classList.add('hanging-indent');
-          citeDiv.classList.add('csl-entry');
-          var biblioDiv = window.document.getElementById('ref-' + cite);
-          if (biblioDiv) {
-            citeDiv.innerHTML = biblioDiv.innerHTML;
-          }
-          popup.appendChild(citeDiv);
-        });
-        return popup.innerHTML;
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
       });
-    }
+      return popup.innerHTML;
+    });
   }
 });
 </script>

@@ -2,8 +2,7 @@
 title: "Metatranscriptome survey of Pacific Ocean"
 ---
 
-Home for code and analysis for microeukaryotic metatranscriptome survey.
-
+Home for code and analysis for microeukaryotic metatranscriptome survey. From github repo: https://github.com/shu251/pacificocean-metaT
 _in prep_
 
 **TO DO**:

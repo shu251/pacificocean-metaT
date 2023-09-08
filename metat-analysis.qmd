@@ -35,7 +35,7 @@ library(patchwork)
 
 # Whole community analysis
 
-Below, we will import the averaged (across replicates) and scaled transcript per million (TPM) values so we can look at the overall protistan community structure. 
+Below, we will import the averaged (across replicates) and scaled transcript per million (TPM) values so we can look at the overall protistan community structure.
 
 ## Input all TPM results
 
@@ -242,11 +242,11 @@ tax_formatted %>%
 
 #### Table 1
 
-Get stats on what transcripts were annotated to various levels, etc. 
+Get stats on what transcripts were annotated to various levels, etc.
 
 This represents a toy dataset to troubleshoot code.
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 load("input-data/toy_1000.Rdata", verbose = TRUE)
 
 # Change to original names, so code below can be written
@@ -293,7 +293,7 @@ summary_annotated <- annotated_mean %>%
 
 > How many are annotated and have taxonomic IDs?
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 noneuk <- c("Unclassified", "Bacteria", "Archaea")
 as.data.frame(annotated_mean %>% 
              count(output = !(Domain %in% noneuk), 
@@ -320,12 +320,12 @@ as.data.frame(annotated_mean %>%
   pivot_longer(cols = everything(), values_to = "Number annotated") %>% 
   mutate(Percent_annotated = 100*(`Number annotated`/length(annotated_mean$SequenceID)))
 ```
-> Need to run the above on the HPC. 
 
+> Need to run the above on the HPC.
 
 ## PCoA with whole community functional profile
 
-Ahead of time, normalized community composition data was center scaled. Below, we can import this dataset and perform principle component analysis. 
+Ahead of time, normalized community composition data was center scaled. Below, we can import this dataset and perform principle component analysis.
 
 Import normalized center data.
 
@@ -340,7 +340,6 @@ pca_lr <- prcomp(as.data.frame(t(df_ctr_norm)))
 variance_lr <- (pca_lr$sdev^2)/sum(pca_lr$sdev^2)
 ```
 
-
 Import PCA objects from running R on the HPC.
 
 ```{r}
@@ -352,7 +351,6 @@ Determine how appropriate the PCoA is in 2 vs 3 dimensions.
 ```{r}
 barplot(variance_lr, main = "Log-Ratio PCA Screeplot", xlab = "PC Axis", ylab = "% Variance", cex.names = 1.5, cex.axis = 1.5, cex.lab = 1.5, cex.main = 1.5)
 ```
-
 
 ```{r, fig.height=7, fig.width=7}
 pc1 <- round(variance_lr[1] * 100, 2)
@@ -376,237 +374,6 @@ pca_df %>%
     labs(x =  paste(pc1, "%"), y = paste(pc2, "%"))
 ```
 
-# Query 1
-
-```{r}
-# load("input-data/Avg_scaled_tpm_curated_08252023.RData", verbose = TRUE)
-# load("input-data/normed_center_df_curated_08252023.RData", verbose = TRUE)
-```
-
-> How does nutrient utilization among euphotic zone phytoplankton vary between coastal California and the NPSG?
-
-```{r}
-head(counts_curated)
-```
-
-```{r}
-counts_curated_annot %>% 
-  filter(Category01 == "Phagotrophy" & Domain == "Eukaryota") %>% 
-  select(starts_with("mean."), Supergroup:Species, Category02, GeneID, Gene_identification, PFAMs) %>% 
-  pivot_longer(cols = starts_with("mean."), names_to = "SAMPLE_tmp", values_to = "TPM") %>% 
-  mutate(SAMPLE = str_remove(SAMPLE_tmp, "mean."),
-         LOG_TPM = log(TPM)) %>%
-  ggplot(aes(x = Phylum, y = GeneID, fill = LOG_TPM)) +
-    geom_tile()
-```
-
-
-# Query 2
-
-
-## Obtain differentially expressed genes from euphotic region communities
-
-By depth, look at taxonomic breakdown at higher resolution. Use the center normalized data - separating this specifically by sub-euphotic and euphotic to pair with the DESeq results.
-
-This represents a toy dataset to troubleshoot code.
-
-```{r}
-# load("input-data/toy_1000.Rdata", verbose = TRUE)
-
-# Change to original names, so code below can be written
-# annotated_mean <- annotated_mean_10000
-# df_ctr_norm <- ctr_norm_10000
-```
-
-> Aug 25 \*\*This the above toy data set to work with the ctr normalized data. Get the taxa sorted - what is the taxonomic resolution associated with euphotic vs. subeuphotic.
-
-# Differentially expressed genes
-
-Resources: 1. http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#the-deseqdataset
-
-Pre-filtering / pre-processing data: Remove counts that are less than 10, and make sure the minimal number of samples that a count appears is 3.
-
-```{r, warning=FALSE, message=FALSE}
-library(DESeq2)
-```
-
-### Light vs. Region in the Pac Ocean
-
-Using the whole dataset, these are the comparisons.
-
-light: upregulated in the euphotic zone vs subeuphotic pac: upregulated in NPSG vs CA lightpac - combo!?
-
-```{r, echo=TRUE, eval=FALSE}
-load("light-pacregion-deseq.RData")
-  # ds_tpm_light
-  # ds_tpm_pac
-  # ds_tpm_lightpac
-
-groupsize <- 5
-keep <- rowSums(counts(ds_tpm_light) >= 100) >= groupsize
-ds_tpm_light_filtered <- ds_tpm_light[keep,]
-
-ds_tpm_light_filtered$LIGHT <- factor(ds_tpm_light_filtered$LIGHT, levels = c("Euphotic", "Sub-euphotic"))
-
-# this step takes time
-dds_light <- DESeq2::DESeq(ds_tpm_light_filtered) 
-
-# report results
-res_light <- results(dds_light)
-```
-
-```{r, echo=TRUE, eval=FALSE}
-# Compare with the Pacific Ocean
-groupsize <- 5
-keep <- rowSums(counts(ds_tpm_pac) >= 100) >= groupsize
-dds_obj_filtered <- ds_tpm_pac[keep,]
-dds_obj_filtered$PACIFIC_REGION <- factor(dds_obj_filtered$PACIFIC_REGION, levels = c("CA", "NPSG"))
-# this step takes time
-dds_light <- DESeq2::DESeq(dds_obj_filtered) 
-# report results
-res_pacific <- results(dds_light)
-
-# Compare with Pacific ocean and light
-groupsize <- 5
-keep <- rowSums(counts(ds_tpm_lightpac) >= 100) >= groupsize
-dds_obj_filtered <- ds_tpm_lightpac[keep,]
-dds_obj_filtered$LIGHT <- factor(dds_obj_filtered$LIGHT, levels = c("Euphotic", "Sub-euphotic"))
-# this step takes time
-dds_light <- DESeq2::DESeq(dds_obj_filtered)
-# report results
-res_lightpac <- results(dds_light)
-```
-
-```{r, echo=TRUE, eval=FALSE}
-save(res_light, res_pacific, res_lightpac, file = "DE_results_light.RData")
-```
-
-### CA and NPSG only
-
-```{r, echo=TRUE, eval=FALSE}
-load(file = "/vortexfs1/scratch/sarahhu/txi-objs-metaT/npsg-deseq.RData", verbose = TRUE)
-load(file = "/vortexfs1/scratch/sarahhu/txi-objs-metaT/ca-deseq.RData", verbose = TRUE)
-```
-
-```{r, echo=TRUE, eval=FALSE}
-# ds_tpm_npsg_light
-# ds_tpm_ca_light
-```
-
-npsg_light: upreg in euphotic on npsg ca_light : upreg in euphotic in CA \*use the month NPSG one for supplement -it should support that July and March are being used as Biological replicates.
-
-```{r, echo=TRUE, eval=FALSE}
-groupsize <- 2
-keep <- rowSums(counts(ds_tpm_npsg_light) >= 50) >= groupsize
-ds_tpm_light_filtered <- ds_tpm_npsg_light[keep,]
-ds_tpm_light_filtered$LIGHT <- factor(ds_tpm_light_filtered$LIGHT, levels = c("Euphotic", "Sub-euphotic"))
-# this step takes time
-dds_light <- DESeq2::DESeq(ds_tpm_light_filtered) 
-# report results
-res_npsg_light <- results(dds_light)
-```
-
-```{r, echo=TRUE, eval=FALSE}
-# Check NPSG month - here - place in supplement.
-groupsize <- 1
-keep <- rowSums(counts(ds_tpm_npsg_month) >= 50) >= groupsize
-ds_tpm_light_filtered <- ds_tpm_npsg_month[keep,]
-ds_tpm_light_filtered$MONTH <- factor(ds_tpm_light_filtered$MONTH, levels = c("July", "March"))
-# this step takes time
-dds_light <- DESeq2::DESeq(ds_tpm_light_filtered) 
-# report results
-res_npsg_month <- results(dds_light)
-```
-
-```{r, echo=TRUE, eval=FALSE}
-# CA only
-groupsize <- 2
-keep <- rowSums(counts(ds_tpm_ca_light) >= 50) >= groupsize
-ds_tpm_light_filtered <- ds_tpm_ca_light[keep,]
-
-dds_obj_filtered$LIGHT <- 
-factor(ds_tpm_light_filtered$LIGHT, levels = c("Euphotic", "Sub-euphotic"))
-# this step takes time
-dds_light <- DESeq2::DESeq(ds_tpm_light_filtered) 
-# report results
-res_ca_light <- results(dds_light)
-```
-
-```{r, echo=TRUE, eval=FALSE}
-save(res_npsg_month, res_npsg_light, res_ca_light, file = "DE_results_regional.RData")
-```
-
-## Euphotic and subeuphotic only
-
-subeuphotic:in the subeuphotic, upreg in npsg or CA euphotic: in the euphotic only, upreg in NPSG or CA
-
-```{r, echo=TRUE, eval=FALSE}
-load("/vortexfs1/scratch/sarahhu/txi-objs-metaT/euphotic-subeuphotic-deseq.RData")
-```
-
-```{r, echo=TRUE, eval=FALSE}
-# Euphotic
-groupsize <- 2
-keep <- rowSums(counts(ds_tpm_euphotic) >= 50) >= groupsize
-ds_tpm_light_filtered <- ds_tpm_euphotic[keep,]
-
-dds_obj_filtered$PACIFIC_REGION <- factor(dds_obj_filtered$PACIFIC_REGION, levels = c("CA", "NPSG"))
-
-# this step takes time
-dds_light <- DESeq2::DESeq(ds_tpm_light_filtered) 
-# report results
-res_euphotic_reg <- results(dds_light)
-```
-
-```{r, echo=TRUE, eval=FALSE}
-# Subeuphotic
-groupsize <- 2
-keep <- rowSums(counts(ds_tpm_subeuphotic) >= 50) >= groupsize
-ds_tpm_light_filtered <- ds_tpm_subeuphotic[keep,]
-
-dds_obj_filtered$PACIFIC_REGION <- factor(dds_obj_filtered$PACIFIC_REGION, levels = c("CA", "NPSG"))
-
-# this step takes time
-dds_light <- DESeq2::DESeq(ds_tpm_light_filtered) 
-# report results
-res_subeuphotic_reg <- results(dds_light)
-```
-
-```{r, echo=TRUE, eval=FALSE}
-save(res_subeuphotic_reg, res_euphotic_reg, file = "DE_results_region_light.RData")
-```
-
-> Aug 25 \*\* this is all running on poseidon!
-
-### Bring locally.
-
-```{r}
-# load("input-data/DE_results_light.RData", verbose = TRUE)
-```
-
-Get stats on these outputs.
-
-```{r}
-# summary(res_light)
-# summary(res_pacific)
-# hist(res_pacific$log2FoldChange)
-```
-
-```{r, fig.height=5, fig.width=7}
-# plotMA(res_light)
-# plotMA(res_lightpac)
-# plotMA(res_light_05)
-```
-
-# Closer look at functional profiles
-
-KEGG IDs that were manually curated were pulled out and used in the TXIMPORT subset functions. Here we are importing the results to be used for visualizations and stats. For the normalized center results, we can use this for heat maps, etc.
-
-```{r}
-load("input-data/Avg_scaled_tpm_curated_08252023.RData", verbose = TRUE)
-load("input-data/normed_center_df_curated_08252023.RData", verbose = TRUE)
-```
-
 ## Import KEGG IDs
 
 These have been curated.
@@ -626,8 +393,8 @@ key_geneid <- curated_kegg %>%
 Subset key_geneid dataframe to select what we want from it.
 
 ```{r}
-head(key_geneid)
-unique(key_geneid$KeggOrthology_B)
+# head(key_geneid)
+# unique(key_geneid$KeggOrthology_B)
 
 kegg_ortho_based <- key_geneid %>% 
   select(KeggOrthology_B, KEGG, GeneID, Gene_identification) %>% 
@@ -645,48 +412,22 @@ kegg_curated <- key_geneid %>%
 # dim(kegg_curated)
 ```
 
+# Question 1
+
+> How does nutrient utilization among euphotic zone phytoplankton vary between coastal California and the NPSG?
+
+## Targeted
+
+Data for targeted sections is imported from `process-eukrhythmic-output` code titled *Curated genes only*.
+
 ```{r}
-# head(counts_curated)
-# colnames(ctr_norm_curated)
-# head(ds_tpm_curated)
+load("input-data/Avg_scaled_tpm_curated_08252023.RData", verbose = TRUE)
+# load("input-data/normed_center_df_curated_08252023.RData", verbose = TRUE)
 ```
 
-### Average across replicates
-
-Take center normalized counts that have been curated by gene id, average across replicates.
+To address question 1, subset to a curated set of genes.
 
 ```{r}
-# colnames(ctr_norm_curated)
-names_orig <- colnames(ctr_norm_curated)
-names_new <- sub("_[^_]+$", "", names_orig)
-#
-colnames(ctr_norm_curated) <- names_new
-
-mean_ctr_norm_curated <- ctr_norm_curated %>%
-  cbind(as.list(.) %>%
-    Filter(is.numeric, .) %>%
-    split(names(.)) %>%
-    lapply(as.data.frame) %>%
-    lapply(rowMeans) %>%
-    setNames(paste0("mean.", names(.)))) %>% 
-  select(SequenceID, starts_with("mean"), ShortSeqID, Domain, Supergroup, Phylum, Class, Order, Family, Genus, Species, GOs, PFAMs, KEGG) %>% 
-  mutate(KEGG = str_remove(KEGG, "ko:")) %>%
-  left_join(kegg_curated)
-
-# dim(ctr_norm_curated)
-# dim(mean_ctr_norm_curated)
-```
-
-```{r}
-head(mean_ctr_norm_curated)
-dim(mean_ctr_norm_curated)
-```
-
-## KEGG based orthology
-
-```{r}
-# dim(counts_curated)
-##
 counts_curated_annot <- counts_curated %>%
   mutate(KEGG = str_remove(KEGG_ko, "ko:")) %>%
   left_join(kegg_curated)
@@ -698,79 +439,143 @@ counts_curated_kegg <- counts_curated %>%
 ```
 
 ```{r}
-# head(counts_curated_kegg)
-
-kegg_ortho_bysample <- counts_curated_kegg %>% 
-  select(starts_with("mean."), Domain:Species, KeggOrthology_B, GeneID, Gene_identification) %>% 
-  distinct() %>% 
-  pivot_longer(cols = starts_with("mean."), values_to = "TPM", names_to = "SAMPLE_tmp") %>% 
-  filter(TPM > 0 & Domain == "Eukaryota") %>% 
-  mutate(SAMPLE = str_remove(SAMPLE_tmp, "mean.")) %>% 
-  group_by(SAMPLE, KeggOrthology_B, Supergroup, Phylum) %>% 
-    summarise(SUM_TPM = sum(TPM),
-              COUNT_GENE = length(unique(GeneID))) %>% 
-  mutate(log_SUM_TPM = log(SUM_TPM))
+unique(counts_curated_annot$Category01)
 ```
+
+Planning to subset genes from the N and P metabolism category. Modify input table for downstream visualization.
 
 ```{r}
-hist((kegg_ortho_bysample$log_SUM_TPM))
-max(kegg_ortho_bysample$log_SUM_TPM)
-```
+# min(as.numeric(counts_curated_annot))
+n_p_TPM_0 <- counts_curated_annot %>% 
+  filter(Category01 == "N and P metabolism" & Domain == "Eukaryota") %>% 
+  select(starts_with("mean."), Supergroup:Species, Category02, GeneID, Gene_identification, PFAMs) %>% 
+  pivot_longer(cols = starts_with("mean."), names_to = "SAMPLE_tmp", values_to = "TPM") %>% 
+  mutate(SAMPLE = str_remove(SAMPLE_tmp, "mean."))
 
-Create series of supplementary plots that summarizes the relative TPM values across key taxonomic groups.
+# head(n_p_TPM_0)
+min_TPM <- min((n_p_TPM_0 %>% filter(TPM>0))$TPM)
+# log(min_TPM)
 
-```{r, fig.width=30, fig.height=5}
-ortho_fxn <- function(TAX){
-  # max_num <- max(kegg_ortho_bysample$log_SUM_TPM)
-    reds <- c("#f7f7f7","#fee5d9", "#fcae91", "#fb6a4a", "#a50f15")
-  kegg_ortho_bysample %>% 
-    filter(!is.na(KeggOrthology_B)) %>% 
-    filter(Supergroup %in% TAX & Phylum != "Unclassified") %>% 
-    ggplot(aes(x = SAMPLE, y = KeggOrthology_B, fill = log_SUM_TPM)) +
-      geom_tile(stat = "identity", color = "white") +
-    # facet_grid(cols = vars(Phylum), rows = vars(Supergroup), scales = "free", space = "free") +
-    facet_wrap(vars(Supergroup, Phylum)) +
-    scale_fill_stepsn(
-      limits = c(0,14),
-      breaks = c(0.0, 3.5, 7.0, 10.5),
+n_p_TPM_1 <- n_p_TPM_0 %>%
+  mutate(TAXA = case_when(
+    Phylum == "Dinoflagellata" ~ "Dinoflagellate",
+    Phylum == "Ciliophora" ~ "Ciliate",
+    Phylum == "Haptophyta" ~ "Haptophyte",
+    Phylum == "Chlorophyta" ~ "Chlorophyte",
+    Class == "Bacillariophyta" ~ "Diatom",
+    Supergroup == "Rhizaria" ~ "Rhizaria",
+    TRUE ~ "Else")) %>% 
+  select(TAXA, SAMPLE, Category02, GeneID, Gene_identification, PFAMs, TPM) %>% 
+  filter(TAXA != "Else") %>% 
+  mutate(TPM_mod = case_when(
+    TPM == 0 ~ min_TPM,
+    TRUE ~ TPM))
+
+# Changed 0 for TPM to be the minimum
+
+# length(unique(n_p_TPM_1$GeneID)) # 24 total genes
+
+n_p_TPM_meanSAMPLE <- n_p_TPM_1 %>% 
+  group_by(TAXA, Category02, GeneID, Gene_identification, PFAMs, TPM_mod) %>% 
+  summarise(MEAN_TPM = mean(TPM_mod)) %>% 
+  add_column(SAMPLE = "all sample mean")
+
+n_p_TPM_meanGeneID <- n_p_TPM_1 %>% 
+  group_by(TAXA, Category02, SAMPLE, Gene_identification, PFAMs, TPM_mod) %>% 
+  summarise(MEAN_TPM = mean(TPM_mod)) %>% 
+  add_column(GeneID = "all gene mean")
+
+n_p_TPM_df <- n_p_TPM_1 %>% 
+  group_by(TAXA, Category02, SAMPLE, GeneID, Gene_identification, PFAMs, TPM_mod) %>% 
+  summarise(MEAN_TPM = mean(TPM_mod)) %>% 
+  rbind(n_p_TPM_meanSAMPLE) %>% 
+  rbind(n_p_TPM_meanGeneID) %>% 
+  mutate(FACET_SAMPLE = case_when(
+    SAMPLE == "all sample mean" ~ "AVG",
+    TRUE ~ "SAMPLE"
+  ),
+  FACET_GENE = case_when(
+    GeneID == "all gene mean" ~ "AVG",
+    TRUE ~ "GENE"
+  )) 
+
+reds <- c("#f7f7f7","#fee5d9", "#fcae91", "#fb6a4a", "#a50f15")
+unique(n_p_TPM_df$TAXA)
+
+n_p_TPM_df %>% 
+  filter(TAXA == "Diatom") %>% 
+   ggplot(aes(x = SAMPLE, y = GeneID, fill = log(MEAN_TPM))) +
+    geom_tile(stat = "identity", color = "black") +
+  scale_fill_stepsn(
+      # limits = c(-5,5),
+      # breaks = c(0.0, 3.5, 7.0, 10.5),
       show.limits = TRUE,
       colors = reds) +
     coord_flip() +
     theme_classic() +
-      labs(x = "", y = "TPM Relative Abundance") +
-  scale_x_discrete(position = "top") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0, hjust = 1, color = "black"),
-        strip.background = element_blank(),
-        panel.border = element_blank(),
-        axis.text.y = element_text(color = "black"),
-        axis.ticks = element_blank(),
-        panel.grid = element_blank(),
-        strip.placement = "outside")
-}
-
-unique(kegg_ortho_bysample$Supergroup)
+    facet_grid(cols = vars(FACET_GENE), rows = vars(FACET_SAMPLE), space = "free", scales = "free") +
+    # labs(x = "", y = "TPM Relative Abundance") +
+    # scale_x_discrete(position = "top") +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0, hjust = 1, color = "black"),
+          strip.background = element_blank(),
+          panel.border = element_blank(),
+          axis.text.y = element_text(color = "black"),
+          axis.ticks = element_blank(),
+          panel.grid = element_blank())
 ```
 
-### Alveolata
+## Untargeted
 
-```{r, fig.height=15, fig.width=18}
-tax_of_interest <- c("Alveolata", "Archaeplastida", "Amoebozoa", "Rhizaria", "Hacrobia", "Stramenopiles", "Rhizaria", "Excavata")
-ortho_fxn(tax_of_interest)
-ortho_fxn("Alveolata")
+```{r, echo=TRUE, eval=FALSE}
+load("/scratch/group/hu-lab/pacocean-metaT/Robjs/euphotic_by_taxa.RData")
 ```
 
-## Heterotrophy
+https://introtogenomics.readthedocs.io/en/latest/2021.11.11.DeseqTutorial.html
 
-Isolate and sum to pathways associated with heterotrophy. Gene level is likely too much. Determine for each
+Fold change is calculated from a ratio of normalised read counts between two conditions of interest. However, level of gene expression changes are often shown as log2 fold change. Using log2 value become particularly helpful for visualising the gene expression changes. Furthermore, it eventually become intuitive that log2FC of 1 means expression level double in a given condition, and a negative log2FC means the gene is down-regulated in a given condition.
 
-```{r}
-head(counts_curated_annot)
-# dim(counts_curated_annot)
-unique(counts_curated_annot$Category01)
+p-value of 0.05 means there is a 5% chance that the difference observed is due to chance (false-positive)
 
+```{r, echo=TRUE, eval=FALSE}
+# Plot log fold change
+data.frame(res_hapto) %>% 
+  mutate(REGULATION = case_when(
+    log2FoldChange > 0 ~ "upregulated in CA",
+    log2FoldChange < 0 ~ "upregulated in NPSG"
+  ),
+  SIGNIFICANT = case_when(
+    pvalue <= 0.05 ~ "Significantly",
+    TRUE ~ "Not significantly"
+  )) %>% 
+  ggplot(aes(x = baseMean, y = log2FoldChange, color = SIGNIFICANT)) +
+    geom_point(stat = "identity") +
+    scale_x_log10() +
+    theme_classic() +
+    scale_color_manual(values = c("#878787", "#d73027")) +
+    labs(title = mcols(res_hapto)$description[2])
 ```
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
+# Get table
+hapto_transcripts <- data.frame(res_hapto) %>% 
+  mutate(REGULATION = case_when(
+    log2FoldChange > 0 ~ "upregulated in CA",
+    log2FoldChange < 0 ~ "upregulated in NPSG"
+  ),
+  SIGNIFICANT = case_when(
+    pvalue <= 0.05 ~ "Significantly",
+    TRUE ~ "Not significantly"
+  )) %>% 
+  filter(SIGNIFICANT == "Significantly") %>% 
+  rownames_to_column(var = "SequenceID") %>% 
+  mutate(TAXA = "Haptophyte")
+```
+
+# Question 2
+
+## Targeted
+
+```{r, echo=TRUE, eval=FALSE}
 counts_curated_annot %>% 
   filter(Category01 == "Phagotrophy" & Domain == "Eukaryota") %>% 
   select(starts_with("mean."), Supergroup:Species, Category02, GeneID, Gene_identification, PFAMs) %>% 
@@ -781,43 +586,7 @@ counts_curated_annot %>%
     geom_tile()
 ```
 
-```{r}
-counts_curated_annot %>% 
-  filter(Category01 == "Phagotrophy" & Domain == "Eukaryota") %>% 
-  select(starts_with("mean."), Supergroup:Species, Category02, GeneID, Gene_identification, PFAMs) %>% 
-  pivot_longer(cols = starts_with("mean."), names_to = "SAMPLE_tmp", values_to = "TPM") %>% 
-  mutate(SAMPLE = str_remove(SAMPLE_tmp, "mean.")) %>%
-  group_by(Supergroup, Phylum, SAMPLE, Category02) %>% 
-    summarise(SUM_TPM = sum(TPM)) %>% 
-  ggplot(aes(x = Phylum, y = SUM_TPM, fill = Category02)) +
-    geom_bar(stat = "identity", position = "stack") +
-  facet_grid(rows = vars(SAMPLE)) +
-  coord_flip()
-```
-
-```{r}
-head(mean_ctr_norm_curated)
-```
-
-> How varied are the transcriptional signatures related to heterotrophy among protists?
-
-Use flag/half square heatmap, where top half shows the percent number of genes and bottom half shows the TPM summary.
-
-### N & P metabolism
-
-Isolate at individual gene level for N & P pathways. Show TPM across sites and core taxa
-
-> For ecologically-important phytoplankton at ALOHA and coastal CA, what is the relative importance of nutrient profiles? nutrient utilization?
-
-Plot heat map for each taxa. Show all N and P relevant genes on the x axis and y axis should have all samples.
-
-### Determine statistical significance
-
-Estimate statistical significance for N&P genes, pairwise comparisons. Then add a column for each gene ID that lists the number of samples that are statistically different.
-
-# Functional redundancy
-
-Input data is all normalized. Then perform pairwise Jaccard dissimilarity with taxa and then with KEGG/pfam IDs - plot as x/y
+## Untargeted
 
 # Session info
 
