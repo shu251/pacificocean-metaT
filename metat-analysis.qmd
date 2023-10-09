@@ -61,6 +61,7 @@ Import metadata as well.
 sample_metadata_1 <- read.csv("input-data/sample-metadata.csv")
 sample_metadata <- sample_metadata_1 %>% 
   mutate(SAMPLE_MATCH = sub("_[^_]+$", "", SAMPLE))
+sample_metadata
 ```
 
 ## Taxonomic composition & distribution
@@ -192,6 +193,7 @@ tax_names <- tax_only %>%
   select(DOMAIN, SUPERGROUP, Class:Species) %>% 
   distinct()
 unique(tax_names$Phylum)
+unique(tax_names$Supergroup)
 ```
 
 Now, reformat taxonomic information to visualize.
@@ -209,6 +211,9 @@ tax_formatted <- data.frame(tax_only) %>%
   # Taxonomic group curation
   mutate(SUPERGROUP = case_when(
     Supergroup == "Alveolata" ~ paste(Supergroup, Phylum, sep = "-"),
+    (Class == "Bacillariophyta" & Supergroup == "Stramenopiles") ~ paste(Supergroup, "Diatom", sep = "-"),
+    (Class != "Bacillariophyta" & Supergroup == "Stramenopiles") ~ paste(Supergroup, "Other", sep = "-"),
+    Supergroup == "Archaeplastida" ~ "Chlorophyte",
     TRUE ~ Supergroup
   ))
 # head(tax_formatted)
@@ -225,7 +230,7 @@ names(tax_order_color) <- (supergroup_order)
 
 #### Figure 1
 
-```{r}
+```{r, fig.height=5, fig.width=7}
 tax_formatted %>% 
   mutate(SUPERGROUP = factor(tax_formatted$SUPERGROUP, levels = supergroup_order)) %>% 
   group_by(SAMPLE_ID_PARSED, PACIFIC_REGION, LIGHT, DEPTH, SUPERGROUP) %>% 
@@ -239,6 +244,38 @@ tax_formatted %>%
     theme(axis.text.x = element_text(vjust = 1, hjust = 1)) +
     labs(x = "", y = "TPM Relative Abundance")
 ```
+
+#### Additional taxonomic resolution
+
+```{r}
+head(tax_formatted)
+unique(tax_formatted$SUPERGROUP)
+tax_interest <- c("Alveolata-Ciliophora", "Alveolata-Dinoflagellata", "Chlorophyte", "Hacrobia", "Rhizaria","Stramenopiles-Diatom")
+pink_qual <- c("#fff7f3", "#fcc5c0", "#fa9fb5","#f768a1","#dd3497", "#ae017e", "#7a0177")
+```
+
+
+```{r fig.height=12, fig.width=5}
+tax_formatted %>% 
+  mutate(SUPERGROUP = factor(tax_formatted$SUPERGROUP, levels = supergroup_order)) %>% 
+  filter(SUPERGROUP %in% tax_interest) %>% 
+  group_by(SAMPLE_ID_PARSED, PACIFIC_REGION, LIGHT, DEPTH, SUPERGROUP, Class, Order) %>% 
+  summarise(SUM = sum(SUM_scaledTPM)) %>% 
+  ggplot(aes(x = SAMPLE_ID_PARSED, y = Order)) +
+    geom_tile(stat = "identity", color = "white", aes(fill = log(SUM))) +
+    facet_grid(cols = vars(PACIFIC_REGION), rows = vars(SUPERGROUP), scales = "free", space = "free") +
+      scale_fill_stepsn(
+      # limits = c(-5,5),
+      # breaks = c(0.0, 3.5, 7.0, 10.5),
+      show.limits = TRUE,
+      colors = pink_qual) +
+    theme_classic() +
+    # coord_flip() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+          legend.position = "top") +
+    labs(x = "", y = "Order")
+```
+
 
 #### Table 1
 
@@ -374,6 +411,11 @@ pca_df %>%
     labs(x =  paste(pc1, "%"), y = paste(pc2, "%"))
 ```
 
+## Untargeted - DE transcripts
+
+
+# Prep to address key questions
+
 ## Import KEGG IDs
 
 These have been curated.
@@ -410,19 +452,42 @@ kegg_curated <- key_geneid %>%
   filter(!is.na(Category01)) %>% 
   distinct()
 # dim(kegg_curated)
+# unique(kegg_curated$Category01)
 ```
 
-# Question 1
 
-> How does nutrient utilization among euphotic zone phytoplankton vary between coastal California and the NPSG?
+Create ordered list for genes related to N and P metabolism.
 
-## Targeted
+```{r}
+# head(curated_kegg)
+geneid_order_nuts <- as.character(curated_kegg %>% 
+  filter(Category01 == "N and P metabolism") %>% 
+  rownames_to_column(var = "ORDER") %>% 
+  select(ORDER, GeneID) %>% 
+    rbind(data.frame(ORDER = 0, GeneID = "Mean")) %>% 
+  distinct() %>% arrange(as.numeric(ORDER)) %>% 
+  select(GeneID) %>% 
+    .[["GeneID"]])
+geneid_order_nuts
+
+geneid_order_hets <- as.character(curated_kegg %>% 
+  filter(Category01 == "Phagotrophy") %>% 
+  rownames_to_column(var = "ORDER") %>% 
+  select(ORDER, Category02) %>% 
+    rbind(data.frame(ORDER = 0, Category02 = "Mean")) %>% 
+  arrange(as.numeric(ORDER)) %>%  
+  select(Category02) %>% distinct() %>%
+    .[["Category02"]]) 
+geneid_order_hets
+```
+
+# Prepare data frames for targeted approach
 
 Data for targeted sections is imported from `process-eukrhythmic-output` code titled *Curated genes only*.
 
 ```{r}
 load("input-data/Avg_scaled_tpm_curated_08252023.RData", verbose = TRUE)
-# load("input-data/normed_center_df_curated_08252023.RData", verbose = TRUE)
+# head(counts_curated)
 ```
 
 To address question 1, subset to a curated set of genes.
@@ -432,11 +497,283 @@ counts_curated_annot <- counts_curated %>%
   mutate(KEGG = str_remove(KEGG_ko, "ko:")) %>%
   left_join(kegg_curated)
 
-
 counts_curated_kegg <- counts_curated %>%
   mutate(KEGG = str_remove(KEGG_ko, "ko:")) %>%
   left_join(kegg_ortho_based)
+# head(ctr_norm_curated)
 ```
+
+
+```{r}
+load("input-data/normed_center_df_curated_08252023.RData", verbose = TRUE)
+head(ctr_norm_curated)
+```
+
+
+```{r}
+# Rename column headers
+names_orig <- colnames(ctr_norm_curated)
+names_new <- sub("_[^_]+$", "", names_orig)
+# names_new
+colnames(ctr_norm_curated) <- names_new
+```
+
+Mean across columns that have the same name - which are replicates.
+
+```{r}
+# colnames(ctr_norm_curated)
+mean_ctr_df <- ctr_norm_curated %>%
+  cbind(as.list(.) %>%
+    Filter(is.numeric, .) %>%
+    split(names(.)) %>%
+    lapply(as.data.frame) %>%
+    lapply(rowMeans) %>%
+    setNames(paste0("mean.", names(.)))) %>% 
+  select(starts_with("mean"), SequenceID, ShortSeqID, Domain:Species, GOs, PFAMs, KEGG) %>% 
+  select(-mean.rownames, -mean.X)
+# colnames(mean_ctr_df)
+```
+
+Join with KEGG information that is curated
+
+```{r}
+# Repeat with ctr_norm_curated
+ctr_curated_annot <- mean_ctr_df %>%
+  mutate(KEGG = str_remove(KEGG, "ko:")) %>%
+  left_join(kegg_curated)
+
+ctr_curated_kegg <- mean_ctr_df %>%
+  mutate(KEGG = str_remove(KEGG, "ko:")) %>%
+  left_join(kegg_ortho_based)
+
+```
+
+
+Use 'mean_ctr_df' for downstream targeted analyses.
+
+# Question 1
+
+> How does nutrient utilization among euphotic zone phytoplankton vary between coastal California and the NPSG?
+
+
+## Untargeted
+
+Complete code: `/scripts/get_euphotic_DE_bytaxa.R`
+
+Use output files below for further analysis below.
+
+### Stats on DE transcripts
+
+```{r, echo=TRUE, eval=FALSE}
+de_all <- read.csv("input-data/bytaxa_euphoticzone_DE.csv")
+de_all
+```
+
+Example code for compiling DE transcripts by individual taxa (from script):
+
+```{r, echo=TRUE, eval=FALSE}
+load("euphotic_by_taxa.RData", verbose = TRUE)
+```
+
+```{r, echo=TRUE, eval=FALSE}
+res_hapto <- results(de_hapto, alpha=0.05)
+
+plot_hapto <- data.frame(res_hapto) %>% 
+  mutate(REGULATION = case_when(
+    log2FoldChange > 0 ~ "upregulated in CA",
+    log2FoldChange < 0 ~ "upregulated in NPSG"
+  ),
+  SIGNIFICANT = case_when(
+    pvalue <= 0.05 ~ "Significantly",
+    TRUE ~ "Not significantly"
+  )) %>% 
+  ggplot(aes(x = baseMean, y = log2FoldChange, color = SIGNIFICANT)) +
+  geom_point(stat = "identity") +
+  scale_x_log10() +
+  theme_classic() +
+  scale_color_manual(values = c("#878787", "#d73027")) +
+  labs(title = mcols(res_hapto)$description[2])
+
+hapto_transcripts <- data.frame(res_hapto) %>% 
+  mutate(REGULATION = case_when(
+    log2FoldChange > 0 ~ "upregulated in CA",
+    log2FoldChange < 0 ~ "upregulated in NPSG"
+  ),
+  SIGNIFICANT = case_when(
+    pvalue <= 0.05 ~ "Significantly",
+    TRUE ~ "Not significantly"
+  )) %>% 
+  filter(SIGNIFICANT == "Significantly") %>% 
+  rownames_to_column(var = "SequenceID") %>% 
+  mutate(TAXA = "Haptophyte")
+
+write.csv(hapto_transcripts, file = "hapto_sig_de_euphotic.csv")
+```
+
+See script: `euphotic_region_bytax.R`.
+
+```{r, echo=TRUE, eval=FALSE}
+# List of DE transcripts - what is upregulated vs downregulated by taxa
+de_all <- read.csv("bytaxa_euphoticzone_DE.csv")
+#
+de_chloro <- read.csv("chloro_sig_de_euphotic.csv")
+de_dino <- read.csv("dinos_sig_de_euphotic.csv")
+de_diatom <- read.csv("diatom_sig_de_euphotic.csv")
+de_hapto <- read.csv("hapto_sig_de_euphotic.csv")
+```
+
+
+Sequence IDs are all unique, because they correspond to taxa. Therefore, we need to include gene-level IDs so we can compare what is DE across CA vs. NPSG.
+
+```{r, echo=TRUE, eval=FALSE}
+# Import KEGG information
+taxfxn <- read.csv("TaxonomicAndFunctionalAnnotations.csv")
+
+alltax <- de_chloro %>% 
+  rbind(de_diatom) %>% 
+  rbind(de_dino) %>% 
+  rbind(de_hapto) %>% 
+  select(SequenceID, log2FoldChange, pvalue, REGULATION, TAXA) %>%
+  left_join(taxfxn)
+```
+
+This `alltax` Robj is helpful for coming back to getting more taxonomic resolution. 
+
+
+What is shared versus unique?
+```{r, echo=TRUE, eval=FALSE}
+alltax_compareDE <- alltax %>% 
+  unite(GENEID_ko_pfam, PFAMs, KEGG_ko, sep = ";") %>% 
+  select(REGULATION, TAXA, log2FoldChange, GENEID_ko_pfam) %>% 
+  group_by(REGULATION, GENEID_ko_pfam, TAXA) %>%
+  summarise(n = dplyr::n(), .groups = "drop") %>%
+  filter(n > 1L) %>% 
+  pivot_wider(names_from = TAXA, values_from = n)
+
+save(alltax_compareDE, alltax, file = "taxa-untarget-q1.RData")
+```
+
+### Local - untargeted mining
+
+```{r}
+load("input-data/taxa-untarget-q1.RData")
+```
+
+```{r}
+library(ggupset)
+
+alltax %>% 
+  unite(GENEID_ko_pfam, PFAMs, KEGG_ko, sep = ";") %>% 
+  select(REGULATION, TAXA, log2FoldChange, GENEID_ko_pfam) %>% 
+  group_by(REGULATION, GENEID_ko_pfam, TAXA) %>%
+  summarise(n = dplyr::n(), .groups = "drop") %>%
+  filter(n > 1L) %>% 
+  group_by(GENEID_ko_pfam, REGULATION) %>% 
+    summarise(TAXA = list(TAXA)) %>% 
+  ggplot(aes(x = TAXA)) +
+    geom_bar(aes(fill = REGULATION)) +
+    scale_fill_manual(values = c("#74add1", "#fdae61")) +
+    scale_x_upset(order_by = "freq") +
+  theme_classic() +
+    theme(axis.text.x = element_text(vjust = 1, hjust = 1)) +
+    labs(x = "", y = "TPM Relative Abundance")
+```
+
+Based on this plot, it looks like these taxa primarily have their own strategies in the coastal California environment versus the NPSG environment.  
+
+```{r}
+head(alltax)
+head(alltax_compareDE)
+```
+
+
+
+#### What transcripts are shared across all taxa vs. unique?
+
+```{r}
+tax_indiv <- alltax_compareDE %>%
+  mutate(CATEGORY = case_when(
+                     (is.na(Chlorophyte) & is.na(Diatom) & is.na(Haptophyte)) ~ "Dinoflagellate only",
+                   (is.na(Dinoflagellate) & is.na(Diatom) & is.na(Haptophyte)) ~ "Chlorophyte only",
+                   (is.na(Dinoflagellate) & is.na(Chlorophyte) & is.na(Haptophyte)) ~ "Diatom only",
+                   (is.na(Dinoflagellate) & is.na(Chlorophyte) & is.na(Diatom)) ~ "Haptophyte only",
+                   TRUE ~ NA)) %>% 
+  filter(!is.na(CATEGORY))
+
+shared_euphotic <- alltax_compareDE %>% 
+  drop_na() %>% 
+  add_column(CATEGORY = "Shared across all taxa") %>% 
+  rbind(tax_indiv) %>% 
+  separate(GENEID_ko_pfam, into = c("PFAMs", "KEGG_ko"), sep = ";") %>% 
+  mutate(KEGG = str_remove(KEGG_ko, "ko:")) %>%
+  left_join(key_geneid) %>% 
+  add_column(COUNT = 1)
+# head(shared_euphotic)
+# colnames(alltax_compareDE)
+```
+
+```{r}
+unique(shared_euphotic$KeggOrthology_A)
+unique(shared_euphotic$Category01)
+
+paths_ORDER <- c("Photosynthesis", "Energy Acquisition", "Carbon fixation", "Nutrient processing", "Gluconeogenesis-glycolysis", "N and P metabolism", "Glyoxylate cycle", "Phagotrophy", 
+                 "Environmental Information Processing", "Cellular Processes",
+                 "Genetic Information Processing", "Metabolism",
+                 "Other")
+
+paths_COLOR <-c ("#f7fcb9", "#fdae6b", "#fc9272", "#7fcdbb", "#d9f0a3", "#78c679", "#bfd3e6", "#fde0dd",
+                 "#fd8d3c", "#225ea8", 
+                 "#cb181d", "#41ab5d",
+                 "#969696")
+```
+
+
+```{r fig.height=3, fig.width=15}
+shared_euphotic %>% 
+  mutate(Category01 = str_replace_na(Category01, "Other")) %>%
+  group_by(CATEGORY, REGULATION, Category01) %>% 
+    summarise(Category01_SUM = sum(COUNT)) %>% 
+  add_column(CATEGORY_TYPE = "KEGG_cat01") %>% 
+  select(CATEGORY, REGULATION, CATEGORY_TYPE, TYPE_NAME = Category01, SUM = Category01_SUM) %>%
+  #
+  rbind(
+    #
+    shared_euphotic %>% 
+  mutate(KeggOrthology_A = str_replace_na(KeggOrthology_A, "Other")) %>%
+  group_by(CATEGORY, REGULATION, KeggOrthology_A) %>% 
+    summarise(KeggOrthology_A_SUM = sum(COUNT)) %>% 
+  add_column(CATEGORY_TYPE = "KEGG_ORTHO_A") %>% 
+  select(CATEGORY, REGULATION, CATEGORY_TYPE, TYPE_NAME = KeggOrthology_A, SUM = KeggOrthology_A_SUM)
+  #
+  ) %>% 
+  mutate(CATEGORY_TYPE_ORDER = factor(TYPE_NAME, levels = paths_ORDER)) %>% 
+  ggplot(aes(x = CATEGORY_TYPE, fill = CATEGORY_TYPE_ORDER, y = SUM)) +
+    geom_bar(stat = "identity", position = "fill", color = "black", stroke = 0.4) + facet_grid(cols = vars(CATEGORY, REGULATION)) +
+  theme_classic() +
+  coord_flip() +
+  theme(axis.text.x = element_text(angle = 0, h = 1, vjust = 1),
+        strip.text = element_text(angle = 0),
+        legend.position = "bottom") +
+  scale_fill_manual(values = paths_COLOR)
+```
+
+
+**Take home messages**: Most of the transcripts are upregulated in California. More dynamic environment compared to the NPSG surface. For transcripts that were shared across all taxa, they were on the overall low end. Among KEGG categories, a lot were assocaited with genetic information processing. For those that were curated for this study, many were related to phagotrophy. Emphasizing just how different the strategies are among all of these taxa to succeed in the euphotic zone. 
+
+*NEXT STEPS:*
+> Questions to follow up on:
+1. For the dinoflagellates - what are some of the top phagotrophy genes only in CA? and the energy acquisition genes?
+2. For haptophyte and diatom only, why the gluconeogenesis-glycolysis genes? 
+3. to round out the above, what about the chlorophytes?
+4. For the shared - only upregulated in CA, and primarily phagotrophy - what are these? AND under the "Genetic Information Processing" KEGG category.
+
+Note, that for these figures above, we are looking at the TOTAL NUMBER of significantly upregulated transcripts depending on taxonomic group and sample. We are not including the log FC. 
+
+
+
+## Targeted
+
+First we will focus on transcripts among phytoplankton that were annotated under the N and P metabolism category.
 
 ```{r}
 unique(counts_curated_annot$Category01)
@@ -476,35 +813,77 @@ n_p_TPM_1 <- n_p_TPM_0 %>%
 # length(unique(n_p_TPM_1$GeneID)) # 24 total genes
 
 n_p_TPM_meanSAMPLE <- n_p_TPM_1 %>% 
-  group_by(TAXA, Category02, GeneID, Gene_identification, PFAMs, TPM_mod) %>% 
+  group_by(TAXA, Category02, GeneID, Gene_identification, PFAMs) %>% 
   summarise(MEAN_TPM = mean(TPM_mod)) %>% 
-  add_column(SAMPLE = "all sample mean")
+  add_column(SAMPLE = "Mean")
 
 n_p_TPM_meanGeneID <- n_p_TPM_1 %>% 
-  group_by(TAXA, Category02, SAMPLE, Gene_identification, PFAMs, TPM_mod) %>% 
+  group_by(TAXA, Category02, SAMPLE, Gene_identification, PFAMs) %>% 
   summarise(MEAN_TPM = mean(TPM_mod)) %>% 
-  add_column(GeneID = "all gene mean")
+  add_column(GeneID = "Mean")
 
 n_p_TPM_df <- n_p_TPM_1 %>% 
-  group_by(TAXA, Category02, SAMPLE, GeneID, Gene_identification, PFAMs, TPM_mod) %>% 
+  group_by(TAXA, Category02, SAMPLE, GeneID, Gene_identification, PFAMs) %>% 
   summarise(MEAN_TPM = mean(TPM_mod)) %>% 
   rbind(n_p_TPM_meanSAMPLE) %>% 
   rbind(n_p_TPM_meanGeneID) %>% 
   mutate(FACET_SAMPLE = case_when(
-    SAMPLE == "all sample mean" ~ "AVG",
+    SAMPLE == "Mean" ~ "AVG",
     TRUE ~ "SAMPLE"
   ),
   FACET_GENE = case_when(
-    GeneID == "all gene mean" ~ "AVG",
+    GeneID == "Mean" ~ "AVG",
     TRUE ~ "GENE"
   )) 
-
-reds <- c("#f7f7f7","#fee5d9", "#fcae91", "#fb6a4a", "#a50f15")
+head(n_p_TPM_df)
 unique(n_p_TPM_df$TAXA)
+unique(n_p_TPM_df$SAMPLE)
+sample_order <- c("Catalina", "PortofLA", "SPOT_surface", "SPOT_150m", "SPOT_890m",
+  "July_5m", "March_5m", "July_DCM","March_DCM", "July_150m", "March_150m", "July_1000m", "March_1000m", "Mean")
+sample_label <- c("Catalina", "Port of LA", "SPOT surface", "SPOT 150m", "SPOT 890m",
+  "ALOHA surface (July)", "ALOHA surface (March)", "ALOHA DCM (July)","ALOHA DCM (March)", "ALOHA 150m (July)", "ALOHA 150m (March)", "ALOHA 1000m (July)", "ALOHA 1000m (March)", "Mean")
+yl_red <- c("#ffffcc", "#fed976", "#feb24c", "#fc4e2a", "#e31a1c", "#b10026")
+reds <- c("#f7f7f7","#fee5d9", "#fcae91", "#fb6a4a", "#a50f15")
+n_p_TPM_df$SAMPLE_ORDER <- factor(n_p_TPM_df$SAMPLE, levels = rev(sample_order), labels = rev(sample_label))
+n_p_TPM_df$GeneID_ORDER <- factor(n_p_TPM_df$GeneID, levels = geneid_order_nuts)
 
+phyto <- c("Diatom", "Chlorophyte", "Haptophyte", "Dinoflagellate")
+
+```
+
+```{r, fig.height=12, fig.width=8}
+n_p_TPM_df %>%
+  filter(TAXA %in% phyto) %>% 
+   ggplot(aes(x = SAMPLE_ORDER, y = GeneID_ORDER, fill = log(MEAN_TPM))) +
+    geom_tile(stat = "identity", color = "black") +
+  scale_fill_stepsn(
+      # limits = c(-5,5),
+      # breaks = c(0.0, 3.5, 7.0, 10.5),
+      show.limits = TRUE,
+      # colors = reds) +
+      colors = yl_red) +
+    coord_flip() +
+    theme_classic() +
+    facet_grid(cols = vars(FACET_GENE), rows = vars(TAXA, rev(FACET_SAMPLE)), 
+               space = "free", scales = "free", switch = "y") +
+    # scale_y_discrete(position = "right") +
+    scale_x_discrete(position = "top") +
+    labs(x = "", y = "") +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, color = "black"),
+          axis.text.y = element_text(color = "black", vjust = 0.5, hjust = 1),
+          strip.background = element_blank(),
+          axis.line = element_blank(),
+          panel.border = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid = element_blank(),
+          strip.placement = "outside",
+          strip.text.x = element_blank())
+```
+
+```{r}
 n_p_TPM_df %>% 
-  filter(TAXA == "Diatom") %>% 
-   ggplot(aes(x = SAMPLE, y = GeneID, fill = log(MEAN_TPM))) +
+  filter(TAXA == "Chlorophyte") %>% 
+   ggplot(aes(x = SAMPLE_ORDER, y = GeneID, fill = log(MEAN_TPM))) +
     geom_tile(stat = "identity", color = "black") +
   scale_fill_stepsn(
       # limits = c(-5,5),
@@ -513,80 +892,445 @@ n_p_TPM_df %>%
       colors = reds) +
     coord_flip() +
     theme_classic() +
-    facet_grid(cols = vars(FACET_GENE), rows = vars(FACET_SAMPLE), space = "free", scales = "free") +
-    # labs(x = "", y = "TPM Relative Abundance") +
-    # scale_x_discrete(position = "top") +
-    theme(axis.text.x = element_text(angle = 90, vjust = 0, hjust = 1, color = "black"),
+    facet_grid(cols = vars(FACET_GENE), rows = vars(rev(FACET_SAMPLE)), space = "free", scales = "free") +
+    # scale_y_discrete(position = "right") +
+    scale_x_discrete(position = "top") +
+    labs(x = "", y = "") +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, color = "black"),
+          axis.text.y = element_text(color = "black", vjust = 0.5, hjust = 1),
           strip.background = element_blank(),
+          axis.line = element_blank(),
           panel.border = element_blank(),
-          axis.text.y = element_text(color = "black"),
           axis.ticks = element_blank(),
-          panel.grid = element_blank())
+          panel.grid = element_blank(),
+          strip.text = element_blank())
 ```
 
-## Untargeted
-
-```{r, echo=TRUE, eval=FALSE}
-load("/scratch/group/hu-lab/pacocean-metaT/Robjs/euphotic_by_taxa.RData")
-```
-
-https://introtogenomics.readthedocs.io/en/latest/2021.11.11.DeseqTutorial.html
-
-Fold change is calculated from a ratio of normalised read counts between two conditions of interest. However, level of gene expression changes are often shown as log2 fold change. Using log2 value become particularly helpful for visualising the gene expression changes. Furthermore, it eventually become intuitive that log2FC of 1 means expression level double in a given condition, and a negative log2FC means the gene is down-regulated in a given condition.
-
-p-value of 0.05 means there is a 5% chance that the difference observed is due to chance (false-positive)
-
-```{r, echo=TRUE, eval=FALSE}
-# Plot log fold change
-data.frame(res_hapto) %>% 
-  mutate(REGULATION = case_when(
-    log2FoldChange > 0 ~ "upregulated in CA",
-    log2FoldChange < 0 ~ "upregulated in NPSG"
-  ),
-  SIGNIFICANT = case_when(
-    pvalue <= 0.05 ~ "Significantly",
-    TRUE ~ "Not significantly"
-  )) %>% 
-  ggplot(aes(x = baseMean, y = log2FoldChange, color = SIGNIFICANT)) +
-    geom_point(stat = "identity") +
-    scale_x_log10() +
+```{r}
+n_p_TPM_df %>% 
+  filter(TAXA == "Haptophyte") %>% 
+   ggplot(aes(x = SAMPLE_ORDER, y = GeneID, fill = log(MEAN_TPM))) +
+    geom_tile(stat = "identity", color = "black") +
+  scale_fill_stepsn(
+      # limits = c(-5,5),
+      # breaks = c(0.0, 3.5, 7.0, 10.5),
+      show.limits = TRUE,
+      colors = reds) +
+    coord_flip() +
     theme_classic() +
-    scale_color_manual(values = c("#878787", "#d73027")) +
-    labs(title = mcols(res_hapto)$description[2])
+    facet_grid(cols = vars(FACET_GENE), rows = vars(rev(FACET_SAMPLE)), space = "free", scales = "free") +
+    # scale_y_discrete(position = "right") +
+    scale_x_discrete(position = "top") +
+    labs(x = "", y = "") +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, color = "black"),
+          axis.text.y = element_text(color = "black", vjust = 0.5, hjust = 1),
+          strip.background = element_blank(),
+          axis.line = element_blank(),
+          panel.border = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid = element_blank(),
+          strip.text = element_blank())
 ```
 
-```{r, echo=TRUE, eval=FALSE}
-# Get table
-hapto_transcripts <- data.frame(res_hapto) %>% 
-  mutate(REGULATION = case_when(
-    log2FoldChange > 0 ~ "upregulated in CA",
-    log2FoldChange < 0 ~ "upregulated in NPSG"
-  ),
-  SIGNIFICANT = case_when(
-    pvalue <= 0.05 ~ "Significantly",
-    TRUE ~ "Not significantly"
-  )) %>% 
-  filter(SIGNIFICANT == "Significantly") %>% 
-  rownames_to_column(var = "SequenceID") %>% 
-  mutate(TAXA = "Haptophyte")
+```{r}
+n_p_TPM_df %>% 
+  filter(TAXA == "Dinoflagellate") %>% 
+   ggplot(aes(x = SAMPLE_ORDER, y = GeneID, fill = log(MEAN_TPM))) +
+    geom_tile(stat = "identity", color = "black") +
+  scale_fill_stepsn(
+      # limits = c(-5,5),
+      # breaks = c(0.0, 3.5, 7.0, 10.5),
+      show.limits = TRUE,
+      colors = reds) +
+    coord_flip() +
+    theme_classic() +
+    facet_grid(cols = vars(FACET_GENE), rows = vars(rev(FACET_SAMPLE)), space = "free", scales = "free") +
+    # scale_y_discrete(position = "right") +
+    scale_x_discrete(position = "top") +
+    labs(x = "", y = "") +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, color = "black"),
+          axis.text.y = element_text(color = "black", vjust = 0.5, hjust = 1),
+          strip.background = element_blank(),
+          axis.line = element_blank(),
+          panel.border = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid = element_blank(),
+          strip.text = element_blank())
 ```
+```{r}
+n_p_TPM_df %>% 
+  filter(TAXA == "Diatom") %>% 
+   ggplot(aes(x = SAMPLE_ORDER, y = GeneID, fill = log(MEAN_TPM))) +
+    geom_tile(stat = "identity", color = "black") +
+  scale_fill_stepsn(
+      # limits = c(-5,5),
+      # breaks = c(0.0, 3.5, 7.0, 10.5),
+      show.limits = TRUE,
+      colors = reds) +
+    coord_flip() +
+    theme_classic() +
+    facet_grid(cols = vars(FACET_GENE), rows = vars(rev(FACET_SAMPLE)), space = "free", scales = "free") +
+    # scale_y_discrete(position = "right") +
+    scale_x_discrete(position = "top") +
+    labs(x = "", y = "") +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, color = "black"),
+          axis.text.y = element_text(color = "black", vjust = 0.5, hjust = 1),
+          strip.background = element_blank(),
+          axis.line = element_blank(),
+          panel.border = element_blank(),
+          axis.ticks = element_blank(),
+          panel.grid = element_blank(),
+          strip.text = element_blank())
+```
+
+> What kinds of things can we say about specific genes?
 
 # Question 2
 
-## Targeted
+> Do we see a similar euphotic vs. sub-euphotic shift in the metabolic potential of taxa observed at coastal California and the NPSG?
 
-```{r, echo=TRUE, eval=FALSE}
-counts_curated_annot %>% 
-  filter(Category01 == "Phagotrophy" & Domain == "Eukaryota") %>% 
-  select(starts_with("mean."), Supergroup:Species, Category02, GeneID, Gene_identification, PFAMs) %>% 
-  pivot_longer(cols = starts_with("mean."), names_to = "SAMPLE_tmp", values_to = "TPM") %>% 
-  mutate(SAMPLE = str_remove(SAMPLE_tmp, "mean."),
-         LOG_TPM = log(TPM)) %>%
-  ggplot(aes(x = Phylum, y = GeneID, fill = LOG_TPM)) +
-    geom_tile()
-```
 
 ## Untargeted
+
+To approach question 2 with an untargeted approach, used `run_bydepth_deseq_taxa.R` script to generate R objects of each comparison.
+
+To compare euphotic versus subeuphotic, decided to with all samples, CA only samples and then only NPSG samples. See code: `ca-light.R`, `all-light.R`, and `npsg-light.R`. 
+
+Run this script, which selects the differentially expressed genes and includes the functional annotation information: `euphotic_v_subeuphotic.R`.
+
+```{r, echo=TRUE, eval=FALSE}
+# Import KEGG information
+taxfxn <- read.csv("TaxonomicAndFunctionalAnnotations.csv")
+head(taxfxn)
+
+# Sequence IDs are all unique, because they correspond to taxa. Therefore, we need to include gene-level IDs so we can compare what is DE across the euphotic vs. subeuphotic regions.
+CA_only <- read.csv("bytaxa_CA-LIGHT_DE.csv")
+NPSG_only <- read.csv("bytaxa_NPSG-LIGHT_DE.csv")
+all_only <- read.csv("bytaxa_ALL-LIGHT_DE.csv")
+
+#
+head(CA_only)
+# For this there are three tables. 
+CA_tax_bydepth <- CA_only %>% 
+  select(SequenceID, log2FoldChange, pvalue, REGULATION, TAXA) %>%
+  left_join(taxfxn)
+
+# head(CA_tax_bydepth)
+
+NPSG_tax_bydepth <- NPSG_only %>% 
+  select(SequenceID, log2FoldChange, pvalue, REGULATION, TAXA) %>%
+  left_join(taxfxn)
+
+ALL_tax_bydepth <- all_only %>% 
+  select(SequenceID, log2FoldChange, pvalue, REGULATION, TAXA) %>%
+  left_join(taxfxn)
+
+##
+
+alltax_compareDE <- ALL_tax_bydepth %>% 
+  unite(GENEID_ko_pfam, PFAMs, KEGG_ko, sep = ";") %>% 
+  select(REGULATION, TAXA, log2FoldChange, GENEID_ko_pfam) %>% 
+  group_by(REGULATION, GENEID_ko_pfam, TAXA) %>%
+  summarise(n = dplyr::n(), .groups = "drop") %>%
+  filter(n > 1L) %>% 
+  pivot_wider(names_from = TAXA, values_from = n)
+
+NPSGtax_compareDE <- NPSG_tax_bydepth %>% 
+  unite(GENEID_ko_pfam, PFAMs, KEGG_ko, sep = ";") %>% 
+  select(REGULATION, TAXA, log2FoldChange, GENEID_ko_pfam) %>% 
+  group_by(REGULATION, GENEID_ko_pfam, TAXA) %>%
+  summarise(n = dplyr::n(), .groups = "drop") %>%
+  filter(n > 1L) %>% 
+  pivot_wider(names_from = TAXA, values_from = n)
+
+CAtax_compareDE <- CA_tax_bydepth %>% 
+  unite(GENEID_ko_pfam, PFAMs, KEGG_ko, sep = ";") %>% 
+  select(REGULATION, TAXA, log2FoldChange, GENEID_ko_pfam) %>% 
+  group_by(REGULATION, GENEID_ko_pfam, TAXA) %>%
+  summarise(n = dplyr::n(), .groups = "drop") %>%
+  filter(n > 1L) %>% 
+  pivot_wider(names_from = TAXA, values_from = n)
+
+save(alltax_compareDE, CAtax_compareDE, NPSGtax_compareDE, ALL_tax_bydepth, NPSG_tax_bydepth, CA_tax_bydepth, file = "taxa-untarget_bydepth-q2.RData")
+```
+
+Locally, now can work with results.
+
+
+#### Local -untargeted
+```{r}
+load("input-data/taxa-untarget_bydepth-q2.RData", verbose = TRUE)
+```
+### Shared vs unique
+```{r message=FALSE}
+library(ggupset)
+
+ALL_tax_bydepth %>% 
+  unite(GENEID_ko_pfam, PFAMs, KEGG_ko, sep = ";") %>% 
+  select(REGULATION, TAXA, log2FoldChange, GENEID_ko_pfam) %>% 
+  group_by(REGULATION, GENEID_ko_pfam, TAXA) %>%
+  summarise(n = dplyr::n(), .groups = "drop") %>%
+  filter(n > 1L) %>% 
+  group_by(GENEID_ko_pfam, REGULATION) %>% 
+    summarise(TAXA = list(TAXA)) %>% 
+  ggplot(aes(x = TAXA)) +
+    geom_bar(aes(fill = REGULATION)) +
+    scale_fill_manual(values = c("#74add1", "#fdae61")) +
+    scale_x_upset(order_by = "freq") +
+  theme_classic() +
+    theme(axis.text.x = element_text(vjust = 1, hjust = 1)) +
+    labs(x = "", y = "TPM Relative Abundance",
+         title = "All euphotic vs subeuphotic comparison")
+
+NPSG_tax_bydepth %>% 
+  unite(GENEID_ko_pfam, PFAMs, KEGG_ko, sep = ";") %>% 
+  select(REGULATION, TAXA, log2FoldChange, GENEID_ko_pfam) %>% 
+  group_by(REGULATION, GENEID_ko_pfam, TAXA) %>%
+  summarise(n = dplyr::n(), .groups = "drop") %>%
+  filter(n > 1L) %>% 
+  group_by(GENEID_ko_pfam, REGULATION) %>% 
+    summarise(TAXA = list(TAXA)) %>% 
+  ggplot(aes(x = TAXA)) +
+    geom_bar(aes(fill = REGULATION)) +
+    scale_fill_manual(values = c("#74add1", "#fdae61")) +
+    scale_x_upset(order_by = "freq") +
+  theme_classic() +
+    theme(axis.text.x = element_text(vjust = 1, hjust = 1)) +
+    labs(x = "", y = "TPM Relative Abundance",
+         title = "NPSG comparison")
+
+CA_tax_bydepth %>% 
+  unite(GENEID_ko_pfam, PFAMs, KEGG_ko, sep = ";") %>% 
+  select(REGULATION, TAXA, log2FoldChange, GENEID_ko_pfam) %>% 
+  group_by(REGULATION, GENEID_ko_pfam, TAXA) %>%
+  summarise(n = dplyr::n(), .groups = "drop") %>%
+  filter(n > 1L) %>% 
+  group_by(GENEID_ko_pfam, REGULATION) %>% 
+    summarise(TAXA = list(TAXA)) %>% 
+  ggplot(aes(x = TAXA)) +
+    geom_bar(aes(fill = REGULATION)) +
+    scale_fill_manual(values = c("#74add1", "#fdae61")) +
+    scale_x_upset(order_by = "freq") +
+  theme_classic() +
+    theme(axis.text.x = element_text(vjust = 1, hjust = 1)) +
+    labs(x = "", y = "TPM Relative Abundance",
+         title = "Coastal California comparison")
+```
+
+
+#### What transcripts are shared across all taxa vs. unique?
+
+```{r}
+tax_indiv <- alltax_compareDE %>%
+  mutate(CATEGORY = case_when(
+                     (is.na(Ciliate) & is.na(Rhizaria) & is.na(Haptophyte)) ~ "Dinoflagellate only",
+                   (is.na(Dinoflagellate) & is.na(Rhizaria) & is.na(Haptophyte)) ~ "Ciliate only",
+                   (is.na(Dinoflagellate) & is.na(Ciliate) & is.na(Rhizaria)) ~ "Haptophyte only",
+                   (is.na(Dinoflagellate) & is.na(Ciliate) & is.na(Haptophyte)) ~ "Rhizaria only",
+                   TRUE ~ NA)) %>% 
+  filter(!is.na(CATEGORY))
+
+shared_euphotic <- alltax_compareDE %>% 
+  drop_na() %>% 
+  add_column(CATEGORY = "Shared across all taxa") %>% 
+  rbind(tax_indiv) %>% 
+  separate(GENEID_ko_pfam, into = c("PFAMs", "KEGG_ko"), sep = ";") %>% 
+  mutate(KEGG = str_remove(KEGG_ko, "ko:")) %>%
+  left_join(key_geneid) %>% 
+  add_column(COUNT = 1)
+head(shared_euphotic)
+# colnames(alltax_compareDE)
+```
+
+```{r}
+unique(shared_euphotic$KeggOrthology_A)
+unique(shared_euphotic$Category01)
+
+paths_ORDER <- c("Photosynthesis", "Energy Acquisition", "Carbon fixation", "Nutrient processing", "Gluconeogenesis-glycolysis", "N and P metabolism", "Glyoxylate cycle", "Phagotrophy", 
+                 "Environmental Information Processing", "Cellular Processes",
+                 "Genetic Information Processing", "Metabolism",
+                 "Other")
+
+paths_COLOR <-c ("#f7fcb9", "#fdae6b", "#fc9272", "#7fcdbb", "#d9f0a3", "#78c679", "#bfd3e6", "#fde0dd",
+                 "#fd8d3c", "#225ea8", 
+                 "#cb181d", "#41ab5d",
+                 "#969696")
+```
+
+
+```{r fig.height=3, fig.width=15}
+shared_euphotic %>% 
+  mutate(Category01 = str_replace_na(Category01, "Other")) %>%
+  group_by(CATEGORY, REGULATION, Category01) %>% 
+    summarise(Category01_SUM = sum(COUNT)) %>% 
+  add_column(CATEGORY_TYPE = "KEGG_cat01") %>% 
+  select(CATEGORY, REGULATION, CATEGORY_TYPE, TYPE_NAME = Category01, SUM = Category01_SUM) %>%
+  #
+  rbind(
+    #
+    shared_euphotic %>% 
+  mutate(KeggOrthology_A = str_replace_na(KeggOrthology_A, "Other")) %>%
+  group_by(CATEGORY, REGULATION, KeggOrthology_A) %>% 
+    summarise(KeggOrthology_A_SUM = sum(COUNT)) %>% 
+  add_column(CATEGORY_TYPE = "KEGG_ORTHO_A") %>% 
+  select(CATEGORY, REGULATION, CATEGORY_TYPE, TYPE_NAME = KeggOrthology_A, SUM = KeggOrthology_A_SUM)
+  #
+  ) %>% 
+  mutate(CATEGORY_TYPE_ORDER = factor(TYPE_NAME, levels = paths_ORDER)) %>% 
+  ggplot(aes(x = CATEGORY_TYPE, fill = CATEGORY_TYPE_ORDER, y = SUM)) +
+    geom_bar(stat = "identity", position = "fill", color = "black", stroke = 0.4) + facet_grid(cols = vars(CATEGORY, REGULATION)) +
+  theme_classic() +
+  coord_flip() +
+  theme(axis.text.x = element_text(angle = 0, h = 1, vjust = 1),
+        strip.text = element_text(angle = 0),
+        legend.position = "bottom") +
+  scale_fill_manual(values = paths_COLOR)
+```
+
+
+```{r}
+head(shared_euphotic)
+colnames(shared_euphotic)
+
+shared_euphotic %>% 
+  filter(Category01 == "Phagotrophy") %>% 
+  ggplot(aes(x = Gene_identification, y = CATEGORY)) +
+    geom_tile(aes(fill = COUNT)) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+
+write.csv((shared_euphotic %>% 
+  filter(Category01 == "Phagotrophy")), "output-data/phagotrophy-shared_v_unique-gene.csv")
+```
+
+
+
+## Targeted
+
+Shifting gears to focus on phagotrophy-related transcripts. There are a lot of them, and there is another category that separates different phagotrophy pathways.
+
+> genes that were present in at least 2 samples for the taxonomic group? - Normalize to individual taxa.
+
+
+First, isolate a list of KEGG IDs that are found in at least 2 samples.
+
+```{r}
+# head(counts_curated_annot)
+tmp <- counts_curated_annot %>% 
+  filter(Category01 == "Phagotrophy" & Domain == "Eukaryota") %>% 
+  select(starts_with("mean."), KEGG)
+head(tmp)
+dim(tmp)
+tmp2 <- tmp[apply(tmp != 0, 1, sum) >=2,]
+dim(tmp)[1] - dim(tmp2)[1]
+
+# (dim(tmp2)[1]) / (dim(tmp)[1])
+
+kegg_keep_hets <- as.character(unique(tmp2$KEGG))
+
+```
+Removed about 18k transcripts, keeping 98% of the data.
+
+```{r}
+het_TPM_scale <- counts_curated_annot %>%
+  # Filter by category and domain
+  filter(Category01 == "Phagotrophy" & Domain == "Eukaryota") %>%
+  # Filter by frequency in samples
+  filter(KEGG %in% kegg_keep_hets) %>% 
+  select(starts_with("mean."), Supergroup:Species, Category02, GeneID, KEGG, Gene_identification, PFAMs) %>%
+  mutate(TAXA = case_when(
+    Phylum == "Dinoflagellata" ~ "Dinoflagellate",
+    Phylum == "Ciliophora" ~ "Ciliate",
+    Phylum == "Haptophyta" ~ "Haptophyte",
+    Phylum == "Chlorophyta" ~ "Chlorophyte",
+    Class == "Bacillariophyta" ~ "Diatom",
+    Supergroup == "Rhizaria" ~ "Rhizaria",
+    TRUE ~ "Else")) %>%
+  filter(TAXA != "Else") %>% 
+  pivot_longer(cols = starts_with("mean."), names_to = "SAMPLE_tmp", values_to = "TPM") %>% 
+  mutate(LOG_TPM = log(TPM))  %>% 
+  mutate(SAMPLE = str_remove(SAMPLE_tmp, "mean.")) %>% 
+  mutate(SAMPLE_ORDER = factor(SAMPLE, levels = sample_order, labels = sample_label))
+
+# head(het_TPM_scale)
+# unique(het_TPM_scale$SAMPLE)
+```
+
+```{r}
+sample_order <- c("Catalina", "PortofLA", "SPOT_surface", "SPOT_150m", "SPOT_890m",
+  "July_5m", "March_5m", "July_DCM","March_DCM", "July_150m", "March_150m", "July_1000m", "March_1000m", "Mean")
+sample_label <- c("Catalina", "Port of LA", "SPOT surface", "SPOT 150m", "SPOT 890m",
+  "ALOHA surface (July)", "ALOHA surface (March)", "ALOHA DCM (July)","ALOHA DCM (March)", "ALOHA 150m (July)", "ALOHA 150m (March)", "ALOHA 1000m (July)", "ALOHA 1000m (March)", "Mean")
+yl_red <- c("#ffffcc", "#fed976", "#feb24c", "#fc4e2a", "#e31a1c", "#b10026")
+reds <- c("#f7f7f7","#fee5d9", "#fcae91", "#fb6a4a", "#a50f15")
+n_p_TPM_df$SAMPLE_ORDER <- factor(n_p_TPM_df$SAMPLE, levels = rev(sample_order), labels = rev(sample_label))
+n_p_TPM_df$GeneID_ORDER <- factor(n_p_TPM_df$GeneID, levels = geneid_order_nuts)
+
+phyto <- c("Diatom", "Chlorophyte", "Haptophyte", "Dinoflagellate")
+```
+
+
+
+Here, we've narrowed things down to key phagotrophy-related genes.
+
+```{r}
+# hist(het_TPM_scale$LOG_TPM)
+```
+
+```{r}
+# library(ggdist)
+```
+
+```{r}
+head(het_TPM_scale)
+```
+
+Try a birds eye view look at how different the phagotrophy signature may be between taxa.
+
+```{r, fig.height=25, fig.width=15}
+het_TPM_scale %>% 
+  filter(TPM > 0) %>% 
+  ggplot(aes(x = GeneID, y = SAMPLE_ORDER)) +
+    geom_tile(aes(fill = LOG_TPM)) +
+    coord_flip() +
+    facet_grid(cols = vars(TAXA), rows = vars(Category02), scales = "free", space = "free") +
+  theme_classic() +
+  theme(strip.placement = "outside",
+        axis.text.x = element_text(angle = 90))
+```
+
+```{r, fig.height=25, fig.width=15}
+het_TPM_scale %>% 
+  filter(TPM > 0) %>% 
+  ggplot(aes(x = GeneID, y = SAMPLE_ORDER)) +
+    geom_tile(aes(fill = LOG_TPM), color = "white") +
+    # scale_fill_binned(type = "gradient") +
+  scale_fill_steps(
+    low = "#ece2f0",
+    high = "#016c59",
+    space = "Lab",
+    na.value = "grey50",
+    guide = "coloursteps",
+    aesthetics = "fill"
+  ) +
+    coord_flip() +
+    facet_grid(cols = vars(TAXA), rows = vars(Category02), scales = "free", space = "free") +
+  theme_classic() +
+  theme(strip.placement = "outside",
+        strip.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0),
+        strip.text.y = element_text(angle = 0, vjust = 0.5, hjust = 0),
+        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+```
+
+
+
+# Supplementary
+
+```{r}
+# months <- read.csv("summary-months.csv")
+```
+
+
 
 # Session info
 

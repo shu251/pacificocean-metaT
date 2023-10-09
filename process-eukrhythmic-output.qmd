@@ -84,10 +84,6 @@ Output files from`run_tximport.R` provide an RData file that can be used for the
 
 Import as DESeq object from tximport.
 
-DESeq will automatically find a control in your levels or list for the design. There is a way for DESeq to ignore this need for a control.
-
-SEE SHARON GRIM'S CODE
-
 ```{r}
 library(DESeq2)
 library(tidyverse)
@@ -96,7 +92,7 @@ load("tximport_metaT-ALOHA-CA.Rdata", verbose = TRUE)
 # design ~ x == serves the purpose of considering biological replicates
 ```
 
-> Loading objects: txi sample_merged
+Working with R objects, `txi` and `sample_merged`.
 
 ## By sample name
 
@@ -497,10 +493,11 @@ Compare and contrast within regions. For part of our analysis we want to subset 
 
 ## Question 1
 
-For the first of our two core questions, we want to know what genes are significantly differentially expressed among the euphotic zone samples for the dominant protistan phytoplankton. 
-We are specifically focusing on diatoms, chlorophytes, archaeplastidia (chlorophya), dinoflagellates, and haptophytes for this. 
+For the first of our two core questions, we want to know what genes are significantly differentially expressed among the euphotic zone samples for the dominant protistan phytoplankton. We are specifically focusing on diatoms, chlorophytes, archaeplastidia (chlorophya), dinoflagellates, and haptophytes for this.
 
 > How does nutrient utilization among euphotic zone phytoplankton vary between coastal California and the NPSG?
+
+`/scripts/run_euphotic_deseq_taxa.R`
 
 ```{r}
 # Function to subset txi by individual taxa and perform DESeq
@@ -571,19 +568,17 @@ de_chloro <- deseq_region_bytax(euphotic, chloro)
 save(de_diatom, de_hapto, de_dinos, de_chloro, file = "/scratch/group/hu-lab/pacocean-metaT/Robjs/euphotic_by_taxa.RData")
 ```
 
-
 ## Question 2
 
 We can repeat the above approach, but select different taxa.
 
 > Do we see a similar euphotic vs. sub-euphotic shift in the metabolic potential of taxa observed at coastal California and the NPSG?
 
-~ repeat code above with euphotic versus euphotic ~
+Use `scripts/run_bydepth_deseq_taxa.R`.
 
 # Curated genes only
 
 Here, we isolated annotated transcripts that we curated ourselves.
-
 
 ```{r}
 library(tximport)
@@ -650,7 +645,6 @@ ctr_norm_curated <- df_ctr_norm_curated %>%
 save(ctr_norm_curated, ds_tpm_curated, file = "normed_center_df_curated_08252023.RData")
 ```
 
-
 # July versus March for NPSG
 
 ```{r}
@@ -677,7 +671,7 @@ out <- summary(results_month)
 write.csv(out, file = "summary-months.csv")
 
 # Plot log fold change
-svg("rplot-month.csv", width = 9, height = 8)
+svg("rplot-month.svg", width = 9, height = 8)
 data.frame(results_month) %>% 
   mutate(REGULATION = case_when(
     log2FoldChange > 0 ~ "upregulated in July",
@@ -710,4 +704,3 @@ month_transcripts <- data.frame(results_month) %>%
 
 write.csv(month_transcripts, file = "/scratch/group/hu-lab/pacocean-metaT/month-transcripts.csv")
 ```
-
