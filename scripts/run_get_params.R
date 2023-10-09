@@ -79,7 +79,7 @@ diatom <- as.character(
     select(SequenceID) %>% 
     .[["SequenceID"]]) 
 
-#Dinoflagellata pPhylum
+#Dinoflagellata Phylum
 dinos <- as.character(
   filter(taxfxn, Phylum == "Dinoflagellata" & (PFAMs != "-" | KEGG_ko != "-")) %>% 
     select(SequenceID) %>% 
