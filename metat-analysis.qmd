@@ -183,6 +183,7 @@ tax_only <- tax_plot %>%
 ```
 
 #### Local import
+
 ```{r}
 load("input-data/tax_only_08242023.RData", verbose = TRUE)
 ```
@@ -484,7 +485,6 @@ pca_df %>%
     labs(x =  paste(pc1, "%"), y = paste(pc2, "%"))
 ```
 
-
 ```{r}
 # install.packages("factoextra")
 library(factoextra)
@@ -493,7 +493,6 @@ library(factoextra)
 # hc_norm_dist <- hclust(df_ctr_norm_dist, method = "average")
 # plot(hc_norm_dist)
 ```
-
 
 ## Untargeted - DE transcripts
 
@@ -642,7 +641,6 @@ tmp <- mean_ctr_df %>%
   sample_n(1000)
 ```
 
-
 ```{r}
 tmp2 <- mean_ctr_df %>% 
   pivot_longer(cols = starts_with("mean."), names_to = "SAMPLE01", values_to = "CTR") %>% 
@@ -665,6 +663,7 @@ order_seqid <- as.character(unique(order_spot_surf$SequenceID))
 ```
 
 change so aloha and CA samples are arranged by the first surface sample - look at prefiltering
+
 ```{r}
 tmp2 %>% 
   mutate(SEQID_ORDER = factor(SequenceID, levels = order_seqid)) %>% 
@@ -689,8 +688,6 @@ tmp2 %>%
                       guide = guide_coloursteps(even.steps = TRUE,
                                                 show.limits = TRUE))
 ```
-
-
 
 # k-means clustering
 
@@ -813,7 +810,6 @@ TPM_wcluster <- counts_curated %>%
   )) %>% 
   mutate(SUPERGROUP_ORDER = factor(SUPERGROUP, levels = supergroup_order))
 ```
-
 
 ### Compare compositions of k-means clusters
 
@@ -985,6 +981,7 @@ output_untarget <- alltax_compareDE
 ### Local - untargeted mining
 
 Bring untargeted results locally to mine.
+
 ```{r}
 load("input-data/taxa-untarget-q1.RData", verbose = TRUE)
 ```
@@ -997,7 +994,8 @@ table(alltax %>%
 
 #### UpsetR plot
 
-Make supplementary figures to summarize what the significantly differentially expressed genes are for individual taxa. 
+Make supplementary figures to summarize what the significantly differentially expressed genes are for individual taxa.
+
 ```{r}
 library(ggupset)
 
@@ -1068,13 +1066,13 @@ shared_dino_hapto_chl <- alltax_compareDE %>%
 # View(shared_dino_hapto_chl)
 # write_delim(shared_dino_hapto_chl, file = "output-data/shared_dinos_hapto_chlor.txt", delim = "\t")
 ```
-Use this data frame to see if the genes we pick out also belong to specific clusters. 
+
+Use this data frame to see if the genes we pick out also belong to specific clusters.
 
 ```{r}
 alltax %>% 
   left_join(df_kmeans_pacoce %>% select(SequenceID, CLUSTER = `.cluster`))
 ```
-
 
 ### Plot shared and unique categories
 
@@ -1092,7 +1090,8 @@ paths_COLOR <-c ("#f7fcb9", "#fdae6b", "#fc9272", "#7fcdbb", "#d9f0a3", "#78c679
                  "#cb181d", "#41ab5d",
                  "#969696")
 ```
-Additional supplementary figure to see how 
+
+Additional supplementary figure to see how
 
 ```{r fig.height=6, fig.width=7}
 shared_euphotic %>% 
@@ -1138,12 +1137,11 @@ write_delim((shared_euphotic %>%
 
 Explore:
 
-* Cluster 17 of Catalina
+-   Cluster 17 of Catalina
 
-* Cluster 19 of Port of LA
+-   Cluster 19 of Port of LA
 
-* Overall, comparing clusters that have a lot of surface and DCM ALOHA - when done by unique transcripts, signal is not as strong, does this mean that these clusters have highly expressed genes, but there are fewer of them?
-
+-   Overall, comparing clusters that have a lot of surface and DCM ALOHA - when done by unique transcripts, signal is not as strong, does this mean that these clusters have highly expressed genes, but there are fewer of them?
 
 #### Tree map cluster 17
 
@@ -1151,8 +1149,8 @@ Explore:
 glimpse(TPM_wcluster)
 ```
 
-
 Composition of cluster 17
+
 ```{r, fig.width=15, fig.height=2}
 TPM_wcluster %>% 
   filter(CLUSTER == "17") %>% 
@@ -1174,6 +1172,7 @@ TPM_wcluster %>%
   scale_fill_manual(values = tax_order_color) +
   labs(x = "", y = "Sequence proportion by Supergroup")
 ```
+
 ```{r}
 TPM_wcluster %>% 
   filter(CLUSTER == "17" & SAMPLE == "Catalina" & SUPERGROUP_ORDER == "Chlorophyte") %>% 
@@ -1195,9 +1194,11 @@ TPM_wcluster %>%
   # scale_fill_manual(values = tax_order_color) +
   labs(x = "", y = "Sequence proportion by Supergroup")
 ```
+
 When we go further with taxa (within Mamiellophyceae), Bathycoccus is the main chlorophyte. Otherwise, we get unclassified.
 
 Highly transcribed genes within Cluster 17
+
 ```{r}
 # View(TPM_wcluster %>% 
 #   filter(CLUSTER == "17" & SAMPLE == "Catalina") %>% 
@@ -1206,10 +1207,10 @@ Highly transcribed genes within Cluster 17
 #   arrange(desc(SUM_TPM)))
 ```
 
-
 #### Tree map cluster 19
 
 Composition of cluster 19
+
 ```{r, fig.width=15, fig.height=2}
 TPM_wcluster %>% 
   filter(CLUSTER == "19") %>% 
@@ -1256,6 +1257,7 @@ TPM_wcluster %>%
 ```
 
 Highly transcribed genes within Cluster 19
+
 ```{r}
 # View(TPM_wcluster %>%
 #   filter(CLUSTER == "19" & SAMPLE == "PortofLA") %>%
@@ -1268,12 +1270,11 @@ Highly transcribed genes within Cluster 19
 
 First we will focus on transcripts among phytoplankton that were annotated under the N and P metabolism category.
 
-`counts_curated_annot` originated from `input-data/Avg_scaled_tpm_curated_08252023.RData`, and then annealing output with the KEGG database information that we have curated ahead of time. 
+`counts_curated_annot` originated from `input-data/Avg_scaled_tpm_curated_08252023.RData`, and then annealing output with the KEGG database information that we have curated ahead of time.
 
 ```{r}
 unique(counts_curated_annot$Category01)
 ```
-
 
 ### Format to focus on N & P metabolism
 
@@ -1344,7 +1345,9 @@ n_p_TPM_df <- n_p_TPM_1 %>%
     TRUE ~ "GENE"
   )) 
 ```
+
 Factor sample IDs and color for heat maps
+
 ```{r}
 glimpse(n_p_TPM_df)
 unique(n_p_TPM_df$TAXA)
@@ -1495,8 +1498,6 @@ Archive below code from individual taxa?
 #           panel.grid = element_blank(),
 #           strip.text = element_blank())
 ```
-
-
 
 # Question 2
 
@@ -1710,8 +1711,8 @@ glimpse(shared_depth_spec)
 write.csv(shared_depth_spec,"output-data/shared_v_unique-depth_q2.csv")
 ```
 
-
 Look at list of genes that are shared across all taxa.
+
 ```{r}
 # View(shared_depth_spec %>% 
 #   filter(CATEGORY == "Shared across all taxa") %>% 
@@ -1720,20 +1721,17 @@ Look at list of genes that are shared across all taxa.
 #     distinct())
 ```
 
-
-
 ## Targeted
 
 Shifting gears to focus on phagotrophy-related transcripts. There are a lot of them, and there is another category that separates different phagotrophy pathways.
 
-`counts_curated_annot` originated from `input-data/Avg_scaled_tpm_curated_08252023.RData`, and then annealing output with the KEGG database information that we have curated ahead of time. 
+`counts_curated_annot` originated from `input-data/Avg_scaled_tpm_curated_08252023.RData`, and then annealing output with the KEGG database information that we have curated ahead of time.
 
 ```{r}
 # unique(counts_curated_annot$Category01)
 # unique(counts_curated_annot$Supergroup)
 glimpse(counts_curated_annot)
 ```
-
 
 ```{r}
 # pre-format dataframe; average across July and March at ALOHA
@@ -1777,7 +1775,6 @@ depth_TPM_1 <- depth_TPM_0 %>%
     summarise(TPM_mod_avg = mean(TPM_mod))
 ```
 
-
 ```{r, fig.height=6, fig.width=6}
 depth_TPM_meanSAMPLE <- depth_TPM_1 %>% 
   group_by(TAXA, Category01) %>% 
@@ -1815,7 +1812,9 @@ depth_TPM_meanSAMPLE %>%
           strip.text.x = element_blank())
 
 ```
+
 Heat map for mean across categories:
+
 ```{r, fig.height=6, fig.width=6}
 # unique(depth_TPM_meanCAT$SAMPLE)
 
@@ -1871,9 +1870,8 @@ depth_TPM_pt_plot <- depth_TPM_1 %>%
 # range(depth_TPM_pt_plot$sum_tpm_bin)
 ```
 
-
-
 Generate plots to combine
+
 ```{r, fig.height=7, fig.width=25}
 library(ggbeeswarm); library(see)
 
@@ -1928,7 +1926,6 @@ taxa_depth <- c("Ciliate", "Dinoflagellate", "Haptophyte", "Rhizaria")
           strip.placement = "outside",
           strip.text.x = element_blank())) + patchwork::plot_layout(ncol = 1)
 ```
-
 
 #### Heterotrophy only
 
@@ -1989,7 +1986,6 @@ het_TPM_scale <- counts_curated_annot %>%
 
 Here, we've narrowed things down to key phagotrophy-related genes.
 
-
 ```{r, fig.height=25, fig.width=15}
 het_TPM_scale %>% 
   filter(TPM > 0) %>% 
@@ -2017,7 +2013,6 @@ het_TPM_scale %>%
 ```{r}
 head(het_TPM_scale)
 ```
-
 
 ```{r, fig.width=13, fig.height=3.5}
 het_TPM_scale %>% 
@@ -2051,11 +2046,11 @@ het_TPM_scale %>%
 ```
 
 Presence
+
 ```{r}
 head(counts_curated_annot)
 unique(counts_curated_annot$Category01)
 ```
-
 
 ```{r, fig.width=8, fig.height=4}
 phagotrophy_order <- c("Motility and prey recognition", "Actin polymerization", "Lysosome binding and processing","Chitinase","V-type ATPase", "Phagosome maturation", "Endocytosis", "SNARE complex","Fatty acid biosynthesis", "Fatty acid breakdown")
@@ -2101,6 +2096,7 @@ counts_curated_annot %>%
 ```{r}
 glimpse(depth_TPM_1)
 ```
+
 ```{r, fig.height=10, fig.width=18}
 # glimpse(depth_TPM_1)
 phagotrophy_order <- c("Motility and prey recognition", "Actin polymerization", "Lysosome binding and processing","Chitinase","V-type ATPase", "Phagosome maturation", "Endocytosis", "SNARE complex","Fatty acid biosynthesis", "Fatty acid breakdown")
@@ -2179,7 +2175,6 @@ depth_TPM_1 %>%
 unique(depth_TPM_1$TAXA)
 ```
 
-
 ```{r, fig.height=15, fig.width=8}
 yl_red <- c("#ffffcc", "#fed976", "#feb24c", "#fc4e2a", "#e31a1c", "#b10026")
 depth_TPM_1 %>% 
@@ -2209,11 +2204,11 @@ depth_TPM_1 %>%
         axis.title = element_text(face = "bold", size = 12)) +
   labs(x = "", y = "Transcript proportion by phagotrophy category")
 ```
+
 ```{r}
 range(depth_TPM_1$TPM_mod_avg)
 median(depth_TPM_1$TPM_mod_avg)
 ```
-
 
 ```{r, fig.width=18, fig.height=8}
 depth_TPM_1 %>% 
@@ -2244,13 +2239,11 @@ depth_TPM_1 %>%
   labs(x = "", y = "Transcript proportion by phagotrophy category")
 ```
 
-
 # Supplementary
 
 ```{r}
 # months <- read.csv("summary-months.csv")
 ```
-
 
 ```{r, fig.height=5, fig.width=5}
 # | warning: false
@@ -2268,40 +2261,6 @@ ggplot(df, aes(x, y)) +
   theme_bw()
 geom_val
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # Session info
 
