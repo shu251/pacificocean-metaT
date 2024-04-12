@@ -639,7 +639,7 @@ glimpse(mean_ctr_df)
 
 # Play with toy dataset
 tmp <- mean_ctr_df %>% 
-  sample_n(1000)
+  sample_n(100)
 ```
 
 
