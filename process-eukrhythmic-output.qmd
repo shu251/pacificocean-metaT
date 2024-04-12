@@ -1,5 +1,5 @@
 ---
-title: "eukrhythmic compilation"
+title: "Compilation of eukrhythmic output"
 execute:
   echo: true
   eval: false
@@ -73,7 +73,6 @@ library(tidyr)
 library(dplyr)
 library(tximport)
 library(readr)
-
 num_threads <- getDTthreads()
 # Conflicts between tidyverse and data.table can be ignored
 ```
@@ -87,14 +86,14 @@ Import as DESeq object from tximport.
 ```{r}
 library(DESeq2)
 library(tidyverse)
-load("tximport_metaT-ALOHA-CA.Rdata", verbose = TRUE)
+load("/scratch/group/hu-lab/pacocean-metaT/tximport_metaT-ALOHA-CA.Rdata", verbose = TRUE)
 # colData : Rows of colData correspond to columns of countData
 # design ~ x == serves the purpose of considering biological replicates
 ```
 
 Working with R objects, `txi` and `sample_merged`.
 
-## By sample name
+## Get TPM by sample name
 
 For taxonomic bar plot and overall cluster analysis. (March and July are separate at ALOHA)
 
@@ -107,7 +106,7 @@ ds_tpm_samplename <- DESeqDataSetFromTximport(txi,
 
 ```
 
-*optional*
+*optional*: subset data to keep only transcripts with >10 tpm.
 
 ```{r}
 keep <- rowSums(counts(ds_tpm_samplename)) >= 10
@@ -117,6 +116,8 @@ dds <- ds_tpm_samplename[keep,]
 `dds` includes \> 10. Now dim is 6972094, it was originally, 14737135. Keeping about 47% of data.
 
 ## Extract count table
+
+Use this for the majority of downstream analyses.
 
 ```{r}
 library(tximport)
@@ -129,7 +130,7 @@ counts_scaled <- makeCountsFromAbundance(
 )
 
 counts_df <- as.data.frame(counts_scaled)
-
+counts_withreps <- counts_df
 ```
 
 Rename so replicates have the same name for counts
@@ -155,6 +156,7 @@ mean_counts_df <- counts_df %>%
 
 ```{r}
 save(mean_counts_df, sample_merged, file = "Avg_scaled_tpm_08222023.RData")
+load("/scratch/group/hu-lab/pacocean-metaT/Avg_scaled_tpm_08222023.RData")
 ```
 
 ## Extract centered data
@@ -186,8 +188,140 @@ df_ctr_norm <- as.data.frame(assay(vsd_all))
 ```
 
 ```{r}
-save(df_ctr_norm, file = "normed_center_df_08222023.RData")
+save(df_ctr_norm, file = "/scratch/group/hu-lab/pacocean-metaT/normed_center_df_08222023.RData")
 ```
+
+
+## Extract z-score table
+
+Standardizing to z-scores will make it easier to compare across the large dataset. And we will be able to detect outliers and anomalies.
+
+First to do some data quality control
+```{r}
+head(counts_withreps)
+glimpse(counts_withreps)
+```
+
+Remove transcripts that sum to less than 1, and remove transcripts that appear in only 1 sample. 
+```{r}
+qc_df_wreps <- counts_withreps %>%
+  filter(rowSums(across(where(is.numeric), ~.x!=0))>1) %>% # samples appear more than 2 times
+  filter(rowSums(across(where(is.numeric)))>10) # total sum of transcript across dataset is > 10
+
+dim(qc_df_wreps)[1] / dim(counts_withreps)[1]
+# head(qc_df_wreps)
+
+qc_mean_counts <- mean_counts_df %>%
+  filter(rowSums(across(where(is.numeric), ~.x!=0))>1) %>% # samples appear more than 2 times
+  filter(rowSums(across(where(is.numeric)))>=5)
+
+dim(qc_mean_counts)[1] / dim(mean_counts_df)[1]
+```
+
+
+
+```{r}
+scale_z_wreps <- scale(as.matrix(qc_df_wreps), center = TRUE)
+range(scale_z_wreps); median(scale_z_wreps)
+
+scale_z_means <- scale(as.matrix(qc_mean_counts), center = TRUE)
+range(scale_z_means); median(scale_z_means)
+```
+
+```{r}
+save(scale_z_means, scale_z_wreps, file = "/scratch/group/hu-lab/pacocean-metaT/zscore_outputs.RData")
+```
+
+
+## Visualize zscore
+
+
+```{r}
+# taxfxn <- read.csv("/scratch/group/hu-lab/pacocean-metaT/TaxonomicAndFunctionalAnnotations.csv")
+```
+
+```{r}
+glimpse(scale_z_means)
+# glimpse(taxfxn)
+df_zscale_means <- as.data.frame(scale_z_means) %>%
+  rownames_to_column(var = "SequenceID") %>%
+  left_join(taxfxn) %>%
+  pivot_longer(cols = starts_with("mean."), names_to = "SAMPLENAME", values_to = "zscore_TPM")
+```
+
+
+```{r, fig.height=15, fig.width=25}
+dim(df_zscale_means)
+df_zscale_means %>%
+  mutate(ANNOTATION = case_when(
+    is.na(KEGG_ko) ~ PFAMs,
+    TRUE ~ KEGG_ko
+  )) %>% 
+  filter(!is.na(ANNOTATION)) %>% 
+  ggplot(aes(x = ANNOTATION, y = SAMPLENAME, fill = zscore_TPM)) +
+    geom_tile() + 
+  scale_fill_gradient2(
+  name = waiver(),
+  low = "red",
+  mid = "white",
+  high = "blue",
+  midpoint = 0,
+  space = "Lab",
+  na.value = "grey50",
+  transform = "identity",
+  guide = "colourbar",
+  aesthetics = "fill"
+) +
+  theme(axis.text.x = element_blank())
+```
+
+### Working here!
+
+```{r}
+sample_order_month_RENAME <- c("ALOHA 5m", "ALOHA DCM", "ALOHA 150m", "ALOHA 1000m", "ALOHA 5m", "ALOHA DCM", "ALOHA 150m", "ALOHA 1000m", "Catalina", "Port of LA", "SPOT surface", "SPOT 150m", "SPOT 890m")
+sample_order_month_MEAN <- c("mean.July_5m", "mean.July_DCM", "mean.July_150m", "mean.July_1000m", "mean.March_5m", "mean.March_DCM", "mean.March_150m", "mean.March_1000m", "mean.Catalina", "mean.PortofLA", "mean.SPOT_surface", "mean.SPOT_150m", "mean.SPOT_890m")
+
+```
+
+
+```{r}
+mean_counts_df_reformat <- mean_counts_df %>% 
+  sample_n(50) %>% 
+  filter(rowSums(across(where(is.numeric)))>=5) %>% # sum of transcript has to be >=5
+  rownames_to_column(var = "SequenceID") %>% 
+  # left_join(taxfxn) %>%
+  pivot_longer(cols = starts_with("mean."), names_to ="SAMPLE", values_to = "TPM_whole") %>% 
+  # mutate(ANNOTATION = case_when(
+  #   KEGG_ko == "-" ~ PFAMs,
+  #   TRUE ~ KEGG_ko
+  # )) %>%
+  # filter(!is.na(ANNOTATION)) %>% 
+  # filter(ANNOTATION != "-") %>% 
+  mutate(SAMPLE_NAME = factor(SAMPLE, levels = sample_order_month_MEAN, labels = sample_order_month_RENAME)) %>% 
+  group_by(SequenceID, SAMPLE_NAME) %>%
+    summarize(TPM = mean(TPM_whole))
+
+# dataset mean and sd
+mean_dataset <- mean(mean_counts_df_wannot$TPM)
+sd_dataset <- sd(mean_counts_df_wannot$TPM)
+
+zscore_trans_df <- mean_counts_df_wannot %>% 
+  group_by(SequenceID, SAMPLE_NAME) %>%
+    summarise(SUMTPM = sum(TPM),
+              zscore = ((SUMTPM - mean_dataset) / sd_dataset))
+```
+```{r}
+
+```
+
+
+```{r}
+glimpse(zscore_trans_df)
+
+```
+
+
+Core RObjects from above are stored: /scratch/group/hu-lab/pacocean-metaT
 
 # DEseq2 reanalysis for DE genes
 
