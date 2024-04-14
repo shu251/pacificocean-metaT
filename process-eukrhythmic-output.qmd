@@ -51,10 +51,9 @@ Our goal is to take eukrhthymic estimated counts (from salmon) to get transcript
     -   Explaination using DESeq: https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html
     -   https://bioconductor.org/packages/release/bioc/manuals/DESeq2/man/DESeq2.pdf
 
-Script takes output from salmon counts and modifies for the gene length across all samples. The outcome will be the transcript-level estimates. 
+Script takes output from salmon counts and modifies for the gene length across all samples. The outcome will be the transcript-level estimates.
 
 Output file is *tximport_metaT-ALOHA-CA.Rdata*
-
 
 ## Set up R environment
 
@@ -99,7 +98,7 @@ load("/scratch/group/hu-lab/pacocean-metaT/tximport_metaT-ALOHA-CA.Rdata", verbo
 
 Working with R objects, `txi` (output from txi import script) and `sample_merged` (metadata table).
 
-For below count tables, we can also add in annotation information. 
+For below count tables, we can also add in annotation information.
 
 ```{r}
 taxfxn <- read.csv("/scratch/group/hu-lab/pacocean-metaT/TaxonomicAndFunctionalAnnotations.csv")
@@ -109,11 +108,9 @@ taxfxn_mini <- taxfxn %>%
   select(SequenceID, Domain:Species, PFAMs, KEGG_ko)
 ```
 
-
-
 ## Use DESeq to export TPM values & transformed data
 
-See ```pacificocean-metaT/scripts/run_deseq_vst_rlog_transformed.R```.
+See `pacificocean-metaT/scripts/run_deseq_vst_rlog_transformed.R`.
 
 For taxonomic bar plot and overall cluster analysis. (March and July are separate at ALOHA)
 
@@ -149,11 +146,11 @@ dds_dis_subset <- DESeq(dds_subset)
 
 See "Count data transformations" in https://introtogenomics.readthedocs.io/en/latest/2021.11.11.DeseqTutorial.html
 
-Use `vst` command to estimate dispersion. Variance stabilizing transformations (VST) (Tibshirani 1988; Huber et al. 2003; Anders and Huber 2010). Output should be transformed data on the log2 scale. 
+Use `vst` command to estimate dispersion. Variance stabilizing transformations (VST) (Tibshirani 1988; Huber et al. 2003; Anders and Huber 2010). Output should be transformed data on the log2 scale.
 
-VST and rlog remove dependence of the variance on the mean. Both transformations consider the experiment specific trend of variance instead of the mean. 
+VST and rlog remove dependence of the variance on the mean. Both transformations consider the experiment specific trend of variance instead of the mean.
 
-Above, the `DESeq()` was already run, so dispersions were estimated. Therefore use ```blind = FALSE``` below.
+Above, the `DESeq()` was already run, so dispersions were estimated. Therefore use `blind = FALSE` below.
 
 ```{r}
 # Estiamte scaled datasets by VST
@@ -165,8 +162,7 @@ df_ctr_norm_vst <- as.data.frame(assay(vst_all))
 df_ctr_norm_subset_vst <- as.data.frame(assay(vst_subset))
 ```
 
-
-_rlog_ is regularized log. It transforms the original count data into the log2 scale and fits a model with a term for each sample. 
+*rlog* is regularized log. It transforms the original count data into the log2 scale and fits a model with a term for each sample.
 
 ```{r}
 rld_all <- rlog(dds_dis_all, blind = FALSE)
@@ -177,6 +173,7 @@ df_ctr_norm_subset_rld <- as.data.frame(assay(rld_subset))
 ```
 
 Output from `pacificocean-metaT/scripts/run_deseq_vst_rlog_transformed.R`.
+
 ```{r}
 save(rld_all, rld_subset, df_ctr_norm_rld, df_ctr_norm_subset_rld, file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_rld.RData")
 
@@ -184,13 +181,11 @@ save(vst_all, vst_subset, df_ctr_norm_vst, df_ctr_norm_subset_vst,
      file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_vst.RData")
 ```
 
-
 ### Function to combine replicates and include annotation information for normalized dataframes
 
-Below is also a function in the scripts directory to assemble output dataframes with annotation information and average across replicates. 
+Below is also a function in the scripts directory to assemble output dataframes with annotation information and average across replicates.
 
 See script: `pacificocean-metaT/scripts/run_deseq_vst_rlog_transformed.R`
-
 
 ```{r}
 convert_format_scaled <- function(df){
@@ -219,7 +214,6 @@ vst_format_all <- convert_format_scaled(df_ctr_norm_vst)
 
 save(vst_format_subset, vst_format_all, file = "/scratch/group/hu-lab/pacocean-metaT/vst_formatted_forlocaluse.RData")
 ```
-
 
 ## Extract count table
 
@@ -266,13 +260,11 @@ mean_counts_df <- counts_df %>%
 save(counts_withreps, mean_counts_df, sample_merged, file = "/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData")
 ```
 
-
-
 ## Extract z-score table
 
 Standardizing to z-scores will make it easier to compare across the large dataset. And we will be able to detect outliers and anomalies.
 
-First to do some data quality control based on data table that includes all replicates. 
+First to do some data quality control based on data table that includes all replicates.
 
 ```{r}
 load("/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData")
@@ -291,6 +283,7 @@ dim(qc_df_wreps)[1] / dim(counts_withreps)[1] # Keeping 61% of data
 ```
 
 Now average across replicates
+
 ```{r}
 names_orig_qc <- colnames(qc_df_wreps)
 names_new_qc <- sub("_[^_]+$", "", names_orig)
@@ -310,7 +303,6 @@ qc_df_subset_noreps <- qc_df_wreps %>%
 head(qc_df_subset_noreps)
 ```
 
-
 ```{r}
 scale_z_wreps <- scale(as.matrix(qc_df_subset_noreps), center = TRUE)
 # range(scale_z_wreps); median(scale_z_wreps)
@@ -326,7 +318,6 @@ df_zscale_means <- as.data.frame(scale_z_wreps) %>%
 ```{r}
 save(df_zscale_means, scale_z_wreps, file = "/scratch/group/hu-lab/pacocean-metaT/zscore_output.RData")
 ```
-
 
 # DEseq2 reanalysis for DE genes
 

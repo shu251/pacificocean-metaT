@@ -74,13 +74,6 @@ load(file = "input-data/Avg_scaled_tpm_08222023.RData", verbose = T)
 Import metadata as well.
 
 ```{r}
-# metadata_tmp <- read.delim("input-data/complete-sample-list.txt", header = TRUE, sep = ",")
-# sample_metadata <- read.csv("input-data/sample_table.csv") %>%
-  # unite(SAMPLE, Sample, Replicate, sep = "_", remove = FALSE) %>% 
-  # select(RUN = SRR, everything()) %>% 
-  # right_join(metadata_tmp)
-
-# write.csv(sample_metadata, file = "input-data/sample-metadata.csv")
 sample_metadata_1 <- read.csv("input-data/sample-metadata.csv")
 sample_metadata <- sample_metadata_1 %>% 
   mutate(SAMPLE_MATCH = sub("_[^_]+$", "", SAMPLE))
@@ -94,11 +87,11 @@ Report total number of transcripts after assembly and annotation.
 ```{r, echo=TRUE, eval=FALSE}
 # | echo: true
 # | eval: false
-length(unique(taxfxn$SequenceID))
+# length(unique(taxfxn$SequenceID))
 # rows: 14,841,331
 # 14840771
 
-length(unique(rownames(mean_counts_df)))
+# length(unique(rownames(mean_counts_df)))
 # 14737135
 ```
 
@@ -429,6 +422,9 @@ as.data.frame(annotated_mean %>%
 
 > Need to run the above on the HPC.
 
+
+# Ordination analysis
+
 ## PCoA with whole community functional profile
 
 Ahead of time, normalized community composition data was center scaled. Below, we can import this dataset and perform principle component analysis.
@@ -485,16 +481,54 @@ pca_df %>%
     labs(x =  paste(pc1, "%"), y = paste(pc2, "%"))
 ```
 
+
+## Hierarchical clustering
+
+Making toy data set first, to test code.
+Need to input the processed center normalized data for below. 
 ```{r}
 # install.packages("factoextra")
 library(factoextra)
 # head(df_ctr_norm)
+tmp_500 <- df_ctr_norm %>% sample_n(500) 
+head(df_ctr_norm)
+```
+
+
+```{r}
 # df_ctr_norm_dist <- dist(df_ctr_norm, method = "euclidean")
-# hc_norm_dist <- hclust(df_ctr_norm_dist, method = "average")
+df_ctr_norm_dist <- dist(t(tmp_500), method = "euclidean")
+# head(df_ctr_norm_dist)
+hc_norm_dist <- hclust(df_ctr_norm_dist, method = "average")
 # plot(hc_norm_dist)
 ```
 
-## Untargeted - DE transcripts
+```{r}
+library(ggdendro)
+dendro_plot_df <- ggdendro::dendro_data(as.dendrogram(hc_norm_dist), type = "rectangle")
+# head(dendro_plot_df)
+# label_dendro_order <- as.character(dendro_plot_df$labels$label)
+```
+
+```{r, fig.height=15, fig.width=9}
+dendro_plot_output <- ggplot(segment(dendro_plot_df)) + 
+  geom_segment(aes(x = x, y = y, xend = xend, yend = yend)) + 
+  coord_flip() + 
+  scale_y_reverse(expand = c(0.2, 0.5), breaks = c(0, 0.2, 0.4, 0.6, 0.8)) + 
+  geom_text(aes(x = x, y = y, label = label, angle = 0, hjust = 0), data = label(dendro_plot_df)) + 
+  theme_dendro() + 
+  # labs(y = "Dissimilarity", title = "Jaccard distance") + 
+  theme(axis.text.x = element_text(color = "black", size = 14), 
+        axis.line.x = element_line(color = "#252525"), 
+        axis.ticks.x = element_line(), axis.title.x = element_text(color = "black", size = 14),
+        plot.margin = margin(1,4,1,1, "cm"))
+dendro_plot_output
+```
+> Save label order from above. Then put in the kmeans output.
+
+
+
+# Untargeted - DE transcripts
 
 # Prep to address key questions (local)
 
@@ -873,6 +907,28 @@ Supplementary figure.
   labs(y = "Transcript count", x = ""))) +
   patchwork::plot_layout(ncol = 1)
 ```
+
+Use the below plot to put this next to the hclust output.
+
+```{r, fig.height=8, fig.width=15}
+TPM_wcluster %>% 
+  group_by(SAMPLE, CLUSTER) %>% 
+  summarise(TRANSCRIPT_COUNT = n(),
+            TPM_SUM = sum(TPM)) %>% 
+  mutate(SAMPLE_ORDER = factor(SAMPLE, levels = sample_order)) %>% 
+  # ggplot(aes(x = SAMPLE, y = TPM_SUM, fill = CLUSTER)) +
+  ggplot(aes(x = SAMPLE, y = TRANSCRIPT_COUNT, fill = CLUSTER)) +
+  geom_bar(stat = "identity", color = "black", position = "fill") +
+  # scale_fill_manual(values = color_sample_order) +
+  scale_y_continuous(expand = c(0,0)) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.text = element_text(color = "black"),
+        legend.title = element_blank()) +
+  labs(y = "TPM", x = "")
+```
+
+
 
 # Question 1
 
@@ -2045,7 +2101,60 @@ het_TPM_scale %>%
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 ```
 
-Presence
+
+### z-score for heterotrophy
+
+```{r}
+# head(het_TPM_scale)
+
+reformat_het_01 <- het_TPM_scale %>% 
+  group_by(SAMPLE, SAMPLE_ORDER, TAXA, GeneID, 	
+Gene_identification, Category02) %>% 
+  summarise(SUM_TPM = sum(TPM))
+
+mean_tpm_z <- mean(reformat_het_01$SUM_TPM)
+# mean_tpm_z
+range(reformat_het_01$SUM_TPM)
+reformat_het_02 <- reformat_het_01 %>% 
+  filter(SUM_TPM > 0) %>% 
+  group_by(SAMPLE, SAMPLE_ORDER, TAXA, Category02) %>% 
+  summarise(SCORE_SUM_TPM = sum(SUM_TPM),
+            SD_TPM = sd(SUM_TPM),
+            MEAN_TPM = mean(SUM_TPM)) %>% 
+  mutate(SD_TPM = replace_na(SD_TPM, 1)) %>%
+  mutate(Z_SCORE = ((SCORE_SUM_TPM - mean_tpm_z)/SD_TPM))
+head(reformat_het_02)
+range(reformat_het_02$SD_TPM)
+range(reformat_het_02$Z_SCORE)
+hist(reformat_het_02$Z_SCORE)
+```
+
+```{r}
+reformat_het_02 %>% 
+  ggplot(aes(x = SAMPLE_ORDER, y = Category02, fill = Z_SCORE)) +
+  geom_tile() +
+  facet_grid(rows = vars(TAXA)) +
+  scale_fill_stepsn(name = "", 
+                    colors =c("#023858", "#045a8d","#0570b0","#74a9cf", "#d0d1e6", "#ece7f2","#fff7fb",
+                              "#ffffcc", "#fed976", "#feb24c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"),
+                    breaks = c(-1500, -1000, -500, -250, -100, -10, -1,
+                               0, 1, 10, 100, 250, 500, 1000, 1500),
+                    limits = c(-2500, 2500))
+# ,
+                    # values = scales::rescale(c(-25, -10, 0, 10, 50))) 
+  # scale_fill_steps(
+  #   low = "blue",
+  #   high = "red",
+  #   space = "Lab",
+  #   na.value = "grey50",
+  #   guide = "coloursteps",
+  #   aesthetics = "fill"
+  # )
+```
+
+
+
+### Tree map
 
 ```{r}
 head(counts_curated_annot)

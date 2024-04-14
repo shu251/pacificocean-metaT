@@ -4,6 +4,7 @@ project:
   # add .qmd files you actually want to the website. Otherwise, will not render
   render:
     - index.qmd # home page
+    - explanation-of-workflow.qmd
     - env-metadata.qmd
     - metat-analysis.qmd
     - process-eukrhythmic-output.qmd
