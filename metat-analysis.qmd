@@ -32,7 +32,7 @@ library(data.table)
 library(compositions)
 library(patchwork)
 library(ggupset)
-library(treemapify)
+# library(treemapify)
 ```
 
 ## Name & color schema
@@ -68,14 +68,14 @@ Below R objects sourced by first isolating only the eukaryotic transcripts, aver
 # | echo: true
 # | eval: false
 load(file = "/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData", verbose = TRUE)
+
 # load(file = "input-data/TPM-count-tables.RData")
-# taxfxn <- read.csv("TaxonomicAndFunctionalAnnotations.csv")
+load(file = "input-data/annot_files.Rdata")
 ```
 
 Import metadata as well.
 
 ```{r}
-<<<<<<< HEAD
 # metadata_tmp <- read.delim("input-data/complete-sample-list.txt", header = TRUE, sep = ",")
 # sample_metadata <- read.csv("input-data/sample_table.csv") %>%
   # unite(SAMPLE, Sample, Replicate, sep = "_", remove = FALSE) %>% 
@@ -83,10 +83,7 @@ Import metadata as well.
   # right_join(metadata_tmp)
 
 # write.csv(sample_metadata, file = "input-data/sample-metadata.csv")
-sample_metadata_1 <- read.csv("../sample-metadata.csv")
-=======
 sample_metadata_1 <- read.csv("input-data/sample-metadata.csv")
->>>>>>> dc51bd4f551b123d7bf950c9ba7c1e702103114c
 sample_metadata <- sample_metadata_1 %>% 
   mutate(SAMPLE_MATCH = sub("_[^_]+$", "", SAMPLE))
 sample_metadata
@@ -144,7 +141,7 @@ subset_02 <- subset_01 %>%
 
 ```
 
-## Taxonomic composition & distribution
+# Taxonomic composition & distribution
 
 Evaluate taxonomic diversity and composition across all sites.
 
@@ -173,7 +170,7 @@ tax_plot <- annotated_mean %>%
 ```{r, echo=TRUE, eval=FALSE}
 # | echo: true
 # | eval: false
-load("input-data/tax_plot_08222023.RData", verbose = TRUE)
+# load("input-data/tax_plot_08222023.RData", verbose = TRUE)
 ```
 
 ```{r, echo=TRUE, eval=FALSE}
@@ -437,6 +434,8 @@ as.data.frame(annotated_mean %>%
 
 # Ordination analysis
 
+Import center scaled data.
+
 ## PCoA with whole community functional profile
 
 Ahead of time, normalized community composition data was center scaled. Below, we can import this dataset and perform principle component analysis.
@@ -614,7 +613,6 @@ Data for targeted sections is imported from `process-eukrhythmic-output` code ti
 
 ```{r}
 load("input-data/Avg_scaled_tpm_curated_08252023.RData", verbose = TRUE)
-# head(counts_curated)
 ```
 
 To address question 1, subset to a curated set of genes.

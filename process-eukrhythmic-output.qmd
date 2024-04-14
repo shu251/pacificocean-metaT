@@ -57,31 +57,29 @@ Output file is *tximport_metaT-ALOHA-CA.Rdata*
 
 ## Set up R environment
 
-Library required to execute code in R
+R libraries required to execute code in R. Load necessary libraries & get number of available threads for data.table.
 
 ```{r}
+# | message: false
+# | warning: false
 ## Installations
 # if (!require("BiocManager", quietly = TRUE))
 #     install.packages("BiocManager")
 # BiocManager::install("DESeq2")
 # BiocManager::install("tximport")
-```
-
-Load necessary libraries & get number of available threads for data.table.
-
-```{r}
-# | message: false
-# | warning: false
 library(data.table)
 library(tidyr)
 library(dplyr)
 library(tximport)
 library(readr)
 num_threads <- getDTthreads()
+
 # Conflicts between tidyverse and data.table can be ignored
+library(DESeq2)
+library(tidyverse)
 ```
 
-Output files from`run_tximport.R` provide an RData file that can be used for the DESeq input file (`tximport_metaT-ALOHA-CA.Rdata`).
+Output files from`run_tximport.R` provides an RData file that can be used for the DESeq input file (`tximport_metaT-ALOHA-CA.Rdata`).
 
 # Generate count tables using DESeq2
 
@@ -89,9 +87,9 @@ Import as DESeq object from tximport.
 
 ```{r}
 # | message: false
-library(DESeq2)
-library(tidyverse)
-load("/scratch/group/hu-lab/pacocean-metaT/tximport_metaT-ALOHA-CA.Rdata", verbose = TRUE)
+# | warning: false
+
+# load("/scratch/group/hu-lab/pacocean-metaT/tximport_metaT-ALOHA-CA.Rdata", verbose = TRUE)
 # colData : Rows of colData correspond to columns of countData
 # design ~ x == serves the purpose of considering biological replicates
 ```
@@ -101,20 +99,24 @@ Working with R objects, `txi` (output from txi import script) and `sample_merged
 For below count tables, we can also add in annotation information.
 
 ```{r}
-taxfxn <- read.csv("/scratch/group/hu-lab/pacocean-metaT/TaxonomicAndFunctionalAnnotations.csv")
+# taxfxn <- read.csv("/scratch/group/hu-lab/pacocean-metaT/TaxonomicAndFunctionalAnnotations.csv")
 
 # Isolate what is needed from tax and fxn annotations for most analyses.
-taxfxn_mini <- taxfxn %>%
-  select(SequenceID, Domain:Species, PFAMs, KEGG_ko)
+# taxfxn_mini <- taxfxn %>%
+  # select(SequenceID, Domain:Species, PFAMs, KEGG_ko)
+# save(taxfxn_mini, sample_merged, file = "input-data/annot_files.RData")
+
+# Alternatively, load necessary files
+load("input-data/annot_files.RData", verbose = TRUE)
 ```
 
-## Use DESeq to export TPM values & transformed data
+## Export TPM values & transformed data (DESeq)
 
 See `pacificocean-metaT/scripts/run_deseq_vst_rlog_transformed.R`.
 
 For taxonomic bar plot and overall cluster analysis. (March and July are separate at ALOHA)
 
-See how to set up subsetting? https://github.com/WHOIGit/super-waffle/blob/main/01_seqpain_deseq.R
+See how to set up subsetting: https://github.com/WHOIGit/super-waffle/blob/main/01_seqpain_deseq.R
 
 ```{r}
 ds_tpm_samplename <- DESeqDataSetFromTximport(txi,
@@ -123,7 +125,7 @@ ds_tpm_samplename <- DESeqDataSetFromTximport(txi,
 
 ```
 
-*optional*: subset data to keep only transcripts with \>10 tpm.
+Subset data to keep only transcripts with \>10 tpm.
 
 ```{r}
 keep <- rowSums(counts(ds_tpm_samplename)) >= 10
@@ -175,10 +177,16 @@ df_ctr_norm_subset_rld <- as.data.frame(assay(rld_subset))
 Output from `pacificocean-metaT/scripts/run_deseq_vst_rlog_transformed.R`.
 
 ```{r}
-save(rld_all, rld_subset, df_ctr_norm_rld, df_ctr_norm_subset_rld, file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_rld.RData")
+# save(rld_all, rld_subset, df_ctr_norm_rld, df_ctr_norm_subset_rld, file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_rld.RData")
+# 
+# save(vst_all, vst_subset, df_ctr_norm_vst, df_ctr_norm_subset_vst,
+#      file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_vst.RData")
+```
 
-save(vst_all, vst_subset, df_ctr_norm_vst, df_ctr_norm_subset_vst,
-     file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_vst.RData")
+Take centered data and reformat with annotations and more.
+```{r}
+load("/scratch/group/hu-lab/pacocean-metaT/normed_dfs_vst.RData", verbose = TRUE)
+load("/scratch/group/hu-lab/pacocean-metaT/normed_dfs_rld.RData", verbose = TRUE)
 ```
 
 ### Function to combine replicates and include annotation information for normalized dataframes
@@ -189,6 +197,7 @@ See script: `pacificocean-metaT/scripts/run_deseq_vst_rlog_transformed.R`
 
 ```{r}
 convert_format_scaled <- function(df){
+  all_samples_col_header <- colnames(df)
   df %>% 
   # sample_n(1000) %>% #uncomment for testing
   rownames_to_column(var = "SequenceID") %>% 
@@ -202,18 +211,20 @@ convert_format_scaled <- function(df){
 ```
 
 ```{r}
-rlog_format_subset <- convert_format_scaled(df_ctr_norm_subset_rld)
-rlog_format_all <- convert_format_scaled(df_ctr_norm_rld)
-
-save(rlog_format_subset, rlog_format_all, file = "/scratch/group/hu-lab/pacocean-metaT/rlog_formatted_forlocaluse.RData")
-cat("\n\n Done with rlog \n\n")
+# rlog_format_subset <- convert_format_scaled(df_ctr_norm_subset_rld)
+# rlog_format_all <- convert_format_scaled(df_ctr_norm_rld)
+# 
+# save(rlog_format_subset, rlog_format_all, file = "/scratch/group/hu-lab/pacocean-metaT/rlog_formatted_forlocaluse.RData")
+# cat("\n\n Done with rlog \n\n")
 
 
 vst_format_subset <- convert_format_scaled(df_ctr_norm_subset_vst)
-vst_format_all <- convert_format_scaled(df_ctr_norm_vst)
+# vst_format_all <- convert_format_scaled(df_ctr_norm_vst)
 
 save(vst_format_subset, vst_format_all, file = "/scratch/group/hu-lab/pacocean-metaT/vst_formatted_forlocaluse.RData")
 ```
+
+> Use above centered data for ordination analysis and more.
 
 ## Extract count table
 
@@ -221,7 +232,6 @@ Start again with the `txi` object and get scaled TPM values.
 
 ```{r}
 # load("/scratch/group/hu-lab/pacocean-metaT/tximport_metaT-ALOHA-CA.Rdata", verbose = TRUE)
-
 library(tximport)
 
 counts_scaled <- makeCountsFromAbundance(
@@ -259,6 +269,29 @@ mean_counts_df <- counts_df %>%
 ```{r}
 save(counts_withreps, mean_counts_df, sample_merged, file = "/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData")
 ```
+
+## Annotate count table
+
+```{r}
+# head(mean_counts_df)
+```
+```{r}
+unique(sample_merged$Sample)
+```
+
+
+```{r}
+mean_counts_curated <- mean_counts_df %>% 
+  rownames_to_column(var = "SequenceID") %>%
+  left_join(taxfxn_mini) %>%
+  pivot_longer(cols = starts_with("mean."), names_to = "sample_tmp", values_to = "TPM") %>% 
+  mutate(Sample = str_remove(sample_tmp, "mean.")) %>% 
+  select(-sample_tmp, -SAMPLENAME) %>% 
+  unite(SAMPLENAME, PACIFIC_REGION, REGION, DEPTH_CATEGORY, sep = " ", remove = FALSE)
+```
+
+
+
 
 ## Extract z-score table
 
