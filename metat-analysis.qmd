@@ -67,7 +67,8 @@ Below R objects sourced by first isolating only the eukaryotic transcripts, aver
 ```{r, echo=TRUE, eval=FALSE}
 # | echo: true
 # | eval: false
-load(file = "input-data/Avg_scaled_tpm_08222023.RData", verbose = T)
+load(file = "/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData", verbose = TRUE)
+# load(file = "input-data/TPM-count-tables.RData")
 # taxfxn <- read.csv("TaxonomicAndFunctionalAnnotations.csv")
 ```
 
@@ -81,7 +82,7 @@ Import metadata as well.
   # right_join(metadata_tmp)
 
 # write.csv(sample_metadata, file = "input-data/sample-metadata.csv")
-sample_metadata_1 <- read.csv("input-data/sample-metadata.csv")
+sample_metadata_1 <- read.csv("../sample-metadata.csv")
 sample_metadata <- sample_metadata_1 %>% 
   mutate(SAMPLE_MATCH = sub("_[^_]+$", "", SAMPLE))
 sample_metadata
