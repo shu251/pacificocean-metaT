@@ -60,9 +60,7 @@ names(tax_order_color) <- (supergroup_order)
 
 Below, we will import the averaged (across replicates) and scaled transcript per million (TPM) values so we can look at the overall protistan community structure.
 
-## Input all TPM results
-
-Below R objects sourced by first isolating only the eukaryotic transcripts, averaging across replicates, and placing into long format.
+Start by importing all TPM results. Below R objects sourced by first isolating only the eukaryotic transcripts, averaging across replicates, and placing into long format.
 
 ```{r, echo=TRUE, eval=FALSE}
 # | echo: true
@@ -89,102 +87,53 @@ sample_metadata <- sample_metadata_1 %>%
 sample_metadata
 ```
 
-## Metatranscriptome stats
-
-Report total number of transcripts after assembly and annotation.
-
-```{r, echo=TRUE, eval=FALSE}
-# | echo: true
-# | eval: false
-# length(unique(taxfxn$SequenceID))
-# rows: 14,841,331
-# 14840771
-
-# length(unique(rownames(mean_counts_df)))
-# 14737135
+Import annotated TPMs
+```{r}
+# load("/scratch/group/hu-lab/pacocean-metaT/mean_counts_annotated.RData", verbose)
 ```
 
-The taxonomic and functional annotation output from Eukrhythmic has more than the total number of transcripts in the count table.
+## Whole community analysis z-score
 
-```{r, echo=TRUE, eval=FALSE}
-# | echo: true
-# | eval: false
-in_counts <- as.character(unique(row.names(mean_counts_df)))
+```{r}
+# load("zscore_whole_bytax.RData", verbose = TRUE)
+```
 
-subset_taxfxn <- taxfxn %>% 
-  filter(SequenceID %in% in_counts) %>% 
-  select(-X, -rownames, -ShortSeqID)
 
-table(subset_taxfxn$Domain)
 
-subset_taxfxn %>% 
-  filter(Domain == "Eukaryota") %>% 
-  group_by(Supergroup) %>% 
-    summarise(COUNT = n())
+Import z-score data frame for overview plot.
+```{r, fig.width=15, fig.height=6}
+ggplot(counts_zscore, aes(x = SequenceID, y = SAMPLENAME, fill = z_score_transcript)) +
+  geom_tile() +  theme(axis.text.x = element_blank(),
+                       axis.ticks = element_blank(),
+                       axis.text.y = element_text(color = "black")) +
+   scale_fill_stepsn(colors = c("#084594", "#4292c6","#c6dbef",
+                               "#eff3ff", "#fef0d9", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f"),
+                      # breaks = c(-1, -0.75, -0.5, -0.25 ,0, 1, 3, 5, 7, 10),
+                      # limits = c(-1, 11),
+                      guide = guide_coloursteps(even.steps = TRUE,
+                                                show.limits = TRUE)) +
+  labs(x = "Transcript signature", y = "")
+```
 
-subset_01 <- subset_taxfxn %>% 
-  filter(Domain == "Eukaryota") %>% 
-  filter(Supergroup != "Unclassified")
-dim(subset_01)
-total <- dim(subset_01)[1]
-# Number of unannotated
-kegg <- length(unique((subset_01 %>% 
-                         filter(KEGG_ko == "-"))$SequenceID))
-go <- length(unique((subset_01 %>% 
-                       filter(GOs == "-"))$SequenceID))
-pfam <- length(unique((subset_01 %>% 
-                         filter(PFAMs == "-"))$SequenceID))
-
-# What transcripts have both taxonomic and functional annotation?
-subset_02 <- subset_01 %>% 
-  filter(Phylum != "Unclassified" & (KEGG_ko != "-" | GOs != "-" | PFAMs != "-"))
-
+Import z-score scale by taxonomic groups to see how z-scores vary by group.
+```{r, fig.width=15, fig.height=20}
+ggplot(bytax_counts_zscore, aes(x = SequenceID, y = SAMPLENAME, fill = z_score_transcript)) +
+  geom_tile() +  theme(axis.text.x = element_blank(),
+                       axis.ticks = element_blank(),
+                       axis.text.y = element_text(color = "black")) +
+   scale_fill_stepsn(colors = c("#084594", "#4292c6","#c6dbef",
+                               "#eff3ff", "#fef0d9", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f"),
+                      # breaks = c(-1, -0.75, -0.5, -0.25 ,0, 1, 3, 5, 7, 10),
+                      # limits = c(-1, 11),
+                      guide = guide_coloursteps(even.steps = TRUE,
+                                                show.limits = TRUE)) +
+  facet_grid(rows = vars(SUPERGROUP)) +
+  labs(x = "Transcript signature", y = "")
 ```
 
 # Taxonomic composition & distribution
 
-Evaluate taxonomic diversity and composition across all sites.
-
-```{r, echo=TRUE, eval=FALSE}
-# | echo: true
-# | eval: false
-annotated_mean <- dplyr::left_join(mean_counts_df %>%
-                   mutate(SequenceID = rownames(mean_counts_df)),
-                                 taxfxn,
-                                 by = "SequenceID")
-# 14737135-14737693
-## 558 were duplicated
-```
-
-Remove the duplicated annotations and make a base taxonomic dataframe for downstream work.
-
-```{r, echo=TRUE, eval=FALSE}
-# | echo: true
-# | eval: false
-tax_plot <- annotated_mean %>% 
-  select(Domain:Species, starts_with("mean"), SequenceID) %>% 
-  distinct()
-# dim(tax_plot) #14737624\
-```
-
-```{r, echo=TRUE, eval=FALSE}
-# | echo: true
-# | eval: false
-# load("input-data/tax_plot_08222023.RData", verbose = TRUE)
-```
-
-```{r, echo=TRUE, eval=FALSE}
-# | echo: true
-# | eval: false
-tax_only <- tax_plot %>% 
-  select(-SequenceID) %>% 
-  pivot_longer(cols = starts_with("mean"), names_to = "SAMPLE", values_to = "scaledTPM") %>% 
-  group_by(SAMPLE, Domain, Supergroup, Phylum, Class, Order, Family, Genus, Species) %>% 
-    summarise(SUM_scaledTPM = sum(scaledTPM)) 
-
-```
-
-#### Local import
+Import pre-processed taxonomic information from `process-eukrhythmic-output` script and start here.
 
 ```{r}
 load("input-data/tax_only_08242023.RData", verbose = TRUE)
@@ -429,12 +378,30 @@ as.data.frame(annotated_mean %>%
   mutate(Percent_annotated = 100*(`Number annotated`/length(annotated_mean$SequenceID)))
 ```
 
-> Need to run the above on the HPC.
 
 
 # Ordination analysis
 
 Import center scaled data.
+
+```{r}
+# | echo: true
+# | eval: false
+load("/scratch/group/hu-lab/pacocean-metaT/vst_formatted_forlocaluse.RData", verbose = TRUE)
+# vst_format_subset, vst_format_all
+load("/scratch/group/hu-lab/pacocean-metaT/TOY_vst_formatted_forlocalus ")
+```
+
+```{r}
+# head(vst_format_subset)
+range(vst_format_subset$MEAN_VALUE)
+```
+
+```{r}
+load("/scratch/group/hu-lab/pacocean-metaT/TOY_vst_formatted_forloca  ")
+```
+
+
 
 ## PCoA with whole community functional profile
 
@@ -442,10 +409,13 @@ Ahead of time, normalized community composition data was center scaled. Below, w
 
 Import normalized center data. Below, principle component calculations were done on HPC.
 
+
+> TRY WITH VST DATA?
+
 ```{r, echo=TRUE, eval=FALSE}
 # | echo: true
 # | eval: false
-load("input-data/normed_center_df_08222023.RData", verbose = TRUE)
+# load("input-data/normed_center_df_08222023.RData", verbose = TRUE)
 ```
 
 ```{r, echo=TRUE, eval=FALSE}
@@ -497,6 +467,9 @@ pca_df %>%
 
 Making toy data set first, to test code.
 Need to input the processed center normalized data for below. 
+
+> TRY WITH VST DATA?
+
 ```{r}
 # install.packages("factoextra")
 library(factoextra)
@@ -538,202 +511,9 @@ dendro_plot_output
 > Save label order from above. Then put in the kmeans output.
 
 
+# K-means clustering
 
-# Untargeted - DE transcripts
-
-# Prep to address key questions (local)
-
-## Import KEGG IDs
-
-These have been curated.
-
-```{r}
-kegg <- read.csv("../KEGG_DB/combined_kegg.csv")
-# head(kegg$KO_number)
-curated_kegg <- read.csv("../KEGG_DB/reformat-kegg-pfam-skh.csv")
-
-key_geneid <- curated_kegg %>% 
-  select(-X) %>% 
-  right_join(kegg %>% select(KEGG = KO_number, everything(), -X)) %>% 
-  distinct() %>% 
-  select(starts_with("KeggOrthology_"), Category01, Category02, FullName, GeneID, Gene_identification, KEGG, PFAM, Descriptions, REF = REFs)
-```
-
-Subset key_geneid dataframe to select what we want from it.
-
-```{r}
-# head(key_geneid)
-# unique(key_geneid$KeggOrthology_B)
-
-kegg_ortho_based <- key_geneid %>% 
-  select(KeggOrthology_B, KEGG, GeneID, Gene_identification) %>% 
-  filter(!is.na(KeggOrthology_B)) %>% 
-  distinct()
-
-# dim(key_geneid)
-# dim(kegg_ortho_based)
-
-
-kegg_curated <- key_geneid %>% 
-  select(Category01, Category02, KEGG, GeneID, Gene_identification) %>% 
-  filter(!is.na(Category01)) %>% 
-  distinct()
-# dim(kegg_curated)
-# unique(kegg_curated$Category01)
-```
-
-Create ordered list for genes related to N and P metabolism.
-
-```{r}
-# head(curated_kegg)
-geneid_order_nuts <- as.character(curated_kegg %>% 
-  filter(Category01 == "N and P metabolism") %>% 
-  rownames_to_column(var = "ORDER") %>% 
-  select(ORDER, GeneID) %>% 
-    rbind(data.frame(ORDER = 0, GeneID = "Mean")) %>% 
-  distinct() %>% arrange(as.numeric(ORDER)) %>% 
-  select(GeneID) %>% 
-    .[["GeneID"]])
-geneid_order_nuts
-
-geneid_order_hets <- as.character(curated_kegg %>% 
-  filter(Category01 == "Phagotrophy") %>% 
-  rownames_to_column(var = "ORDER") %>% 
-  select(ORDER, Category02) %>% 
-    rbind(data.frame(ORDER = 0, Category02 = "Mean")) %>% 
-  arrange(as.numeric(ORDER)) %>%  
-  select(Category02) %>% distinct() %>%
-    .[["Category02"]]) 
-geneid_order_hets
-```
-
-## Prepare data frames for targeted approach
-
-Data for targeted sections is imported from `process-eukrhythmic-output` code titled *Curated genes only*.
-
-```{r}
-load("input-data/Avg_scaled_tpm_curated_08252023.RData", verbose = TRUE)
-```
-
-To address question 1, subset to a curated set of genes.
-
-```{r}
-counts_curated_annot <- counts_curated %>%
-  mutate(KEGG = str_remove(KEGG_ko, "ko:")) %>%
-  left_join(kegg_curated)
-
-counts_curated_kegg <- counts_curated %>%
-  mutate(KEGG = str_remove(KEGG_ko, "ko:")) %>%
-  left_join(kegg_ortho_based)
-# head(ctr_norm_curated)
-```
-
-```{r}
-load("input-data/normed_center_df_curated_08252023.RData", verbose = TRUE)
-# head(ctr_norm_curated)
-# colnames(ctr_norm_curated)
-```
-
-```{r}
-# Rename column headers
-names_orig <- colnames(ctr_norm_curated)
-names_new <- sub("_[^_]+$", "", names_orig)
-names_new
-colnames(ctr_norm_curated) <- names_new
-```
-
-Mean across columns that have the same name - which are replicates.
-
-```{r}
-# colnames(ctr_norm_curated)
-mean_ctr_df <- ctr_norm_curated %>%
-  cbind(as.list(.) %>%
-    Filter(is.numeric, .) %>%
-    split(names(.)) %>%
-    lapply(as.data.frame) %>%
-    lapply(rowMeans) %>%
-    setNames(paste0("mean.", names(.)))) %>% 
-  select(starts_with("mean"), SequenceID, ShortSeqID, Domain:Species, GOs, PFAMs, KEGG) %>% 
-  select(-mean.rownames, -mean.X)
-colnames(mean_ctr_df)
-```
-
-Join with KEGG information that is curated
-
-```{r}
-# Repeat with ctr_norm_curated
-ctr_curated_annot <- mean_ctr_df %>%
-  mutate(KEGG = str_remove(KEGG, "ko:")) %>%
-  left_join(kegg_curated)
-
-ctr_curated_kegg <- mean_ctr_df %>%
-  mutate(KEGG = str_remove(KEGG, "ko:")) %>%
-  left_join(kegg_ortho_based)
-
-```
-
-Use 'mean_ctr_df' for downstream targeted analyses.
-
-# mean_ctr_df
-
-```{r}
-dim(mean_ctr_df)
-glimpse(mean_ctr_df)
-
-# Play with toy dataset
-tmp <- mean_ctr_df %>% 
-  sample_n(100)
-```
-
-```{r}
-tmp2 <- mean_ctr_df %>% 
-  pivot_longer(cols = starts_with("mean."), names_to = "SAMPLE01", values_to = "CTR") %>% 
-  mutate(SAMPLE_TMP = str_remove(SAMPLE01, "mean.")) %>% 
-  mutate(SAMPLE02 = factor(SAMPLE_TMP, levels = rev(sample_order_month), labels = rev(sample_order_month_RENAME))) %>% 
-  group_by(SAMPLE02, SequenceID, pick(Domain:KEGG)) %>% 
-    summarise(CTR_mod = mean(CTR)) %>% 
-  distinct()
-
-mid_point <- mean(tmp2$CTR_mod)
-```
-
-```{r}
-order_spot_surf <- tmp2 %>% 
-  filter(SAMPLE02 == "SPOT surface") %>% 
-  arrange(CTR_mod)
-# head(order_spot_surf)
-?unique()
-order_seqid <- as.character(unique(order_spot_surf$SequenceID))
-```
-
-change so aloha and CA samples are arranged by the first surface sample - look at prefiltering
-
-```{r}
-tmp2 %>% 
-  mutate(SEQID_ORDER = factor(SequenceID, levels = order_seqid)) %>% 
-  ggplot(aes(y = SAMPLE02, x = SEQID_ORDER, fill = CTR_mod)) +
-  geom_tile() +
-  theme(axis.text.x = element_blank()) +
-  # scale_fill_gradient2(low = "blue", mid = "white", high = "red", 
-  #                      midpoint = mid_point, na.value = NA,
-  #                      space = "Lab")
-  # scale_fill_steps(
-  #   name = waiver(),
-  #   low = "#2b8cbe",
-  #   high = "#e34a33",
-  #   space = "Lab",
-  #   na.value = "grey50",
-  #   guide = "coloursteps",
-  #   aesthetics = "fill")
-  scale_fill_stepsn(colors = c("#084594", "#4292c6","#c6dbef",
-                               "#eff3ff", "#fef0d9", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f"),
-                      breaks = c(-1, -0.75, -0.5, -0.25 ,0, 1, 3, 5, 7, 10),
-                      # limits = c(-1, 11),
-                      guide = guide_coloursteps(even.steps = TRUE,
-                                                show.limits = TRUE))
-```
-
-# k-means clustering
+> Try with the VST data!
 
 Explanation of kmeans clustering.
 
@@ -938,6 +718,223 @@ TPM_wcluster %>%
   labs(y = "TPM", x = "")
 ```
 
+
+
+
+
+# Import KEGG IDs
+
+These have been curated.
+
+```{r}
+kegg <- read.csv("../KEGG_DB/combined_kegg.csv")
+# head(kegg$KO_number)
+curated_kegg <- read.csv("../KEGG_DB/reformat-kegg-pfam-skh.csv")
+
+key_geneid <- curated_kegg %>% 
+  select(-X) %>% 
+  right_join(kegg %>% select(KEGG = KO_number, everything(), -X)) %>% 
+  distinct() %>% 
+  select(starts_with("KeggOrthology_"), Category01, Category02, FullName, GeneID, Gene_identification, KEGG, PFAM, Descriptions, REF = REFs)
+```
+
+Subset key_geneid dataframe to select what we want from it.
+
+```{r}
+# head(key_geneid)
+# unique(key_geneid$KeggOrthology_B)
+
+kegg_ortho_based <- key_geneid %>% 
+  select(KeggOrthology_B, KEGG, GeneID, Gene_identification) %>% 
+  filter(!is.na(KeggOrthology_B)) %>% 
+  distinct()
+
+# dim(key_geneid)
+# dim(kegg_ortho_based)
+
+
+kegg_curated <- key_geneid %>% 
+  select(Category01, Category02, KEGG, GeneID, Gene_identification) %>% 
+  filter(!is.na(Category01)) %>% 
+  distinct()
+# dim(kegg_curated)
+# unique(kegg_curated$Category01)
+```
+
+Create ordered list for genes related to N and P metabolism.
+
+```{r}
+# head(curated_kegg)
+geneid_order_nuts <- as.character(curated_kegg %>% 
+  filter(Category01 == "N and P metabolism") %>% 
+  rownames_to_column(var = "ORDER") %>% 
+  select(ORDER, GeneID) %>% 
+    rbind(data.frame(ORDER = 0, GeneID = "Mean")) %>% 
+  distinct() %>% arrange(as.numeric(ORDER)) %>% 
+  select(GeneID) %>% 
+    .[["GeneID"]])
+geneid_order_nuts
+
+geneid_order_hets <- as.character(curated_kegg %>% 
+  filter(Category01 == "Phagotrophy") %>% 
+  rownames_to_column(var = "ORDER") %>% 
+  select(ORDER, Category02) %>% 
+    rbind(data.frame(ORDER = 0, Category02 = "Mean")) %>% 
+  arrange(as.numeric(ORDER)) %>%  
+  select(Category02) %>% distinct() %>%
+    .[["Category02"]]) 
+geneid_order_hets
+```
+
+# Question 1 - N&P metabolism in the euphotic region
+
+
+Load only curated TPM information
+```{r}
+load(file = "/scratch/group/hu-lab/pacocean-metaT/mean_counts_curated_only.RData", verbose = TRUE)
+```
+
+# Question 2 - Heterotrophic modes of nutrition
+
+
+Load only curated TPM information
+```{r}
+load(file = "/scratch/group/hu-lab/pacocean-metaT/mean_counts_curated_only.RData", verbose)
+```
+
+
+# BREAK
+# Untargeted - DE transcripts
+
+# Prep to address key questions (local)
+
+
+
+## Prepare data frames for targeted approach
+
+Data for targeted sections is imported from `process-eukrhythmic-output` code titled *Curated genes only*.
+
+```{r}
+load("input-data/Avg_scaled_tpm_curated_08252023.RData", verbose = TRUE)
+```
+
+To address question 1, subset to a curated set of genes.
+
+```{r}
+counts_curated_annot <- counts_curated %>%
+  mutate(KEGG = str_remove(KEGG_ko, "ko:")) %>%
+  left_join(kegg_curated)
+
+counts_curated_kegg <- counts_curated %>%
+  mutate(KEGG = str_remove(KEGG_ko, "ko:")) %>%
+  left_join(kegg_ortho_based)
+# head(ctr_norm_curated)
+```
+
+```{r}
+load("input-data/normed_center_df_curated_08252023.RData", verbose = TRUE)
+# head(ctr_norm_curated)
+# colnames(ctr_norm_curated)
+```
+
+```{r}
+# Rename column headers
+names_orig <- colnames(ctr_norm_curated)
+names_new <- sub("_[^_]+$", "", names_orig)
+names_new
+colnames(ctr_norm_curated) <- names_new
+```
+
+Mean across columns that have the same name - which are replicates.
+
+```{r}
+# colnames(ctr_norm_curated)
+mean_ctr_df <- ctr_norm_curated %>%
+  cbind(as.list(.) %>%
+    Filter(is.numeric, .) %>%
+    split(names(.)) %>%
+    lapply(as.data.frame) %>%
+    lapply(rowMeans) %>%
+    setNames(paste0("mean.", names(.)))) %>% 
+  select(starts_with("mean"), SequenceID, ShortSeqID, Domain:Species, GOs, PFAMs, KEGG) %>% 
+  select(-mean.rownames, -mean.X)
+colnames(mean_ctr_df)
+```
+
+Join with KEGG information that is curated
+
+```{r}
+# Repeat with ctr_norm_curated
+ctr_curated_annot <- mean_ctr_df %>%
+  mutate(KEGG = str_remove(KEGG, "ko:")) %>%
+  left_join(kegg_curated)
+
+ctr_curated_kegg <- mean_ctr_df %>%
+  mutate(KEGG = str_remove(KEGG, "ko:")) %>%
+  left_join(kegg_ortho_based)
+
+```
+
+Use 'mean_ctr_df' for downstream targeted analyses.
+
+# mean_ctr_df
+
+```{r}
+dim(mean_ctr_df)
+glimpse(mean_ctr_df)
+
+# Play with toy dataset
+tmp <- mean_ctr_df %>% 
+  sample_n(100)
+```
+
+```{r}
+tmp2 <- mean_ctr_df %>% 
+  pivot_longer(cols = starts_with("mean."), names_to = "SAMPLE01", values_to = "CTR") %>% 
+  mutate(SAMPLE_TMP = str_remove(SAMPLE01, "mean.")) %>% 
+  mutate(SAMPLE02 = factor(SAMPLE_TMP, levels = rev(sample_order_month), labels = rev(sample_order_month_RENAME))) %>% 
+  group_by(SAMPLE02, SequenceID, pick(Domain:KEGG)) %>% 
+    summarise(CTR_mod = mean(CTR)) %>% 
+  distinct()
+
+mid_point <- mean(tmp2$CTR_mod)
+```
+
+```{r}
+order_spot_surf <- tmp2 %>% 
+  filter(SAMPLE02 == "SPOT surface") %>% 
+  arrange(CTR_mod)
+# head(order_spot_surf)
+?unique()
+order_seqid <- as.character(unique(order_spot_surf$SequenceID))
+```
+
+change so aloha and CA samples are arranged by the first surface sample - look at prefiltering
+
+```{r}
+tmp2 %>% 
+  mutate(SEQID_ORDER = factor(SequenceID, levels = order_seqid)) %>% 
+  ggplot(aes(y = SAMPLE02, x = SEQID_ORDER, fill = CTR_mod)) +
+  geom_tile() +
+  theme(axis.text.x = element_blank()) +
+  # scale_fill_gradient2(low = "blue", mid = "white", high = "red", 
+  #                      midpoint = mid_point, na.value = NA,
+  #                      space = "Lab")
+  # scale_fill_steps(
+  #   name = waiver(),
+  #   low = "#2b8cbe",
+  #   high = "#e34a33",
+  #   space = "Lab",
+  #   na.value = "grey50",
+  #   guide = "coloursteps",
+  #   aesthetics = "fill")
+  scale_fill_stepsn(colors = c("#084594", "#4292c6","#c6dbef",
+                               "#eff3ff", "#fef0d9", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f"),
+                      breaks = c(-1, -0.75, -0.5, -0.25 ,0, 1, 3, 5, 7, 10),
+                      # limits = c(-1, 11),
+                      guide = guide_coloursteps(even.steps = TRUE,
+                                                show.limits = TRUE))
+```
 
 
 # Question 1

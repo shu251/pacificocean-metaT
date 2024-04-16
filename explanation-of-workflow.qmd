@@ -8,22 +8,54 @@ editor: visual
 
 # Compilation of eukrhythmic output
 
-## run_tximport.R
+Script ```process-eukrhythmic-output.qmd``` starts with taking the output files from the eukrhythmic pipeline and compiling it so it can be processed in R.
 
-Script takes output from salmon counts and modifies for the gene length across all samples. The outcome will be the transcript-level estimates. 
+
+## Initial set of compilation scripts:
+
+### `collate-results.py`
+
+`collate-results.py`: *description of code*
+
+\~Arianna - how do you want to handle this?\~
+
+> Notes for Sarah & Arianna: hopefully we can include a description of taking outputs from eukrhythmic and putting them in specific directories, etc. that can go stright into the run_tximport.R below.
+
+### `run_tximport.R`
+
+*Import library normalized count data*: Script takes output from salmon counts and modifies for the gene length across all samples. The outcome will be the transcript-level estimates.
+
+R script to run this: `scripts/run_tximport.R`.
+
+Our goal is to take eukrhthymic estimated counts (from salmon) to get transcript-level abundance estimates that will account for gene length. The outcome from this is that we get average transcript length across samples. For this we want to import all data into DESeq using tximport as an interface.
+
+-   tximport
+    -   *Why tximport*? tximport allows us to correct for the changes in gene length across our samples. This way we can use transcript-level estimates for our metatranscriptomic analysis. Also, tximport knows the output from salmon, so we can easily put the salmon output into tximport. Then it can link directly to edgeR or DESeq2.
+-   DESeq
+    -   DESeq: Love, M.I., Huber, W., Anders, S. (2014) Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. Genome Biology, 15:550. 10.1186/s13059-014-0550-8
+    -   Explaination using DESeq: https://hbctraining.github.io/DGE_workshop/lessons/02_DGE_count_normalization.html
+    -   https://bioconductor.org/packages/release/bioc/manuals/DESeq2/man/DESeq2.pdf
+
+Script takes output from salmon counts and modifies for the gene length across all samples. The outcome will be the transcript-level estimates.
 
 Output file is *tximport_metaT-ALOHA-CA.Rdata*
 
+## Generate usable data frames to process in R
+
+1. Use DESeq to import from tximport functions.
+2. Create different types of dataframes for downstream processing, including 
+
+#### Center-scaled data using VST and RLOG
 
 # List of Rdata files
 
-1. `tximport_metaT-ALOHA-CA.Rdata` - output from `run_tximport.R`. Items include `txi` and `sample_merged`. These can be directly input into DESeq functions.
+1.  `tximport_metaT-ALOHA-CA.Rdata` - output from `run_tximport.R`. Items include `txi` and `sample_merged`. These can be directly input into DESeq functions.
+###
+2.  `Avg_scaled_tpm_08222023.RData` - from the tximport library, we can use the function "makeCountsFromAbundance" to generate scaledTPM outputs. Since columns include replicates, we averaged the scaled TPM across replicate samples to generate `mean_counts_df`.
 
-2. `Avg_scaled_tpm_08222023.RData` - from the tximport library, we can use the function "makeCountsFromAbundance" to generate scaledTPM outputs. Since columns include replicates, we averaged the scaled TPM across replicate samples to generate `mean_counts_df`.
+3.  `normed_center_df_08222023.RData` - includes `df_ctr_norm` dataframe that used the variance stabilizing transformation (vst) to estimate dispersion from the DESeq object.
+####
 
-3. `normed_center_df_08222023.RData` - includes `df_ctr_norm` dataframe that used the variance stabilizing transformation (vst) to estimate dispersion from the DESeq object. 
+4.  `zscore_outputs.RData` = includes z-score scaled data, after removal of transcripts that appeared in only 1 sample and that added to less than 10. Z-score transformation with replicates and without replicates (averaged across replicates first).
 
-4. `zscore_outputs.RData` = includes z-score scaled data, after removal of transcripts that appeared in only 1 sample and that added to less than 10. Z-score transformation with replicates and without replicates (averaged across replicates first).
-
-
-5. kmeans
+5.  kmeans
