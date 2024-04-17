@@ -57,7 +57,8 @@ cat("\n\n Isolate curated TPMs only\n\n")
 
 mean_counts_curated_only <- curated_kegg %>% 
   left_join(mean_counts_annotated %>% 
-              mutate(KEGG = str_remove(KEGG_ko, "ko:"))) %>%
+              mutate(KEGG = str_remove(KEGG_ko, "ko:")))
+
 save(mean_counts_curated_only, file = "/scratch/group/hu-lab/pacocean-metaT/mean_counts_curated_only.RData")
   
 cat("\n\n A look at mean_counts_curated_only\n\n")

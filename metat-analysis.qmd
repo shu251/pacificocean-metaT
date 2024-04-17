@@ -65,10 +65,10 @@ Start by importing all TPM results. Below R objects sourced by first isolating o
 ```{r, echo=TRUE, eval=FALSE}
 # | echo: true
 # | eval: false
-load(file = "/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData", verbose = TRUE)
+# load(file = "/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData", verbose = TRUE)
 
 # load(file = "input-data/TPM-count-tables.RData")
-load(file = "input-data/annot_files.Rdata")
+load(file = "input-data/annot_files.RData")
 ```
 
 Import metadata as well.
@@ -95,10 +95,12 @@ Import annotated TPMs
 ## Whole community analysis z-score
 
 ```{r}
-# load("zscore_whole_bytax.RData", verbose = TRUE)
+load("/scratch/group/hu-lab/pacocean-metaT/zscore_whole_and_bytax.RData", verbose = TRUE)
 ```
+make a toy dataset to use here and write a script later
+```{r}
 
-
+```
 
 Import z-score data frame for overview plot.
 ```{r, fig.width=15, fig.height=6}
@@ -787,7 +789,6 @@ geneid_order_hets
 ```
 
 # Question 1 - N&P metabolism in the euphotic region
-
 
 Load only curated TPM information
 ```{r}

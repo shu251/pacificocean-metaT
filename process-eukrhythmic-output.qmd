@@ -421,7 +421,7 @@ mean_counts_curated_only <- curated_kegg %>%
 save(mean_counts_curated_only, file = "/scratch/group/hu-lab/pacocean-metaT/mean_counts_curated_only.RData")
 ```
 
-> Use above to address targeted questions 1 and 2.
+
 
 
 # Metatranscriptome stats
