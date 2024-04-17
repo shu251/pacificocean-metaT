@@ -1,0 +1,32 @@
+---
+title: "Data workflow"
+format:
+  html:
+    code-overflow: wrap
+editor: visual
+---
+
+# Compilation of eukrhythmic output
+
+Output from eukrhythmic is processed in the `process-eukrhythmic-output` script. This starts with compilation scripts and then goes into a series of generating count files that will be necessary for downstream analysis. 
+
+
+# List of Rdata files
+
+1. `tximport_metaT-ALOHA-CA.Rdata` - output from `run_tximport.R`. Items include `txi` and `sample_merged`. These can be directly input into DESeq functions.
+
+
+2. Transformed and scaled data.
+
+`rlog_formatted_forlocaluse.RData`
+`vst_formatted_forlocaluse.RData`
+
+
+PREVIOUSLY: Avg_scaled_tpm_08222023.RData`
+2. `TPM-count-tables.RData` - from the tximport library, we can use the function "makeCountsFromAbundance" to generate scaledTPM outputs. Since columns include replicates, we averaged the scaled TPM across replicate samples to generate `mean_counts_df`. A TPM table with replicates is also included.
+
+
+4. `zscore_outputs.RData` - includes z-score scaled data, after removal of transcripts that appeared in only 1 sample and that added to less than 10. After filtering transcripts, TPM was averaged across replicates. Then the Z-score transformation was done (`scale()`). This was combined with the annotation information and saved.
+
+
+5. kmeans
