@@ -21,10 +21,8 @@ ds_tpm_samplename <- DESeqDataSetFromTximport(txi,
 keep <- rowSums(counts(ds_tpm_samplename)) >= 10
 dds_subset <- ds_tpm_samplename[keep,]
 
-
-
 # Run DESeq
-## Estimates dispersion\
+## Estimates dispersion
 
 dds_dis_all <- DESeq(ds_tpm_samplename)
 # res_all <- results(dds_dis_all)
@@ -32,20 +30,21 @@ dds_dis_all <- DESeq(ds_tpm_samplename)
 dds_dis_subset <- DESeq(dds_subset)
 # res_subset <- results(dds_dis_subset)
 
-cat("\n\n Done with DESeq steps \n\n")
+save(dds_dis_all, dds_dis_subset, file = "/scratch/group/hu-lab/pacocean-metaT/DESeq_Robjs_04142024.RData")
+cat("\n\nDone with DESeq steps, saved\n\n")
 
 # Estiamte scaled datasets by VST
-vst_all <- vst(dds_dis_all, blind = FALSE) 
-vst_subset <- vst(dds_dis_subset, blind = FALSE)
+#vst_all <- vst(dds_dis_all, blind = FALSE) 
+#vst_subset <- vst(dds_dis_subset, blind = FALSE)
 
 # Get data frames 
-df_ctr_norm_vst <- as.data.frame(assay(vst_all))
-df_ctr_norm_subset_vst <- as.data.frame(assay(vst_subset))
+#df_ctr_norm_vst <- as.data.frame(assay(vst_all))
+#df_ctr_norm_subset_vst <- as.data.frame(assay(vst_subset))
 
-save(vst_all, vst_subset, df_ctr_norm_vst, df_ctr_norm_subset_vst,
-     file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_vst.RData")
+#save(vst_all, vst_subset, df_ctr_norm_vst, df_ctr_norm_subset_vst,
+#     file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_vst.RData")
 
-cat("\n\n Saved VST output \n\n")
+cat("\n\nSaved VST output\n\n")
 
 # Repeat for rlog transformed data
 rld_all <- rlog(dds_dis_all, blind = FALSE)
@@ -55,4 +54,13 @@ df_ctr_norm_rld <- as.data.frame(assay(rld_all))
 df_ctr_norm_subset_rld <- as.data.frame(assay(rld_subset))
 
 save(rld_all, rld_subset, df_ctr_norm_rld, df_ctr_norm_subset_rld, file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_rld.RData")
-cat("\n\n Saved Rlog output \n\n")
+cat("\n\nSaved Rlog output\n\n")
+
+toy_df_ctr_norm_rld <- df_ctr_norm_rld %>% 
+  sample_n(600)
+
+toy_df_ctr_norm_subset_rld <- df_ctr_norm_subset_rld %>% 
+  sample_n(600)
+
+save(toy_df_ctr_norm_rld, toy_df_ctr_norm_subset_rld, file = "/scratch/group/hu-lab/pacocean-metaT/TOY_normed_dfs_rld.RData")
+cat("\n\nSaved toy dataset - complete\n\n")

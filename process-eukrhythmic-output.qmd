@@ -30,13 +30,6 @@ editor: visual
 -   `04-compare`
     -   `14-MAD-mapping-filtered`: location of individual salmon outputs for all samples (quant.sf)
 
-## Compilation scripts
-
-`collate-results.py`: *description of code*
-
-\~Arianna - how do you want to handle this?\~
-
-> Notes for Sarah & Arianna: hopefully we can include a description of taking outputs from eukrhythmic and putting them in specific directories, etc. that can go stright into the run_tximport.R below.
 
 ## Import library normalized count data
 
@@ -55,33 +48,31 @@ Script takes output from salmon counts and modifies for the gene length across a
 
 Output file is *tximport_metaT-ALOHA-CA.Rdata*
 
-## Set up R environment
+# Set up R environment
 
-Library required to execute code in R
+R libraries required to execute code in R. Load necessary libraries & get number of available threads for data.table.
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
+# | message: false
+# | warning: false
 ## Installations
 # if (!require("BiocManager", quietly = TRUE))
 #     install.packages("BiocManager")
 # BiocManager::install("DESeq2")
 # BiocManager::install("tximport")
-```
-
-Load necessary libraries & get number of available threads for data.table.
-
-```{r}
-# | message: false
-# | warning: false
 library(data.table)
 library(tidyr)
 library(dplyr)
 library(tximport)
 library(readr)
 num_threads <- getDTthreads()
+
 # Conflicts between tidyverse and data.table can be ignored
+library(DESeq2)
+library(tidyverse)
 ```
 
-Output files from`run_tximport.R` provide an RData file that can be used for the DESeq input file (`tximport_metaT-ALOHA-CA.Rdata`).
+Output files from`run_tximport.R` provides an RData file that can be used for the DESeq input file (`tximport_metaT-ALOHA-CA.Rdata`).
 
 # Generate count tables using DESeq2
 
@@ -89,8 +80,7 @@ Import as DESeq object from tximport.
 
 ```{r}
 # | message: false
-library(DESeq2)
-library(tidyverse)
+# | warning: false
 load("/scratch/group/hu-lab/pacocean-metaT/tximport_metaT-ALOHA-CA.Rdata", verbose = TRUE)
 # colData : Rows of colData correspond to columns of countData
 # design ~ x == serves the purpose of considering biological replicates
@@ -101,20 +91,22 @@ Working with R objects, `txi` (output from txi import script) and `sample_merged
 For below count tables, we can also add in annotation information.
 
 ```{r}
-taxfxn <- read.csv("/scratch/group/hu-lab/pacocean-metaT/TaxonomicAndFunctionalAnnotations.csv")
+# taxfxn <- read.csv("/scratch/group/hu-lab/pacocean-metaT/TaxonomicAndFunctionalAnnotations.csv")
 
 # Isolate what is needed from tax and fxn annotations for most analyses.
-taxfxn_mini <- taxfxn %>%
-  select(SequenceID, Domain:Species, PFAMs, KEGG_ko)
+# taxfxn_mini <- taxfxn %>%
+  # select(SequenceID, Domain:Species, PFAMs, KEGG_ko)
+# save(taxfxn_mini, sample_merged, file = "input-data/annot_files.RData")
+
+# Alternatively, load necessary files
+load("input-data/annot_files.RData", verbose = TRUE)
 ```
 
-## Use DESeq to export TPM values & transformed data
+## Import as DESeq object
 
-See `pacificocean-metaT/scripts/run_deseq_vst_rlog_transformed.R`.
+See Rscript to run this `pacificocean-metaT/scripts/run_deseq_vst_rlog_transformed.R`.
 
-For taxonomic bar plot and overall cluster analysis. (March and July are separate at ALOHA)
-
-See how to set up subsetting? https://github.com/WHOIGit/super-waffle/blob/main/01_seqpain_deseq.R
+See how to set up subsetting: https://github.com/WHOIGit/super-waffle/blob/main/01_seqpain_deseq.R
 
 ```{r}
 ds_tpm_samplename <- DESeqDataSetFromTximport(txi,
@@ -123,7 +115,7 @@ ds_tpm_samplename <- DESeqDataSetFromTximport(txi,
 
 ```
 
-*optional*: subset data to keep only transcripts with \>10 tpm.
+Subset data to keep only transcripts with \>10 tpm.
 
 ```{r}
 keep <- rowSums(counts(ds_tpm_samplename)) >= 10
@@ -140,6 +132,10 @@ dds_dis_all <- DESeq(ds_tpm_samplename)
 
 dds_dis_subset <- DESeq(dds_subset)
 # res_subset <- results(dds_dis_subset)
+
+
+# DESeq objects saved. Dispersions have been estimated for downstream stats.
+# save(dds_dis_all, dds_dis_subset, file = "/scratch/group/hu-lab/pacocean-metaT/DESeq_Robjs_04142024.RData")
 ```
 
 ## Extract centered data
@@ -151,6 +147,7 @@ Use `vst` command to estimate dispersion. Variance stabilizing transformations (
 VST and rlog remove dependence of the variance on the mean. Both transformations consider the experiment specific trend of variance instead of the mean.
 
 Above, the `DESeq()` was already run, so dispersions were estimated. Therefore use `blind = FALSE` below.
+
 
 ```{r}
 # Estiamte scaled datasets by VST
@@ -174,21 +171,39 @@ df_ctr_norm_subset_rld <- as.data.frame(assay(rld_subset))
 
 Output from `pacificocean-metaT/scripts/run_deseq_vst_rlog_transformed.R`.
 
+Save this centered data (2 ways) and reformat with annotations and more (see function below)
 ```{r}
-save(rld_all, rld_subset, df_ctr_norm_rld, df_ctr_norm_subset_rld, file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_rld.RData")
+# save(rld_all, rld_subset, df_ctr_norm_rld, df_ctr_norm_subset_rld, file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_rld.RData")
+# 
+# save(vst_all, vst_subset, df_ctr_norm_vst, df_ctr_norm_subset_vst,
+#      file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_vst.RData")
 
-save(vst_all, vst_subset, df_ctr_norm_vst, df_ctr_norm_subset_vst,
-     file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_vst.RData")
+# load("/scratch/group/hu-lab/pacocean-metaT/normed_dfs_vst.RData", verbose = TRUE)
+# load("/scratch/group/hu-lab/pacocean-metaT/normed_dfs_rld.RData", verbose = TRUE)
 ```
 
-### Function to combine replicates and include annotation information for normalized dataframes
+
+TOY dataset to work with.
+```{r}
+# toy_df_ctr_norm_rld <- df_ctr_norm_rld %>% 
+#   sample_n(600)
+# 
+# toy_df_ctr_norm_subset_rld <- df_ctr_norm_subset_rld %>% 
+#   sample_n(600)
+# 
+# save(toy_df_ctr_norm_rld, toy_df_ctr_norm_subset_rld, file = "/scratch/group/hu-lab/pacocean-metaT/TOY_normed_dfs_rld.RData")
+```
+
+
+Function to combine replicates and include annotation information for normalized dataframes
 
 Below is also a function in the scripts directory to assemble output dataframes with annotation information and average across replicates.
 
-See script: `pacificocean-metaT/scripts/run_deseq_vst_rlog_transformed.R`
+See script: `pacificocean-metaT/scripts/run_transformed_df_reformatting.R`.
 
 ```{r}
 convert_format_scaled <- function(df){
+  all_samples_col_header <- colnames(df)
   df %>% 
   # sample_n(1000) %>% #uncomment for testing
   rownames_to_column(var = "SequenceID") %>% 
@@ -202,18 +217,33 @@ convert_format_scaled <- function(df){
 ```
 
 ```{r}
-rlog_format_subset <- convert_format_scaled(df_ctr_norm_subset_rld)
-rlog_format_all <- convert_format_scaled(df_ctr_norm_rld)
+# rlog_format_subset <- convert_format_scaled(df_ctr_norm_subset_rld)
+# rlog_format_all <- convert_format_scaled(df_ctr_norm_rld)
+# 
+# save(rlog_format_subset, rlog_format_all, file = "/scratch/group/hu-lab/pacocean-metaT/rlog_formatted_forlocaluse.RData")
+# cat("\n\n Done with rlog \n\n")
 
-save(rlog_format_subset, rlog_format_all, file = "/scratch/group/hu-lab/pacocean-metaT/rlog_formatted_forlocaluse.RData")
-cat("\n\n Done with rlog \n\n")
 
+# vst_format_subset <- convert_format_scaled(df_ctr_norm_subset_vst)
+# vst_format_all <- convert_format_scaled(df_ctr_norm_vst)
 
-vst_format_subset <- convert_format_scaled(df_ctr_norm_subset_vst)
-vst_format_all <- convert_format_scaled(df_ctr_norm_vst)
-
-save(vst_format_subset, vst_format_all, file = "/scratch/group/hu-lab/pacocean-metaT/vst_formatted_forlocaluse.RData")
+# save(vst_format_subset, vst_format_all, file = "/scratch/group/hu-lab/pacocean-metaT/vst_formatted_forlocaluse.RData")
 ```
+
+
+Generate a TOY dataset to work with locally.
+```{r}
+# TOY_vst_format_subset <- vst_format_subset %>% 
+#   sample_n(600)
+# 
+# TOY_vst_format_all <- vst_format_all %>% 
+#   sample_n(600)
+# 
+# save("/scratch/group/hu-lab/pacocean-metaT/TOY_vst_formatted_forlocaluse.RData")
+load("/scratch/group/hu-lab/pacocean-metaT/TOY_vst_formatted_forlocaluse.RData")
+```
+
+> From here, move to **Ordination analysis** in the `metat-analysis.qmd` script.
 
 ## Extract count table
 
@@ -221,7 +251,6 @@ Start again with the `txi` object and get scaled TPM values.
 
 ```{r}
 # load("/scratch/group/hu-lab/pacocean-metaT/tximport_metaT-ALOHA-CA.Rdata", verbose = TRUE)
-
 library(tximport)
 
 counts_scaled <- makeCountsFromAbundance(
@@ -257,67 +286,325 @@ mean_counts_df <- counts_df %>%
 ```
 
 ```{r}
-save(counts_withreps, mean_counts_df, sample_merged, file = "/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData")
+# save(counts_withreps, mean_counts_df, sample_merged, file = "/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData")
 ```
 
-## Extract z-score table
+
+### Set up toy dataset
+```{r}
+load("/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData", verbose = TRUE)
+load("/scratch/group/hu-lab/pacocean-metaT/TOY_TPM-count-tables.RData", verbose = TRUE)
+# TOY_mean_counts_df <- mean_counts_df %>% 
+  sample_n(600)
+# save(sample_merged, TOY_mean_counts_df, file = "/scratch/group/hu-lab/pacocean-metaT/TOY_TPM-count-tables.RData")
+```
+
+
+## Annotate count table
+
+```{r}
+# mean_counts_df <- TOY_mean_counts_df
+
+mean_counts_annotated <- mean_counts_df %>% 
+  rownames_to_column(var = "SequenceID") %>%
+  left_join(taxfxn_mini) %>%
+  pivot_longer(cols = starts_with("mean."), names_to = "sample_tmp", values_to = "TPM") %>% 
+  filter(TPM > 0) %>% 
+  mutate(Sample = str_remove(sample_tmp, "mean.")) %>% 
+  left_join(sample_merged) %>% 
+  select(-sample_tmp, -SAMPLENAME) %>% 
+  unite(SAMPLENAME, PACIFIC_REGION, REGION, DEPTH_CATEGORY, sep = " ", remove = FALSE)
+
+# save(mean_counts_annotated, file = "/scratch/group/hu-lab/pacocean-metaT/mean_counts_annotated.RData")
+# save(mean_counts_annotated, file = "/scratch/group/hu-lab/pacocean-metaT/TOY_mean_counts_annotated.RData")
+```
+
+
+### Extract z-score table
 
 Standardizing to z-scores will make it easier to compare across the large dataset. And we will be able to detect outliers and anomalies.
 
 First to do some data quality control based on data table that includes all replicates.
 
-```{r}
-load("/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData")
-# head(counts_withreps)
-```
-
-Remove transcripts that sum to less than 1, and remove transcripts that appear in only 1 sample.
 
 ```{r}
-# With replicates:
-qc_df_wreps <- counts_withreps %>%
-  filter(rowSums(across(where(is.numeric), ~.x!=0))>1) %>% # samples appear more than 2 times
-  filter(rowSums(across(where(is.numeric)))>10) # total sum of transcript across dataset is > 10
-
-dim(qc_df_wreps)[1] / dim(counts_withreps)[1] # Keeping 61% of data
+# load("/scratch/group/hu-lab/pacocean-metaT/mean_counts_annotated.RData", verbose = TRUE)
+# glimpse(mean_counts_annotated)
 ```
 
-Now average across replicates
+#### Calculate Z-score over all transcripts.
 
 ```{r}
-names_orig_qc <- colnames(qc_df_wreps)
-names_new_qc <- sub("_[^_]+$", "", names_orig)
-colnames(qc_df_wreps) <- names_new_qc
-# colnames(qc_df_wreps)
+counts_zscore <- mean_counts_annotated %>% 
+  group_by(SequenceID) %>% 
+  mutate(sd_01 = sd(TPM), SD = case_when(sd_01 == 0 ~ 1,
+                                         is.na(sd_01) ~ 1,
+                                         TRUE ~ sd_01),
+         z_score_transcript = (TPM - mean(TPM)) / SD)
 
-qc_df_subset_noreps <- qc_df_wreps %>%
-  cbind(as.list(.) %>%
-    Filter(is.numeric, .) %>%
-    split(names(.)) %>%
-    lapply(as.data.frame) %>%
-    lapply(rowMeans) %>%
-    setNames(paste0("mean.", names(.)))) %>% 
-  select(starts_with("mean"))
+cat("range:")
+range(counts_zscore$z_score_transcript)
+```
 
-# range(qc_df_subset_noreps)
-head(qc_df_subset_noreps)
+
+#### Calculate Z-score over transcripts by species
+```{r}
+# head(mean_counts_annotated)
+```
+
+```{r, fig.height=20, fig.width=10}
+bytax_counts_zscore <-  mean_counts_annotated %>%
+  mutate(across(c(Domain, Supergroup, Phylum, Class, Order, Family, Genus, Species), ~ as.character(str_squish(.)))) %>% 
+  filter(Domain == "Eukaryota") %>% 
+  # Taxonomic group curation
+  mutate(SUPERGROUP = case_when(
+    Supergroup == "Alveolata" ~ paste(Supergroup, Phylum, sep = "-"),
+    (Class == "Bacillariophyta" & Supergroup == "Stramenopiles") ~ paste(Supergroup, "Diatom", sep = "-"),
+    (Class != "Bacillariophyta" & Supergroup == "Stramenopiles") ~ paste(Supergroup, "Other", sep = "-"),
+    Supergroup == "Archaeplastida" ~ "Chlorophyte",
+    TRUE ~ Supergroup
+  )) %>% 
+  group_by(SequenceID, SUPERGROUP) %>% 
+  mutate(sd_01 = sd(TPM), SD = case_when(sd_01 == 0 ~ 1,
+                                         is.na(sd_01) ~ 1,
+                                         TRUE ~ sd_01),
+         z_score_transcript = (TPM - mean(TPM)) / SD)
+# cat("range:")
+# range(counts_zscore$z_score_transcript)
+# svg("Rplot_metat_pca_wholecommunity.svg", width = 7, height = 7)
+save(counts_zscore, bytax_counts_zscore, file = "zscore_whole_bytax.RData") 
+```
+
+> Take these and see if we can plot them directly. See section called, Whole community analysis z-score
+
+### Extract only curated TPMs
+
+```{r}
+# load("/scratch/group/hu-lab/pacocean-metaT/mean_counts_annotated.RData", verbose = TRUE)
+# glimpse(mean_counts_annotated)
+```
+
+#### Import KEGG IDs
+
+```{r}
+kegg <- read.csv("../KEGG_DB/combined_kegg.csv")
+# head(kegg$KO_number)
+curated_kegg <- read.csv("../KEGG_DB/reformat-kegg-pfam-skh.csv")
+
+key_geneid <- curated_kegg %>% 
+  select(-X) %>% 
+  right_join(kegg %>% select(KEGG = KO_number, everything(), -X)) %>% 
+  distinct() %>% 
+  select(starts_with("KeggOrthology_"), Category01, Category02, FullName, GeneID, Gene_identification, KEGG, PFAM, Descriptions, REF = REFs)
+```
+
+Subset key_geneid dataframe to select what we want from it.
+
+```{r}
+kegg_ortho_based <- key_geneid %>% 
+  select(KeggOrthology_B, KEGG, GeneID, Gene_identification) %>% 
+  filter(!is.na(KeggOrthology_B)) %>% 
+  distinct()
+kegg_curated <- key_geneid %>% 
+  select(Category01, Category02, KEGG, GeneID, Gene_identification) %>% 
+  filter(!is.na(Category01)) %>% 
+  distinct()
+```
+
+
+Isolate from `mean_counts_annotated`.
+```{r}
+mean_counts_curated_only <- curated_kegg %>% 
+  left_join(mean_counts_annotated %>% 
+              mutate(KEGG = str_remove(KEGG_ko, "ko:"))) %>%
+
+save(mean_counts_curated_only, file = "/scratch/group/hu-lab/pacocean-metaT/mean_counts_curated_only.RData")
+```
+
+
+
+
+# Metatranscriptome stats
+
+
+```{r}
+# load("/scratch/group/hu-lab/pacocean-metaT/mean_counts_annotated.RData", verbose = TRUE)
+# load("input-data/annot_files.RData", verbose = TRUE)
+# load("/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData", verbose = TRUE)
+
+# TEST RUN:
+load("/scratch/group/hu-lab/pacocean-metaT/TOY_TPM-count-tables.RData", verbose = TRUE)
+mean_counts_df <- TOY_mean_counts_df
+```
+
+
+Report total number of transcripts after assembly and annotation.
+
+```{r, echo=TRUE, eval=FALSE}
+length(unique(taxfxn_mini$SequenceID))
+# rows: 14,841,331
+
+length(unique(rownames(mean_counts_df)))
+# 14737135
+```
+
+The taxonomic and functional annotation output from Eukrhythmic has more than the total number of transcripts in the count table.
+
+```{r, echo=TRUE, eval=FALSE}
+in_counts <- as.character(unique(row.names(mean_counts_df)))
+
+subset_taxfxn <- taxfxn_mini %>% 
+  filter(SequenceID %in% in_counts)
+
+table(subset_taxfxn$Domain)
+
+subset_taxfxn %>% 
+  filter(Domain == "Eukaryota") %>% 
+  group_by(Supergroup) %>% 
+    summarise(COUNT = n())
+
+subset_01 <- subset_taxfxn %>% 
+  filter(Domain == "Eukaryota") %>% 
+  filter(Supergroup != "Unclassified")
+dim(subset_01)
+total <- dim(subset_01)[1]
+
+# Number of unannotated
+kegg <- length(unique((subset_01 %>% 
+                         filter(KEGG_ko == "-"))$SequenceID))
+go <- length(unique((subset_01 %>% 
+                       filter(GOs == "-"))$SequenceID))
+pfam <- length(unique((subset_01 %>% 
+                         filter(PFAMs == "-"))$SequenceID))
+
+# What transcripts have both taxonomic and functional annotation?
+subset_02 <- subset_01 %>% 
+  filter(Phylum != "Unclassified" & (KEGG_ko != "-" | GOs != "-" | PFAMs != "-"))
+
+```
+
+
+
+# Preprocess for taxonomic composition
+
+Create dataframes to evaluate taxonomic diversity and composition across all sites.
+```{r}
+load("/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData", verbose = TRUE)
 ```
 
 ```{r}
-scale_z_wreps <- scale(as.matrix(qc_df_subset_noreps), center = TRUE)
-# range(scale_z_wreps); median(scale_z_wreps)
+annotated_mean <- dplyr::left_join(mean_counts_df %>%
+                   mutate(SequenceID = rownames(mean_counts_df)),
+                                 taxfxn_mini,
+                                 by = "SequenceID")
 ```
 
-```{r}
-df_zscale_means <- as.data.frame(scale_z_wreps) %>%
-  rownames_to_column(var = "SequenceID") %>%
-  left_join(taxfxn_mini) %>%
-  pivot_longer(cols = starts_with("mean."), names_to = "SAMPLENAME", values_to = "zscore_TPM")
+Remove the duplicated annotations and make a base taxonomic dataframe for downstream work.
+
+```{r, echo=TRUE, eval=FALSE}
+# | echo: true
+# | eval: false
+tax_plot <- annotated_mean %>% 
+  select(Domain:Species, starts_with("mean"), SequenceID) %>% 
+  distinct()
+# dim(tax_plot) #14737624\
 ```
 
-```{r}
-save(df_zscale_means, scale_z_wreps, file = "/scratch/group/hu-lab/pacocean-metaT/zscore_output.RData")
+```{r, echo=TRUE, eval=FALSE}
+# | echo: true
+# | eval: false
+tax_only <- tax_plot %>% 
+  select(-SequenceID) %>% 
+  pivot_longer(cols = starts_with("mean"), names_to = "SAMPLE", values_to = "scaledTPM") %>% 
+  group_by(SAMPLE, Domain, Supergroup, Phylum, Class, Order, Family, Genus, Species) %>% 
+    summarise(SUM_scaledTPM = sum(scaledTPM)) 
+# save(tax_only, file = "tax_only_08242023.RData")
 ```
+
+# K-means clustering - pre-processing
+
+* Unsupervised learning technique that we will use to group together observations.
+* We provide a fixed number of clusters (centroid) that group togerher based on their signatures (similarities)
+
+
+Use a series of Rscripts below. Start with `run-kmeans_01.R`
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(broom)
+load("/scratch/group/hu-lab/pacocean-metaT/vst_formatted_forlocaluse.RData", verbose = TRUE)
+```
+
+> WHAT INPUT DO I USE HERE? is is the vst?
+
+
+```{r}
+# Modify input dataframe
+kmeans_input_pac <- mean_ctr_df %>% 
+  select(SequenceID, starts_with("mean.")) %>% 
+  distinct() #%>%
+  # sample_n(20000) # subsample for non-remote option
+
+# colnames(kmeans_input_pac)
+head(kmeans_input_pac)
+```
+
+We do not know the optimal number of clusters, so we have to look at the total within-cluster sum of squares versus the number of k. We want the total within cluster sum of squares `tot.withinss` to be smaller. So we want to pick the number of clusters that represents that, without getting too many clusters out.
+
+Total within cluster sum of squares `tot.withinss`: the distance from all observations to the global centroid. Smaller values suggest that the observations within the cluster are closer together (or more similar).
+
+```{r, fig.height=4, fig.width=6}
+# | echo: true
+# | eval: false
+
+kclusts <-
+  tibble(k = 5:35) %>%
+  mutate(
+    kclust = map(k, ~ kmeans(select(kmeans_input_pac, -SequenceID), .x)),
+    glanced = map(kclust, glance)
+  )
+
+output_kclusts <- kclusts %>%
+  unnest(cols = c(glanced))
+
+write_delim(output_kclusts, file = "input-data/output_kclusts.txt")
+```
+
+Run the below code when you can use a visualizer.
+
+```{r}
+output_kclusts <- read_delim("input-data/output_kclusts.txt")
+
+output_kclusts %>% 
+  ggplot(aes(x = k, y = tot.withinss)) +
+    geom_line(alpha = 0.5, size = 1.2, color = "darkgreen") +
+    geom_point(size = 2, color = "darkgreen") +
+  theme_linedraw() +
+  geom_vline(xintercept = 25, color = "orange")
+```
+
+Based on the output above, clusters between 20-25 should be okay. I plan to use 25, where the orange line is showing the main "elbow" of the figure.
+
+Run k-means clustering with our chosen number of clusters, See script `run-kmeans_02.R`
+
+```{r}
+# | echo: true
+# | eval: false
+pac25_clust <- kmeans(select(kmeans_input_pac, -SequenceID), centers = 25)
+
+summary(pac25_clust)
+
+
+broom::tidy(pac25_clust)
+# ?augment()
+
+augment_pacocean <- augment(pac25_clust, kmeans_input_pac)
+df_kmeans_pacoce <- (data.frame(augment_pacocean))
+
+save(df_kmeans_pacoce, file = "kmeansoutput-pacificocean-metaT.RData")
+```
+
+# BREAK
 
 # DEseq2 reanalysis for DE genes
 
@@ -617,9 +904,6 @@ save(ds_tpm_subeuphotic, ds_tpm_euphotic, file = "/vortexfs1/scratch/sarahhu/txi
 # save(txi_euph, txi_subeuph, file = "/vortexfs1/scratch/sarahhu/txi-objs-metaT/light_txi.RData")
 ```
 
-# By taxonomic groups - DESeq
-
-Compare and contrast within regions. For part of our analysis we want to subset only the euphotic zone samples. Specifically targeting the difference between the SPOT station surface compared to: NPSG surface, NPSG DCM, NPSG 150m, Port of LA, and Catalina.
 
 ## Question 1
 
@@ -706,6 +990,69 @@ We can repeat the above approach, but select different taxa.
 
 Use `scripts/run_bydepth_deseq_taxa.R`.
 
+# July versus March for NPSG
+
+```{r}
+library(tidyverse)
+library(DESeq2)
+load("/scratch/group/hu-lab/pacocean-metaT/Robjs/npsg-deseq.RData", verbose = TRUE)
+# Compare July vs. March in the NPSG
+# ds_tpm_npsg_month <- DESeqDataSetFromTximport(txi_npsg,
+#                                               colData = tmp_sample_merged,
+#                                               design = ~0 + MONTH)
+```
+
+How many genes are differentially expressed between July and March?
+
+```{r}
+## Positive log fold change == up regulated in July, compared to March
+ds_tpm_npsg_month$MONTH <- factor(ds_tpm_npsg_month$MONTH, levels = c("March", "July"))
+
+de_month <- DESeq(ds_tpm_npsg_month)
+
+results_month <- results(de_month, alpha=0.05)
+# plotMA(results_month)
+out <- summary(results_month)
+write.csv(out, file = "summary-months.csv")
+
+# Plot log fold change
+svg("rplot-month.svg", width = 9, height = 8)
+data.frame(results_month) %>% 
+  mutate(REGULATION = case_when(
+    log2FoldChange > 0 ~ "upregulated in July",
+    log2FoldChange < 0 ~ "upregulated in March"
+  ),
+  SIGNIFICANT = case_when(
+    pvalue <= 0.05 ~ "Significantly",
+    TRUE ~ "Not significantly"
+  )) %>% 
+  ggplot(aes(x = baseMean, y = log2FoldChange, color = SIGNIFICANT)) +
+    geom_point(stat = "identity") +
+    scale_x_log10() +
+    theme_classic() +
+    scale_color_manual(values = c("#878787", "#d73027")) +
+    labs(title = mcols(results_month)$description[2])
+dev.off()
+
+# Get table
+month_transcripts <- data.frame(results_month) %>% 
+  mutate(REGULATION = case_when(
+    log2FoldChange > 0 ~ "upregulated in July",
+    log2FoldChange < 0 ~ "upregulated in March"
+  ),
+  SIGNIFICANT = case_when(
+    pvalue <= 0.05 ~ "Significantly",
+    TRUE ~ "Not significantly"
+  )) %>% 
+  filter(SIGNIFICANT == "Significantly") %>% 
+  rownames_to_column(var = "SequenceID")
+
+write.csv(month_transcripts, file = "/scratch/group/hu-lab/pacocean-metaT/month-transcripts.csv")
+```
+
+
+
+## RM BELOW?
 # Curated genes only
 
 Here, we isolated annotated transcripts that we curated ourselves.
@@ -775,62 +1122,3 @@ ctr_norm_curated <- df_ctr_norm_curated %>%
 save(ctr_norm_curated, ds_tpm_curated, file = "normed_center_df_curated_08252023.RData")
 ```
 
-# July versus March for NPSG
-
-```{r}
-library(tidyverse)
-library(DESeq2)
-load("/scratch/group/hu-lab/pacocean-metaT/Robjs/npsg-deseq.RData", verbose = TRUE)
-# Compare July vs. March in the NPSG
-# ds_tpm_npsg_month <- DESeqDataSetFromTximport(txi_npsg,
-#                                               colData = tmp_sample_merged,
-#                                               design = ~0 + MONTH)
-```
-
-How many genes are differentially expressed between July and March?
-
-```{r}
-## Positive log fold change == up regulated in July, compared to March
-ds_tpm_npsg_month$MONTH <- factor(ds_tpm_npsg_month$MONTH, levels = c("March", "July"))
-
-de_month <- DESeq(ds_tpm_npsg_month)
-
-results_month <- results(de_month, alpha=0.05)
-# plotMA(results_month)
-out <- summary(results_month)
-write.csv(out, file = "summary-months.csv")
-
-# Plot log fold change
-svg("rplot-month.svg", width = 9, height = 8)
-data.frame(results_month) %>% 
-  mutate(REGULATION = case_when(
-    log2FoldChange > 0 ~ "upregulated in July",
-    log2FoldChange < 0 ~ "upregulated in March"
-  ),
-  SIGNIFICANT = case_when(
-    pvalue <= 0.05 ~ "Significantly",
-    TRUE ~ "Not significantly"
-  )) %>% 
-  ggplot(aes(x = baseMean, y = log2FoldChange, color = SIGNIFICANT)) +
-    geom_point(stat = "identity") +
-    scale_x_log10() +
-    theme_classic() +
-    scale_color_manual(values = c("#878787", "#d73027")) +
-    labs(title = mcols(results_month)$description[2])
-dev.off()
-
-# Get table
-month_transcripts <- data.frame(results_month) %>% 
-  mutate(REGULATION = case_when(
-    log2FoldChange > 0 ~ "upregulated in July",
-    log2FoldChange < 0 ~ "upregulated in March"
-  ),
-  SIGNIFICANT = case_when(
-    pvalue <= 0.05 ~ "Significantly",
-    TRUE ~ "Not significantly"
-  )) %>% 
-  filter(SIGNIFICANT == "Significantly") %>% 
-  rownames_to_column(var = "SequenceID")
-
-write.csv(month_transcripts, file = "/scratch/group/hu-lab/pacocean-metaT/month-transcripts.csv")
-```
