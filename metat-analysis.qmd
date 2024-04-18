@@ -66,9 +66,9 @@ Start by importing all TPM results. Below R objects sourced by first isolating o
 # | echo: true
 # | eval: false
 # load(file = "/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData", verbose = TRUE)
-
+load(file = "input-data/TOY_TPM-count-tables.RData", verbose = TRUE)
 # load(file = "input-data/TPM-count-tables.RData")
-load(file = "input-data/annot_files.RData")
+# load(file = "input-data/annot_files.RData")
 ```
 
 Import metadata as well.
@@ -88,6 +88,7 @@ sample_metadata
 ```
 
 Import annotated TPMs
+
 ```{r}
 # load("/scratch/group/hu-lab/pacocean-metaT/mean_counts_annotated.RData", verbose)
 ```
@@ -95,16 +96,27 @@ Import annotated TPMs
 ## Whole community analysis z-score
 
 ```{r}
-load("/scratch/group/hu-lab/pacocean-metaT/zscore_whole_and_bytax.RData", verbose = TRUE)
+load("input-data/zscore_TPM10.RData", verbose = TRUE)
+# load("/scratch/group/hu-lab/pacocean-metaT/zscore_whole_and_bytax.RData", verbose = TRUE)
 ```
-make a toy dataset to use here and write a script later
-```{r}
 
+```{r}
+glimpse(counts_zscore_TPM10)
 ```
 
 Import z-score data frame for overview plot.
+
+```{r}
+sample_zscore_order <- c("NPSG ALOHA surface", "NPSG ALOHA DCM", "NPSG ALOHA 150 m", "NPSG ALOHA 1000 m", "CA Catalina surface", "CA PortsdfofLA surface", "CA SPOT surface", "CA SPOT 150 m", "CA SPOT 890 m")
+```
+
+
 ```{r, fig.width=15, fig.height=6}
-ggplot(counts_zscore, aes(x = SequenceID, y = SAMPLENAME, fill = z_score_transcript)) +
+counts_zscore_TPM10 %>% 
+  select(SequenceID, SAMPLENAME, z_score_transcript, PACIFIC_REGION) %>% 
+  distinct() %>% 
+  mutate(SAMPLENAME_ORDER = factor(SAMPLENAME, levels = sample_zscore_order)) %>% 
+ggplot(aes(x = SequenceID, y = SAMPLENAME_ORDER, fill = z_score_transcript)) +
   geom_tile() +  theme(axis.text.x = element_blank(),
                        axis.ticks = element_blank(),
                        axis.text.y = element_text(color = "black")) +
@@ -112,25 +124,28 @@ ggplot(counts_zscore, aes(x = SequenceID, y = SAMPLENAME, fill = z_score_transcr
                                "#eff3ff", "#fef0d9", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f"),
                       # breaks = c(-1, -0.75, -0.5, -0.25 ,0, 1, 3, 5, 7, 10),
                       # limits = c(-1, 11),
+                     na.value = "grey50",
                       guide = guide_coloursteps(even.steps = TRUE,
                                                 show.limits = TRUE)) +
-  labs(x = "Transcript signature", y = "")
+  labs(x = "Transcript signature", y = "") +
+  facet_grid(cols = vars("PACIFIC_REGION"))
 ```
 
 Import z-score scale by taxonomic groups to see how z-scores vary by group.
+
 ```{r, fig.width=15, fig.height=20}
-ggplot(bytax_counts_zscore, aes(x = SequenceID, y = SAMPLENAME, fill = z_score_transcript)) +
-  geom_tile() +  theme(axis.text.x = element_blank(),
-                       axis.ticks = element_blank(),
-                       axis.text.y = element_text(color = "black")) +
-   scale_fill_stepsn(colors = c("#084594", "#4292c6","#c6dbef",
-                               "#eff3ff", "#fef0d9", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f"),
-                      # breaks = c(-1, -0.75, -0.5, -0.25 ,0, 1, 3, 5, 7, 10),
-                      # limits = c(-1, 11),
-                      guide = guide_coloursteps(even.steps = TRUE,
-                                                show.limits = TRUE)) +
-  facet_grid(rows = vars(SUPERGROUP)) +
-  labs(x = "Transcript signature", y = "")
+# ggplot(bytax_counts_zscore, aes(x = SequenceID, y = SAMPLENAME, fill = z_score_transcript)) +
+#   geom_tile() +  theme(axis.text.x = element_blank(),
+#                        axis.ticks = element_blank(),
+#                        axis.text.y = element_text(color = "black")) +
+#    scale_fill_stepsn(colors = c("#084594", "#4292c6","#c6dbef",
+#                                "#eff3ff", "#fef0d9", "#fdbb84", "#fc8d59", "#ef6548", "#d7301f"),
+#                       # breaks = c(-1, -0.75, -0.5, -0.25 ,0, 1, 3, 5, 7, 10),
+#                       # limits = c(-1, 11),
+#                       guide = guide_coloursteps(even.steps = TRUE,
+#                                                 show.limits = TRUE)) +
+#   facet_grid(rows = vars(SUPERGROUP)) +
+#   labs(x = "Transcript signature", y = "")
 ```
 
 # Taxonomic composition & distribution
@@ -380,8 +395,6 @@ as.data.frame(annotated_mean %>%
   mutate(Percent_annotated = 100*(`Number annotated`/length(annotated_mean$SequenceID)))
 ```
 
-
-
 # Ordination analysis
 
 Import center scaled data.
@@ -403,14 +416,11 @@ range(vst_format_subset$MEAN_VALUE)
 load("/scratch/group/hu-lab/pacocean-metaT/TOY_vst_formatted_forloca  ")
 ```
 
-
-
 ## PCoA with whole community functional profile
 
 Ahead of time, normalized community composition data was center scaled. Below, we can import this dataset and perform principle component analysis.
 
 Import normalized center data. Below, principle component calculations were done on HPC.
-
 
 > TRY WITH VST DATA?
 
@@ -464,11 +474,9 @@ pca_df %>%
     labs(x =  paste(pc1, "%"), y = paste(pc2, "%"))
 ```
 
-
 ## Hierarchical clustering
 
-Making toy data set first, to test code.
-Need to input the processed center normalized data for below. 
+Making toy data set first, to test code. Need to input the processed center normalized data for below.
 
 > TRY WITH VST DATA?
 
@@ -479,7 +487,6 @@ library(factoextra)
 tmp_500 <- df_ctr_norm %>% sample_n(500) 
 head(df_ctr_norm)
 ```
-
 
 ```{r}
 # df_ctr_norm_dist <- dist(df_ctr_norm, method = "euclidean")
@@ -510,8 +517,8 @@ dendro_plot_output <- ggplot(segment(dendro_plot_df)) +
         plot.margin = margin(1,4,1,1, "cm"))
 dendro_plot_output
 ```
-> Save label order from above. Then put in the kmeans output.
 
+> Save label order from above. Then put in the kmeans output.
 
 # K-means clustering
 
@@ -720,10 +727,6 @@ TPM_wcluster %>%
   labs(y = "TPM", x = "")
 ```
 
-
-
-
-
 # Import KEGG IDs
 
 These have been curated.
@@ -791,25 +794,24 @@ geneid_order_hets
 # Question 1 - N&P metabolism in the euphotic region
 
 Load only curated TPM information
+
 ```{r}
 load(file = "/scratch/group/hu-lab/pacocean-metaT/mean_counts_curated_only.RData", verbose = TRUE)
 ```
 
 # Question 2 - Heterotrophic modes of nutrition
 
-
 Load only curated TPM information
+
 ```{r}
 load(file = "/scratch/group/hu-lab/pacocean-metaT/mean_counts_curated_only.RData", verbose)
 ```
 
-
 # BREAK
+
 # Untargeted - DE transcripts
 
 # Prep to address key questions (local)
-
-
 
 ## Prepare data frames for targeted approach
 
@@ -936,7 +938,6 @@ tmp2 %>%
                       guide = guide_coloursteps(even.steps = TRUE,
                                                 show.limits = TRUE))
 ```
-
 
 # Question 1
 
@@ -2109,7 +2110,6 @@ het_TPM_scale %>%
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 ```
 
-
 ### z-score for heterotrophy
 
 ```{r}
@@ -2159,8 +2159,6 @@ reformat_het_02 %>%
   #   aesthetics = "fill"
   # )
 ```
-
-
 
 ### Tree map
 

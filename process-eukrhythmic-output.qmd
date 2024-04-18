@@ -30,7 +30,6 @@ editor: visual
 -   `04-compare`
     -   `14-MAD-mapping-filtered`: location of individual salmon outputs for all samples (quant.sf)
 
-
 ## Import library normalized count data
 
 R script to run this: `scripts/run_tximport.R`.
@@ -148,7 +147,6 @@ VST and rlog remove dependence of the variance on the mean. Both transformations
 
 Above, the `DESeq()` was already run, so dispersions were estimated. Therefore use `blind = FALSE` below.
 
-
 ```{r}
 # Estiamte scaled datasets by VST
 vst_all <- vst(dds_dis_all, blind = FALSE) 
@@ -172,6 +170,7 @@ df_ctr_norm_subset_rld <- as.data.frame(assay(rld_subset))
 Output from `pacificocean-metaT/scripts/run_deseq_vst_rlog_transformed.R`.
 
 Save this centered data (2 ways) and reformat with annotations and more (see function below)
+
 ```{r}
 # save(rld_all, rld_subset, df_ctr_norm_rld, df_ctr_norm_subset_rld, file = "/scratch/group/hu-lab/pacocean-metaT/normed_dfs_rld.RData")
 # 
@@ -182,8 +181,8 @@ Save this centered data (2 ways) and reformat with annotations and more (see fun
 # load("/scratch/group/hu-lab/pacocean-metaT/normed_dfs_rld.RData", verbose = TRUE)
 ```
 
-
 TOY dataset to work with.
+
 ```{r}
 # toy_df_ctr_norm_rld <- df_ctr_norm_rld %>% 
 #   sample_n(600)
@@ -193,7 +192,6 @@ TOY dataset to work with.
 # 
 # save(toy_df_ctr_norm_rld, toy_df_ctr_norm_subset_rld, file = "/scratch/group/hu-lab/pacocean-metaT/TOY_normed_dfs_rld.RData")
 ```
-
 
 Function to combine replicates and include annotation information for normalized dataframes
 
@@ -230,8 +228,8 @@ convert_format_scaled <- function(df){
 # save(vst_format_subset, vst_format_all, file = "/scratch/group/hu-lab/pacocean-metaT/vst_formatted_forlocaluse.RData")
 ```
 
-
 Generate a TOY dataset to work with locally.
+
 ```{r}
 # TOY_vst_format_subset <- vst_format_subset %>% 
 #   sample_n(600)
@@ -289,8 +287,8 @@ mean_counts_df <- counts_df %>%
 # save(counts_withreps, mean_counts_df, sample_merged, file = "/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData")
 ```
 
-
 ### Set up toy dataset
+
 ```{r}
 load("/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData", verbose = TRUE)
 load("/scratch/group/hu-lab/pacocean-metaT/TOY_TPM-count-tables.RData", verbose = TRUE)
@@ -298,7 +296,6 @@ load("/scratch/group/hu-lab/pacocean-metaT/TOY_TPM-count-tables.RData", verbose 
   sample_n(600)
 # save(sample_merged, TOY_mean_counts_df, file = "/scratch/group/hu-lab/pacocean-metaT/TOY_TPM-count-tables.RData")
 ```
-
 
 ## Annotate count table
 
@@ -319,13 +316,11 @@ mean_counts_annotated <- mean_counts_df %>%
 # save(mean_counts_annotated, file = "/scratch/group/hu-lab/pacocean-metaT/TOY_mean_counts_annotated.RData")
 ```
 
-
 ### Extract z-score table
 
 Standardizing to z-scores will make it easier to compare across the large dataset. And we will be able to detect outliers and anomalies.
 
 First to do some data quality control based on data table that includes all replicates.
-
 
 ```{r}
 # load("/scratch/group/hu-lab/pacocean-metaT/mean_counts_annotated.RData", verbose = TRUE)
@@ -346,8 +341,8 @@ cat("range:")
 range(counts_zscore$z_score_transcript)
 ```
 
-
 #### Calculate Z-score over transcripts by species
+
 ```{r}
 # head(mean_counts_annotated)
 ```
@@ -411,8 +406,8 @@ kegg_curated <- key_geneid %>%
   distinct()
 ```
 
-
 Isolate from `mean_counts_annotated`.
+
 ```{r}
 mean_counts_curated_only <- curated_kegg %>% 
   left_join(mean_counts_annotated %>% 
@@ -421,11 +416,7 @@ mean_counts_curated_only <- curated_kegg %>%
 save(mean_counts_curated_only, file = "/scratch/group/hu-lab/pacocean-metaT/mean_counts_curated_only.RData")
 ```
 
-
-
-
 # Metatranscriptome stats
-
 
 ```{r}
 # load("/scratch/group/hu-lab/pacocean-metaT/mean_counts_annotated.RData", verbose = TRUE)
@@ -436,7 +427,6 @@ save(mean_counts_curated_only, file = "/scratch/group/hu-lab/pacocean-metaT/mean
 load("/scratch/group/hu-lab/pacocean-metaT/TOY_TPM-count-tables.RData", verbose = TRUE)
 mean_counts_df <- TOY_mean_counts_df
 ```
-
 
 Report total number of transcripts after assembly and annotation.
 
@@ -483,11 +473,10 @@ subset_02 <- subset_01 %>%
 
 ```
 
-
-
 # Preprocess for taxonomic composition
 
 Create dataframes to evaluate taxonomic diversity and composition across all sites.
+
 ```{r}
 load("/scratch/group/hu-lab/pacocean-metaT/TPM-count-tables.RData", verbose = TRUE)
 ```
@@ -523,9 +512,8 @@ tax_only <- tax_plot %>%
 
 # K-means clustering - pre-processing
 
-* Unsupervised learning technique that we will use to group together observations.
-* We provide a fixed number of clusters (centroid) that group togerher based on their signatures (similarities)
-
+-   Unsupervised learning technique that we will use to group together observations.
+-   We provide a fixed number of clusters (centroid) that group togerher based on their signatures (similarities)
 
 Use a series of Rscripts below. Start with `run-kmeans_01.R`
 
@@ -536,7 +524,6 @@ load("/scratch/group/hu-lab/pacocean-metaT/vst_formatted_forlocaluse.RData", ver
 ```
 
 > WHAT INPUT DO I USE HERE? is is the vst?
-
 
 ```{r}
 # Modify input dataframe
@@ -904,7 +891,6 @@ save(ds_tpm_subeuphotic, ds_tpm_euphotic, file = "/vortexfs1/scratch/sarahhu/txi
 # save(txi_euph, txi_subeuph, file = "/vortexfs1/scratch/sarahhu/txi-objs-metaT/light_txi.RData")
 ```
 
-
 ## Question 1
 
 For the first of our two core questions, we want to know what genes are significantly differentially expressed among the euphotic zone samples for the dominant protistan phytoplankton. We are specifically focusing on diatoms, chlorophytes, archaeplastidia (chlorophya), dinoflagellates, and haptophytes for this.
@@ -1050,9 +1036,8 @@ month_transcripts <- data.frame(results_month) %>%
 write.csv(month_transcripts, file = "/scratch/group/hu-lab/pacocean-metaT/month-transcripts.csv")
 ```
 
-
-
 ## RM BELOW?
+
 # Curated genes only
 
 Here, we isolated annotated transcripts that we curated ourselves.
@@ -1121,4 +1106,3 @@ ctr_norm_curated <- df_ctr_norm_curated %>%
 ```{r}
 save(ctr_norm_curated, ds_tpm_curated, file = "normed_center_df_curated_08252023.RData")
 ```
-
